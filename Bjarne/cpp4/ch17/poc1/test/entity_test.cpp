@@ -5,30 +5,20 @@
 #include <sstream>
 #include <iostream>
 
-void simple(
-    std::function<void(void)> code,
-    std::string_view expected
-) {
-    // https://en.cppreference.com/w/cpp/io/basic_ios/rdbuf
+TEST(ch17, move)
+{
     std::ostringstream sout;
     auto cout_buf = std::cout.rdbuf();
     std::cout.rdbuf(sout.rdbuf());
 
-    code();
-
-    std::cout.rdbuf(cout_buf);
-    EXPECT_EQ(sout.str(), expected);
-}
-
-
-TEST(ch17, move)
-{
-    std::function<void(void)> code = []() {
+    {
         Entity e1 {"foo"};
         e1 = f(e1);
         Entity e2 {"bar"};
         e1 = e2;
-    };
+    }
+
+    std::cout.rdbuf(cout_buf);
     std::string_view expected {
         "ctor: foo\n"
         "copy ctor: foo\n"
@@ -41,5 +31,5 @@ TEST(ch17, move)
         "dtor: bar\n"
         "dtor: bar\n"
     };
-    simple(code, expected);
+    EXPECT_EQ(sout.str(), expected);
 }
