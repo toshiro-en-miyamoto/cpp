@@ -45,4 +45,68 @@ void use(int n)
 }
 ```
 
-- 4.3.3 Conversion
+## Statememtns
+
+Expression statements:
+
+```c++
+a = b;
+++b;
+```
+
+Note that the assignment `=` is an operator so that `a = b` is an expression. We need the terminating semicolon to make the expression a statement.
+
+Declarations:
+
+```c++
+int a = 7;
+```
+
+Other statements:
+
+- empty statements
+- `if`-statements
+- `switch`-statements
+- `while`-statements
+- `for`-statements
+
+## Functions
+
+```c++
+for (int i = 0; i < 100, ++i)
+    cout << i << '\t' << square(i) << '\n';
+```
+
+What was `square(i)`? It is a call of the function called `square` with the argument `i`.
+
+Here is a plausible definition of `square`:
+
+```c++
+int square(int x)
+{
+    return x * x;
+}
+```
+
+The syntax of a *function definition*:
+
+```
+type identifier ( parameter-list ) function-body
+```
+
+- type: the type of the return value
+- identifier: the name of the function
+- parameter-list: a list of parameter in parentheses
+- function-body: the statements to be executed
+
+All the information needed to call a function was in the first line of its definition. It is called a *function declaration*. Note that a terminating semicolon is used instead of the function body.
+
+```c++
+int square(int x);
+```
+
+Given that, we know enough to say
+
+```c++
+int resukt = square(44);
+```
