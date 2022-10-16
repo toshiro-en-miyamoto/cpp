@@ -1,10 +1,10 @@
 cc_test(
-    name = "greet",
+    name = "hello-test",
     size = "small",
-    srcs = ["greet_test.cpp"],
+    srcs = ["hello-test.cc"],
     copts = ["-std=c++20"],
     deps = [
         "@com_google_googletest//:gtest_main",
-        "//Bjarne/prog2/ch03/main:greet",
+        "//stage2ut/main:hello-greet",
     ],
 )
