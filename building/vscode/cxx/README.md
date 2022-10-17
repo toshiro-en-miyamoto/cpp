@@ -16,7 +16,7 @@ $ gdb --version
 GNU gdb (Debian 10.1-1.7) 10.1.90.20210103-git
 ```
 
-![C/C++ for Visual Studio Code](cxx4vscode.png)
+![C/C++ extension for VS Code](cxx.png)
 
 As you go through the tutorial, you will create three files in a `.vscode` folder in the workspace:
 
