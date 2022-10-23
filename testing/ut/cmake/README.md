@@ -15,7 +15,7 @@ Get the latest header from [here](https://github.com/boost-ext/ut/blob/master/in
 
 Note that the directory `.` in this document represents the root direcory of the `UT-Tutorial` project.
 
-### Set up VS Code and Git
+### Integrating VS Code and Git
 
 Before writing your test code, `c_cpp_properties.json` and `tasks.json` in `.vscode` directory will help you write your test code.
 
@@ -213,3 +213,51 @@ This is because the `args` value of the above-mentioned `tasks.json` tells the C
 
 - `"-o",`
 - `"${fileDirname}/${fileBasenameNoExtension}.out"`
+
+### Integrating CMake
+
+Let's integrate CMake and UT.
+
+```
+.:
+    CMakeLists.txt
+./.vscode:
+    c_cpp_properties.json
+    tasks.json
+./test:
+    CMakeLists.txt
+./test/include:
+./test/include/boost:
+    ut.hpp
+./test/tutorial:
+    CMakeLists.txt
+    step01.cpp
+```
+
+The project `CMakeLists.txt`:
+
+```cmake
+# ./CMakeLists.txt
+cmake_minimum_required(VERSION 3.23)
+project(microTestTutorial CXX)
+add_subdirectory(test)
+```
+
+The Test `CMakeLists.txt`:
+
+```cmake
+enable_testing()
+add_subdirectory(tutorial)
+```
+
+The Test/Tutorial `CMakeLists.txt`:
+
+```cmake
+add_executable(step01 step01.cpp)
+target_compile_features(    step01 PRIVATE cxx_std_20)
+target_include_directories( step01 PRIVATE
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>"
+)
+add_test(Name Step-01 Command step01)
+```
+
