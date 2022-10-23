@@ -1,31 +1,12 @@
-# How to install the latest `cmake`
+# CMake Resources
 
-Visit [github:Kitware/CMake](https://github.com/Kitware/CMake/releases) to check the latest release:
+`Swidzinski`
+- *Modern CMake for C++*
+- by Rafał Świdziński
+- Feb 2022
+- Packt Publishing
+- ISBN 978-1-80107-005-8
 
-```bash
-$ cd ~/work
-$ wget -O cmake.sh https://github.com/Kitware/CMake/releases/download/v3.23.4/cmake-3.23.4-linux-aarch64.sh
+`tutorial`
+- CMake Documentation >> [CMake Tutorial](https://cmake.org/cmake/help/latest/guide/tutorial/index.html)
 
-$ cd /usr/local
-$ sudo bash ~/work/cmake.sh
-$ sudo mv cmake-3.23.4-linux-aarch64 cmake-3.23.4
-```
-
-Edit `~/.profile` to add the path to `cmake`:
-
-```bash
-# set PATH to cmake
-PATH="/usr/local/cmake-3.23.4/bin:$PATH"
-```
-
-Log out or run `'. .profile'`, then make sure the location and version of `cmake`:
-
-```bash
-$ which cmake
-/usr/local/cmake-3.23.4/bin/cmake
-
-$ cmake --version
-cmake version 3.23.4
-```
-
-You may now remove `~/work/cmake.sh`.
