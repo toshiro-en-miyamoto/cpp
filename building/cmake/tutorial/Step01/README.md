@@ -1,5 +1,21 @@
 # A Basic Starting Point
 
+In this step, we will learn the following topics:
+
+- configuring a CMake project
+- building an executable
+- specifying the C++ standard
+- configured header files
+
+and the following `cmake` commands:
+
+- `cmake_minimum_required`
+- `project`
+- `add_executable`
+- `set: CMAKE_CXX_STANDARD`
+- `configure_file`
+- `target_include_directories`
+
 ## Exercise 1 - Building a Basic Project
 
 Create a simple CMake project. Files in the `Step01` directory:
