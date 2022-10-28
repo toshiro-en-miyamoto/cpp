@@ -345,7 +345,7 @@ Total Test time (real) =   0.01 sec
 
 ### `.gitignore`
 
-It is a basic `.gitignore` template to work with CMake.
+It is a basic `.gitignore` template created by VS Code CMake Tools extension:
 
 ```
 build/
@@ -365,9 +365,9 @@ CMakeFiles/
 **/compile_commands.json
 ```
 
-Unlike `.gitignore` for C/C++ projects, our `.gitignore` does not include binary files produced by compiler or linker such as libraries (`.o` or `a`) and executables. CMake can be configured to place such binrary files in a so-called *build* directory. Our top-level `CMakeLists.txt` specifies `.build/` as the build directory, which is included at the beginning of our `gitignore`.
+Unlike `.gitignore` for C/C++ projects, our `.gitignore` does not include binary files produced by compiler or linker such as libraries (`.o` or `a`) and executables. CMake can be configured to place such binrary files in a so-called *build* directory. Our top-level `CMakeLists.txt` specifies `.build/` as the build directory, which is included at the beginning of our `.gitignore`.
 
-### `c_cpp_properties.json`
+### `~/.vscode/c_cpp_properties.json`
 
 ```json
 {
@@ -395,6 +395,25 @@ In the `includePath`, we are assuming that
 - `boost/ut.hpp` is located at `${workspaceFolder}/test` directory.
 
 UT requires C++20, so does the `cppStandard`.
+
+### `~/.vscode/settings.json`
+
+Once the project is configured with VS Code CMake Tools extension, the following file is created:
+
+```json
+{
+    "cmake.sourceDirectory": "${workspaceFolder}/."
+}
+```
+
+Then you can work with CMake via the Status bar:
+
+![Status bar](statusbar.png)
+
+- build the project
+- debug an executable
+- run executables
+- run CTest tests
 
 # UT Tutorial
 
