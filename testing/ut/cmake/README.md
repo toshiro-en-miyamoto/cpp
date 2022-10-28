@@ -4,6 +4,8 @@
 
 # CMake Integration
 
+## Directory structure
+
 We have the following CMake project to check if CMake and UT work together. The top-level directory is represented as `./`.
 
 ```
@@ -157,16 +159,16 @@ add_subdirectory(zzz)
 
 [A primary use case for INTERFACE library](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#interface-libraries)  is header-only libraries. Since CMake 3.23, header files may be associated with a library by adding them to a header set using the `target_sources()` command.
 
-`test/zzz/CMakeLists.txt` builds the executable `uthello` as follows:
+`test/zzz/CMakeLists.txt` builds the executable `hello_ut` as follows:
 
 ```cmake
-add_executable(uthello hello_test.cpp)
-target_link_libraries(uthello
+add_executable(hello_ut hello_test.cpp)
+target_link_libraries(hello_ut
     PUBLIC hello ut cxx_std
 )
 ```
 
-With the INTERFACE library `ut` to be linked with the `uthello` target, `test/zzz/hello_test.cpp` can include `<boost/ut.hpp>`:
+With the INTERFACE library `ut` to be linked with the `hello_ut` target, `test/zzz/hello_test.cpp` can include `<boost/ut.hpp>`:
 
 ```c++
 #include "hello.h"
@@ -181,6 +183,162 @@ int main()
         expect("Hello world" == actual);
     };
 }
+```
+
+## Configure, Build and Run
+
+Although we have not added `hello_ut` as CMake tests, we can run the executable manually.
+
+At the top-level directory, run `cmake` to configure the project with
+- the `<top-level>` directory as the source directory root and
+- the `<top-level>/build` as the build directory:
+
+```bash
+<top-level> $ cmake -B build
+-- The CXX compiler identification is GNU 10.2.1
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /<top-level>/build
+```
+
+Then run CMake to build:
+
+```bash
+<top-level> $ cmake --build build
+[ 25%] Building CXX object bin/zzz/CMakeFiles/hello.dir/hello.cpp.o
+[ 50%] Linking CXX static library libhello.a
+[ 50%] Built target hello
+[ 75%] Building CXX object test/zzz/CMakeFiles/hello_ut.dir/hello_test.cpp.o
+[100%] Linking CXX executable hello_ut
+[100%] Built target hello_ut
+```
+
+Now that `libhello.a` and `hello_ut` have been built, you can run the test code with UT:
+
+```bash
+<top-level> $ build/test/zzz/hello_ut
+All tests passed (1 asserts in 1 tests)
+```
+
+## Add tests to CTest
+
+Add [`enable_testing()`](https://cmake.org/cmake/help/latest/command/enable_testing.html) command in the top-level `CMakeLists.txt`, which enables testing for this directory and below.
+
+```cmake
+cmake_minimum_required(VERSION 3.23)
+project(microTestTutorial CXX)
+enable_testing()
+
+add_library(cxx_std INTERFACE)
+target_compile_features(cxx_std INTERFACE cxx_std_20)
+
+add_subdirectory(main)
+add_subdirectory(test)
+```
+
+This command should be in the source directory root (`<top-level>`) because `ctest` expects to find a test file in the build directory root (`<top-level>/build`).
+
+Then `test/zzz/CMakeLists.txt` file can add executables as tests:
+
+```cmake
+add_executable(hello_ut hello_test.cpp)
+target_link_libraries(hello_ut
+    PUBLIC hello ut cxx_std
+)
+
+add_test(NAME Hello_UT COMMAND hello_ut)
+```
+
+Let's run the tests with CTest:
+
+```bash
+<top-level> $ cmake -B build
+-- The CXX compiler identification is GNU 10.2.1
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: <top-level>/build
+
+<top-level> $ cmake --build build
+[ 25%] Building CXX object bin/zzz/CMakeFiles/hello.dir/hello.cpp.o
+[ 50%] Linking CXX static library libhello.a
+[ 50%] Built target hello
+[ 75%] Building CXX object test/zzz/CMakeFiles/hello_ut.dir/hello_test.cpp.o
+[100%] Linking CXX executable hello_ut
+[100%] Built target hello_ut
+
+<top-level> $ cd build
+
+build $ ctest
+Test project <top-level>/build
+    Start 1: Hello_UT
+1/1 Test #1: Hello_UT .........................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.02 sec
+```
+
+You have to move to `build` directory to run `ctest` because again, `ctest` expects to find a test file in the build directory root (`<top-level>/build`).
+
+CTest provides the [Build and Test mode](https://cmake.org/cmake/help/latest/manual/ctest.1.html#build-and-test-mode), which is to configure (i.e. run cmake on), build, and/or execute a test:
+
+```
+ctest --build-and-test <path-to-source> <path-to-build>
+    --build-generator <generator>
+    [<options>...]
+    [--build-options <opts>...]
+    [--test-command <command> [<args>...]]
+```
+
+The arguments to this command line are the source and binary directories. The `--build-generator` option must be provided to use `--build-and-test`. If `--test-command` is specified then that will be run after the build is complete.
+
+```bash
+<top-level> $ ctest --build-and-test ./ ./build \
+    --build-generator "Unix Makefiles" \
+    --test-command ctest
+    --output-on-failure
+
+Internal cmake changing into directory: <top-level>/build
+======== CMake output     ======
+The CXX compiler identification is GNU 10.2.1
+Detecting CXX compiler ABI info
+Detecting CXX compiler ABI info - done
+Check for working CXX compiler: /usr/bin/c++ - skipped
+Detecting CXX compile features
+Detecting CXX compile features - done
+Configuring done
+Generating done
+Build files have been written to: <top-level>/build
+======== End CMake output ======
+Change Dir: <top-level>/build
+
+Run Clean Command:/usr/bin/gmake -f Makefile clean
+
+Run Build Command(s):/usr/bin/gmake -f Makefile && [ 25%] Building CXX object bin/zzz/CMakeFiles/hello.dir/hello.cpp.o
+[ 50%] Linking CXX static library libhello.a
+[ 50%] Built target hello
+[ 75%] Building CXX object test/zzz/CMakeFiles/hello_ut.dir/hello_test.cpp.o
+[100%] Linking CXX executable hello_ut
+[100%] Built target hello_ut
+
+Running test command: "/usr/local/cmake-3.23.4/bin/ctest" "--output-on-failure"
+Test project <top-level>/build
+    Start 1: Hello_UT
+1/1 Test #1: Hello_UT .........................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.01 sec
 ```
 
 ## Integrating Git and VS Code
@@ -238,45 +396,7 @@ In the `includePath`, we are assuming that
 
 UT requires C++20, so does the `cppStandard`.
 
-## Configure, Build and Run
-
-Although we have not added `uthello` as CMake tests, we can run the executable manually.
-
-At the top-level directory, run CMake to configure the project:
-
-```bash
-<top-level> $ cmake -S . -B build
--- The CXX compiler identification is GNU 10.2.1
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
--- Check for working CXX compiler: /usr/bin/c++ - skipped
--- Detecting CXX compile features
--- Detecting CXX compile features - done
--- Configuring done
--- Generating done
--- Build files have been written to: /<top-level>/build
-```
-
-Then run CMake to build:
-
-```bash
-<top-level> $ cmake --build build
-[ 25%] Building CXX object bin/zzz/CMakeFiles/hello.dir/hello.cpp.o
-[ 50%] Linking CXX static library libhello.a
-[ 50%] Built target hello
-[ 75%] Building CXX object test/zzz/CMakeFiles/uthello.dir/hello_test.cpp.o
-[100%] Linking CXX executable uthello
-[100%] Built target uthello
-```
-
-Now that `libhello.a` and `uthello` have been built, you can run the test code with UT:
-
-```bash
-<top-level> $ build/test/zzz/uthello
-All tests passed (1 asserts in 1 tests)
-```
-
-# Tutorial
+# UT Tutorial
 
 ## Step 0: Get it
 
