@@ -305,7 +305,7 @@ The arguments to this command line are the source and binary directories. The `-
 ```bash
 <top-level> $ ctest --build-and-test ./ ./build \
     --build-generator "Unix Makefiles" \
-    --test-command ctest
+    --test-command ctest \
     --output-on-failure
 
 Internal cmake changing into directory: <top-level>/build
