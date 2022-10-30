@@ -1,5 +1,4 @@
-add_library(typesize INTERFACE)
-target_sources(typesize INTERFACE
-    FILE_SET HEADERS
-    BASE_DIRS ${PROJECT_SOURCE_DIR}/main/include
+add_library(typesize typesize.cpp)
+target_include_directories(typesize
+    PUBLIC ${PROJECT_SOURCE_DIR}/main/include
 )

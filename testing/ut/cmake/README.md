@@ -94,7 +94,7 @@ UT requires C++20. The `add_library(INTERFACE)` and `target_compile_features()` 
 add_subdirectory(zzz)
 ```
 
-`zzz/hello.cpp` implements the code to be tested with UT.
+`main/zzz/hello.cpp` implements the code to be tested with UT.
 
 ```cpp
 #include "hello.h"
@@ -121,6 +121,15 @@ namespace my {
 std::string greeting(const std::string& who);
 
 } // end of namespace
+```
+
+With the `h` and `cpp` files, `main/zzz/CMakeLists.txt` looks like:
+
+```cmake
+add_library(hello hello.cpp)
+target_include_directories(hello
+    PUBLIC ${PROJECT_SOURCE_DIR}/main/include
+)
 ```
 
 ## `boost/ut.hpp` - the UT single header
