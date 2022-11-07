@@ -1,4 +1,4 @@
-add_executable(x_ut x_test.cpp)
+add_executable(x_ut x_ut.cpp)
 target_link_libraries(x_ut
     PUBLIC incl ut cxx_std
 )

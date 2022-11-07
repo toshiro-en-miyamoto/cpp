@@ -1,4 +1,4 @@
-add_executable(typesize_ut typesize_test.cpp)
+add_executable(typesize_ut typesize_ut.cpp)
 target_link_libraries(typesize_ut
     PUBLIC typesize ut cxx_std
 )

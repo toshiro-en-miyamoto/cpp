@@ -28,10 +28,4 @@ struct X
     ~X() { out("~X()", 0); }
 };
 
-X copy(X a) { return a; }
-X copy2(X a) { X aa = a; return aa; }
-X& ref_to(X& a) { return a; }
-X* make(int i) { X a(i); return new X(a); }
-struct XX { X a; X b; };
-
 }
