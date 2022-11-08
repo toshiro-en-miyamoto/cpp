@@ -12,7 +12,7 @@ struct X
     { std::cout << s << ":" << val << "(" << nv << ")\n"; }
 
     // default constructor
-    X() { out("X()", 0); val = 0; }
+    X() : val{0} { out("X()", 0); }
 
     // a single argument constructor
     X(int v) { val = v; out("X(int)", v); }
