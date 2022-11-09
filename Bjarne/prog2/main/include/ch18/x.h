@@ -15,14 +15,14 @@ struct X
     X() : val{0} { out("X()", 0); }
 
     // a single argument constructor
-    X(int v) { val = v; out("X(int)", v); }
+    X(int v) : val{v} { out("X(int)", v); }
 
     // copy constructor
-    X(const X& x) {val = x.val; out("X(X&)", x.val); }
+    X(const X& x) : val{x.val} { out("X(X&)", x.val); }
 
     // copy assignment
     X& operator=(const X& a)
-    { out("X::operator=()", a.val); val = a.val; return *this; }
+    { out("X::=()", a.val); val = a.val; return *this; }
 
     // destructor
     ~X() { out("~X()", 0); }

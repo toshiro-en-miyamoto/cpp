@@ -6,7 +6,7 @@
 namespace my {
 
 X copy(X a) { return a; }
-X copy2(X a) { X aa = a; return aa; }
+X copy2(X a) { return X{a.val+1}; }
 X& ref_to(X& a) { return a; }
 X* make(int i) { X a(i); return new X(a); }
 struct XX { X a; X b; };
@@ -24,13 +24,13 @@ int main()
 
         {
             std::cout << "local variable\n";
-            my::X loc {4};
+            my::X loc{4};
 
             std::cout << "copy construction\n";
-            my::X loc2 {loc};
+            my::X loc2{loc};
 
             std::cout << "copy assignment\n";
-            loc = my::X {5};
+            loc = my::X{5};
 
             std::cout << "copy by value and return\n";
             loc2 = copy(loc);
@@ -39,7 +39,7 @@ int main()
             loc2 = copy2(loc);
 
             std::cout << "local variable loc3\n";
-            my::X loc3 {6};
+            my::X loc3{6};
 
             std::cout << "call by reference and return\n";
             my::X& r = ref_to(loc);
@@ -76,22 +76,22 @@ int main()
 
             "copy assignment\n"
                 "X(int):5(5)\n"         // constructing rvalue X{5}
-                "X::operator=():4(5)\n"
+                "X::=():4(5)\n"
                 "~X():5(0)\n"           // the rvalue is a temporary
 
             "copy by value and return\n"
-                "X(X&):5(5)\n"          // copying the arg value
-                "X(X&):5(5)\n"          // copying the ret value
-                "X::operator=():4(5)\n" // assignment
-                "~X():5(0)\n"           // the copy of ret is a temporary
-                "~X():5(0)\n"           // the copy of arg is a temporary
+                "X(X&):5(5)\n"          // copying the argument value
+                "X(X&):5(5)\n"          // initializing a return value
+                "X::=():4(5)\n"         // copy assignment
+                "~X():5(0)\n"           // the return value is a temporary
+                "~X():5(0)\n"           // the argument is a local variable
 
             "calling copy2(loc)\n"
-                "X(X&):5(5)\n"          // copying the arg value
-                "X(X&):5(5)\n"          // copying the ret value
-                "X::operator=():5(5)\n" // assignment
-                "~X():5(0)\n"           // the copy of ret is a temporary
-                "~X():5(0)\n"           // the copy of arg is a temporary
+                "X(X&):5(5)\n"          // copying the argument value
+                "X(int):6(6)\n"         // initializing a return value
+                "X::=():5(6)\n"         // copy assignment
+                "~X():6(0)\n"           // the return value is a temporary
+                "~X():5(0)\n"           // the argument is a local variable
 
             "local variable loc3\n"
                 "X(int):6(6)\n"
@@ -146,7 +146,7 @@ int main()
             "~X():0(0)\n"               // destroying vector elements
 
             "~X():6(0)\n"               // loc3
-            "~X():5(0)\n"               // loc2
+            "~X():6(0)\n"               // loc2
             "~X():5(0)\n"               // loc
         ) << test_out.str();
     };

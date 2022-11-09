@@ -90,7 +90,7 @@ size_pair typesize(T val)
     return std::make_pair(sizeof(T), sizeof(val));
 }
 
-template size_pair typesize <char> (char);
+template size_pair typesize<char>(char);
 ```
 
 An explicit instantiation declaration (an *extern template*) prevents implicit instantiations: the code that would otherwise cause an implicit instantiation has to use the explicit instantiation definition provided somewhere else in the program. (since C++ 11)
@@ -103,7 +103,7 @@ An explicit instantiation declaration (an *extern template*) prevents implicit i
 using size_pair = std::pair<std::size_t, std::size_t>;
 template<typename T> size_pair typesize(T val);
 
-extern template size_pair typesize <char> (char);
+extern template size_pair typesize<char>(char);
 ```
 
 Now the build suceeds:
