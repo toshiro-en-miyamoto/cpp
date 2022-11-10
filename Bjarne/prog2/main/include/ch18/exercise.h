@@ -4,9 +4,10 @@
 
 namespace my {
 
+int strcmp(const char* s1, const char* s2);
 char* findx(const char* s, const char* x);
 char* strdup(const char* s);
-std::size_t strcmp(const char* a, const char* b);
+bool matchx(const char* s, const char* x);
 std::size_t strlen(const char* s);
 
 }
