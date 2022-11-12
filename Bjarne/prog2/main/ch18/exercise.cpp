@@ -2,6 +2,85 @@
 #include <stdexcept>
 
 namespace my {
+// exercise 8
+// use the approach of making a backward copy of the string
+// and then comparing;
+bool is_palindrome(const char* first, const char* last)
+{
+    if (first == nullptr) return false;
+
+    auto len = strlen(first);
+    if (len != last + 1 - first)    // last+1 points the trailing zero
+        return false;
+
+    auto copy = new char[len + 1];  // +1 for the trailing zero
+    auto p_copy = copy;
+    auto p_one_prev_first = first - 1;
+    auto p_last = last;
+    while (p_last != p_one_prev_first) {
+        *p_copy = *p_last;
+        ++p_copy;
+        --p_last;
+    }
+    *p_copy = 0x00;     // the trailing zero
+
+    bool result = matchx(first, copy);
+    delete[] copy;
+    return result;
+}
+
+// exercise 7
+char* cat(const char* s1, const char* s2, const char* sep)
+{
+    if (s1 == nullptr) return nullptr;
+    if (s2 == nullptr) return nullptr;
+    if (sep == nullptr) return nullptr;
+
+    auto s1_len = my::strlen(s1);
+    auto s2_len = my::strlen(s2);
+    auto sep_len = my::strlen(sep);
+
+    auto len = s1_len + sep_len + s2_len;
+    auto result = new char[len + 1];    // +1 for the trailing zero
+
+    auto p = result;
+    while (*s1 != 0) {
+        *p = *s1;
+        ++p;
+        ++s1;
+    }
+
+    const char* p_sep = sep;
+    while (*p_sep != 0) {
+        *p = *p_sep;
+        ++p;
+        ++p_sep;
+    }
+
+    while (*s2 != 0) {
+        *p = *s2;
+        ++p;
+        ++s2;
+    }
+
+    *p = 0x00;      // the trailing zero
+    return result;
+}
+
+
+// exercise 6
+std::string cat(const std::string& s1, const std::string& s2, const std::string& sep)
+{
+    std::string result{s1 + sep + s2};
+    return result;
+}
+
+// exercise 5
+std::string cat_dot(const std::string& s1, const std::string& s2)
+{
+    std::string result{s1 + '.' + s2};
+    return result;
+}
 
 // exercise 3
 /*

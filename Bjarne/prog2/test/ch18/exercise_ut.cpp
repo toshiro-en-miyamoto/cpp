@@ -7,6 +7,39 @@ int main()
     using namespace boost::ut;
     using namespace std::literals;
 
+    "exercise 8"_test = [] {
+        const char s1[] = "home";
+        const auto r1 = my::is_palindrome(s1, s1 + my::strlen(s1) - 1);
+        expect(r1 == false);
+        const char s2[] = "malayalam";
+        const auto r2 = my::is_palindrome(s2, s2 + my::strlen(s2) - 1);
+        expect(r2 == true);
+    };
+
+    "exercise 7"_test = [] {
+        const char s1[] = "Niels", s2[] = "Bohr", sep[] = "-";
+
+        auto result = my::cat(s1, s2, sep);
+        std::string_view actual_sv{result};
+        std::string_view expected{"Niels-Bohr"};
+        expect(expected == actual_sv) << actual_sv;
+        delete[] result;
+    };
+
+    "exercise 6"_test = [] {
+        const std::string s1{"Niels"}, s2{"Bohr"}, sep{"-"};
+        std::string expected{"Niels-Bohr"};
+        std::string actual = my::cat(s1, s2, sep);
+        expect(expected == actual) << actual;
+    };
+
+    "exercise 5"_test = [] {
+        const std::string s1{"Niels"}, s2{"Bohr"};
+        std::string expected{"Niels.Bohr"};
+        std::string actual = my::cat_dot(s1, s2);
+        expect(expected == actual) << actual;
+    };
+
     "exercise 3"_test = [] {
         const char a1[] = "abc";
         const char b1[] = "abcd";

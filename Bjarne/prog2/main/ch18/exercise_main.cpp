@@ -2,6 +2,14 @@
 #include <string_view>
 #include <cassert>
 
+void exercise8()
+{
+    const char s1[] = "home";
+    const auto r1 = my::is_palindrome(s1, s1 + my::strlen(s1) - 1);
+    const char s2[] = "malayalam";
+    const auto r2 = my::is_palindrome(s2, s2 + my::strlen(s2) - 1);
+}
+
 void exercise3()
 {
     const char a1[] = "abc";
@@ -58,6 +66,7 @@ void matchx()
 
 int main()
 {
+    exercise8();
     exercise3();
     exercise2();
     exercise1();
