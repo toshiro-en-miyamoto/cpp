@@ -1,19 +1,19 @@
-add_library(drill drill.cpp)
-target_include_directories(drill
+add_library(drill18 drill.cpp)
+target_include_directories(drill18
     PUBLIC ${PROJECT_SOURCE_DIR}/main/include
 )
 
-add_library(exercise exercise.cpp)
-target_include_directories(exercise
+add_library(exercise18 exercise.cpp)
+target_include_directories(exercise18
     PUBLIC ${PROJECT_SOURCE_DIR}/main/include
 )
 
-add_executable(exercise_main exercise_main.cpp)
-target_link_libraries(exercise_main
-    PUBLIC exercise cxx_std
+add_executable(exercise18_main exercise_main.cpp)
+target_link_libraries(exercise18_main
+    PUBLIC exercise18 cxx_std
 )
 
-add_library(vector vector.cpp)
-target_include_directories(vector
+add_library(vector18 vector.cpp)
+target_include_directories(vector18
     PUBLIC ${PROJECT_SOURCE_DIR}/main/include
 )

@@ -2,7 +2,7 @@
 
 #include <initializer_list>
 
-namespace my {
+namespace ch18 {
 
 class vector
 {

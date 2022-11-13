@@ -9,19 +9,19 @@ int main()
     {
         "size of char"_test = []
         {
-            auto [type_size, value_size] = my::typesize<char>('a');
+            auto [type_size, value_size] = ch17::typesize<char>('a');
             expect(type_size == 1_i);
             expect(value_size == 1_i);
         };
         "size of int"_test = []
         {
-            auto [type_size, value_size] = my::typesize<int>(1);
+            auto [type_size, value_size] = ch17::typesize<int>(1);
             expect(type_size == 4_i);
             expect(value_size == 4_i);
         };
         "size of long"_test = []
         {
-            auto [type_size, value_size] = my::typesize<long>(1L);
+            auto [type_size, value_size] = ch17::typesize<long>(1L);
             expect(type_size == 8_i);
             expect(value_size == 8_i);
         };
@@ -29,19 +29,19 @@ int main()
         {
             int i = 1;
             int *pi = &i;
-            auto [type_size, value_size] = my::typesize<int *>(pi);
+            auto [type_size, value_size] = ch17::typesize<int *>(pi);
             expect(type_size == 8_i);
             expect(value_size == 8_i);
         };
         "size of bool"_test = []
         {
-            auto [type_size, value_size] = my::typesize<bool>(true);
+            auto [type_size, value_size] = ch17::typesize<bool>(true);
             expect(type_size == 1_i);
             expect(value_size == 1_i);
         };
         "size of double"_test = []
         {
-            auto [type_size, value_size] = my::typesize<double>(1);
+            auto [type_size, value_size] = ch17::typesize<double>(1);
             expect(type_size == 8_i);
             expect(value_size == 8_i);
         };
@@ -51,34 +51,34 @@ int main()
     {
         "size of char"_test = []
         {
-            auto type_size = my::typesize2('a');
+            auto type_size = ch17::typesize2('a');
             expect(type_size == 1_i);
         };
         "size of int"_test = []
         {
-            auto type_size = my::typesize2(1);
+            auto type_size = ch17::typesize2(1);
             expect(type_size == 4_i);
         };
         "size of long"_test = []
         {
-            auto type_size = my::typesize2(1L);
+            auto type_size = ch17::typesize2(1L);
             expect(type_size == 8_i);
         };
         "size of pointer to int"_test = []
         {
             int i = 1;
             int *pi = &i;
-            auto type_size = my::typesize2(pi);
+            auto type_size = ch17::typesize2(pi);
             expect(type_size == 8_i);
         };
         "size of bool"_test = []
         {
-            auto type_size = my::typesize2(true);
+            auto type_size = ch17::typesize2(true);
             expect(type_size == 1_i);
         };
         "size of double"_test = []
         {
-            auto type_size = my::typesize2<double>(1);
+            auto type_size = ch17::typesize2<double>(1);
             expect(type_size == 8_i);
         };
     };

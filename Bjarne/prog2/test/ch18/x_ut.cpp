@@ -3,7 +3,7 @@
 #include <sstream>
 #include <vector>
 
-namespace my {
+namespace ch18 {
 
 X copy(X a) { return a; }
 X copy2(X a) { return X{a.val+1}; }
@@ -24,13 +24,13 @@ int main()
 
         {
             std::cout << "local variable\n";
-            my::X loc{4};
+            ch18::X loc{4};
 
             std::cout << "copy construction\n";
-            my::X loc2{loc};
+            ch18::X loc2{loc};
 
             std::cout << "copy assignment\n";
-            loc = my::X{5};
+            loc = ch18::X{5};
 
             std::cout << "copy by value and return\n";
             loc2 = copy(loc);
@@ -39,29 +39,29 @@ int main()
             loc2 = copy2(loc);
 
             std::cout << "local variable loc3\n";
-            my::X loc3{6};
+            ch18::X loc3{6};
 
             std::cout << "call by reference and return\n";
-            my::X& r = ref_to(loc);
+            ch18::X& r = ref_to(loc);
 
             std::cout << "calling make(7) and delete it\n";
-            delete my::make(7);
+            delete ch18::make(7);
 
             std::cout << "calling make(8) and delete it\n";
-            delete my::make(8);
+            delete ch18::make(8);
 
             std::cout << "defalut values in vector\n";
-            std::vector<my::X> v(4);
+            std::vector<ch18::X> v(4);
 
             std::cout << "default values in XX\n";
-            my::XX loc4;
+            ch18::XX loc4;
 
             std::cout << "an X on the free store\n";
-            my::X* p = new my::X{9};
+            ch18::X* p = new ch18::X{9};
             delete p;
 
             std::cout << "an array of Xs on the free store\n";
-            my::X* pp = new my::X[5];
+            ch18::X* pp = new ch18::X[5];
             delete[] pp;
         }
 

@@ -2,7 +2,7 @@
 
 #include <vector>
 
-namespace my {
+namespace ch18 {
 
 extern int ga[];
 void fa(int[], int);

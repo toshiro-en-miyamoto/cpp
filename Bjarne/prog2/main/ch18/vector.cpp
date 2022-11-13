@@ -1,12 +1,12 @@
 #include <ch18/vector.h>
 #include <algorithm>
 
-my::vector::vector()
+ch18::vector::vector()
     : sz{0}
     , elem{nullptr}
 {}
 
-my::vector::vector(std::size_t s)
+ch18::vector::vector(std::size_t s)
     : sz{s}
     , elem{new double[s]}
 {
@@ -15,26 +15,26 @@ my::vector::vector(std::size_t s)
     }
 }
 
-my::vector::vector(std::initializer_list<double> lst)
+ch18::vector::vector(std::initializer_list<double> lst)
     : sz{lst.size()}
     , elem{new double[lst.size()]}
 {
     std::copy(lst.begin(), lst.end(), elem);
 }
 
-my::vector::~vector()
+ch18::vector::~vector()
 {
     delete[] elem;
 }
 
-my::vector::vector(const my::vector& v)
+ch18::vector::vector(const ch18::vector& v)
     : sz{v.sz}
     , elem{new double[v.sz]}
 {
     std::copy(v.elem, v.elem + v.sz, elem);
 }
 
-my::vector& my::vector::operator=(const my::vector& v)
+ch18::vector& ch18::vector::operator=(const ch18::vector& v)
 {
     // to do: check self-assignment
     auto p = new double[v.sz];
@@ -45,7 +45,7 @@ my::vector& my::vector::operator=(const my::vector& v)
     return *this;
 }
 
-my::vector::vector(my::vector&& v)
+ch18::vector::vector(ch18::vector&& v)
     : sz{v.sz}
     , elem{v.elem}
 {
@@ -53,7 +53,7 @@ my::vector::vector(my::vector&& v)
     v.elem = nullptr;
 }
 
-my::vector& my::vector::operator=(vector&& v)
+ch18::vector& ch18::vector::operator=(vector&& v)
 {
     delete[] elem;      // throw away old elements
     elem = v.elem;      // steal v's elements
@@ -63,12 +63,12 @@ my::vector& my::vector::operator=(vector&& v)
     return *this;
 }
 
-double& my::vector::operator[](std::size_t i)
+double& ch18::vector::operator[](std::size_t i)
 {
     return elem[i];
 }
 
-double my::vector::operator[](std::size_t i) const
+double ch18::vector::operator[](std::size_t i) const
 {
     return elem[i];
 }

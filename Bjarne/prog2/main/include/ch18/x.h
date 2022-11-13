@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 
-namespace my {
+namespace ch18 {
 
 struct X
 {

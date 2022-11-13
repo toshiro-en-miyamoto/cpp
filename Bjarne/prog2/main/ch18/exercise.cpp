@@ -1,7 +1,7 @@
 #include <ch18/exercise.h>
 #include <stdexcept>
 
-namespace my {
+namespace ch18 {
 // exercise 8
 // use the approach of making a backward copy of the string
 // and then comparing;
@@ -36,9 +36,9 @@ char* cat(const char* s1, const char* s2, const char* sep)
     if (s2 == nullptr) return nullptr;
     if (sep == nullptr) return nullptr;
 
-    auto s1_len = my::strlen(s1);
-    auto s2_len = my::strlen(s2);
-    auto sep_len = my::strlen(sep);
+    auto s1_len = ch18::strlen(s1);
+    auto s2_len = ch18::strlen(s2);
+    auto sep_len = ch18::strlen(sep);
 
     auto len = s1_len + sep_len + s2_len;
     auto result = new char[len + 1];    // +1 for the trailing zero

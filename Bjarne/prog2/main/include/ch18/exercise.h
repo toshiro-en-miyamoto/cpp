@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <string>
 
-namespace my {
+namespace ch18 {
 
 bool is_palindrome(const char* first, const char* last);
 char* cat(const char* s1, const char* s2, const char* sep);

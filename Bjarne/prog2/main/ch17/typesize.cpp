@@ -1,6 +1,6 @@
 #include <ch17/typesize.h>
 
-namespace my {
+namespace ch17 {
 
 template<typename T>
 size_pair typesize(T val)
