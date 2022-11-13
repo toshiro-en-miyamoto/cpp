@@ -278,6 +278,42 @@ A destructor is called whenever an object of its class is destroyed; that happen
 - the program terminates, or
 - `delete` is used on a pointer to an object.
 
+## Copy assignment operators
+
+When implementing the assignment, you could consider simplifying the code by freeing the memory for the old elements before creating the copy:
+
+```c++
+my::vector& my::vector::operator=(const my::vector& v)
+{
+    sz = v.sz;
+    delete[] elem;
+    elem = new double[sz];
+    std::copy(v.elem, v.elem + sz, elem);
+    return *this;
+}
+```
+
+But it is usually a very good idea not to throw away information before you know that you can replace it.
+
+```c++
+my::vector& my::vector::operator=(const my::vector& v)
+{
+    auto p = new double[v.sz];
+    std::copy(v.elem, v.elem + v.sz, p);
+    delete[] elem;
+    elem = p;
+    sz = v.sz;
+    return *this;
+}
+```
+
+Also, if you did that, strange things would happen if you assigned a vector to itself:
+
+```c++
+my::vector v(10);
+v = v;              // self-assignment
+```
+
 ## Access to `vector` elements
 
 We want our usual subscript notation: `v[i]`.

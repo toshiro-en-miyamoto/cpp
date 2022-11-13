@@ -12,3 +12,8 @@ add_executable(exercise_main exercise_main.cpp)
 target_link_libraries(exercise_main
     PUBLIC exercise cxx_std
 )
+
+add_library(vector vector.cpp)
+target_include_directories(vector
+    PUBLIC ${PROJECT_SOURCE_DIR}/main/include
+)

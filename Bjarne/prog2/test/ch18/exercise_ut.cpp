@@ -8,16 +8,16 @@ int main()
     using namespace std::literals;
 
     "exercise 8"_test = [] {
-        const char s1[] = "home";
+        const char* s1 = "home";
         const auto r1 = my::is_palindrome(s1, s1 + my::strlen(s1) - 1);
         expect(r1 == false);
-        const char s2[] = "malayalam";
+        const char* s2 = "malayalam";
         const auto r2 = my::is_palindrome(s2, s2 + my::strlen(s2) - 1);
         expect(r2 == true);
     };
 
     "exercise 7"_test = [] {
-        const char s1[] = "Niels", s2[] = "Bohr", sep[] = "-";
+        const char *s1 = "Niels", *s2 = "Bohr", *sep = "-";
 
         auto result = my::cat(s1, s2, sep);
         std::string_view actual_sv{result};
@@ -41,26 +41,26 @@ int main()
     };
 
     "exercise 3"_test = [] {
-        const char a1[] = "abc";
-        const char b1[] = "abcd";
+        const char  *a1 = "abc",
+                    *b1 = "abcd";
         expect(my::strcmp(a1, b1) < 0_i);
-        const char a2[] = "abb";
-        const char b2[] = "abc";
+        const char  *a2 = "abb",
+                    *b2 = "abc";
         expect(my::strcmp(a2, b2) < 0_i);
-        const char a3[] = "abc";
-        const char b3[] = "abc";
+        const char  *a3 = "abc",
+                    *b3 = "abc";
         expect(my::strcmp(a3, b3) == 0_i);
-        const char a4[] = "abd";
-        const char b4[] = "abc";
+        const char  *a4 = "abd",
+                    *b4 = "abc";
         expect(my::strcmp(a4, b4) > 0_i);
-        const char a5[] = "abcd";
-        const char b5[] = "abc";
+        const char  *a5 = "abcd",
+                    *b5 = "abc";
         expect(my::strcmp(a5, b5) > 0_i);
     };
 
     "exercise 2"_test = [] {
-        const char p[] = "exercise";
-        const char x1[] = "xe";
+        const char  *p = "exercise",
+                    *x1 = "xe";
         auto found = my::findx(p, x1);
         expect(found == p+1);
     };
@@ -76,20 +76,20 @@ int main()
     };
 
     "matchx"_test = [] {
-        const char s1[] = "abc";
-        const char x1[] = "abcd";
+        const char  *s1 = "abc",
+                    *x1 = "abcd";
         expect(my::matchx(s1, x1) == false);
-        const char s2[] = "abb";
-        const char x2[] = "abc";
+        const char  *s2 = "abb",
+                    *x2 = "abc";
         expect(my::matchx(s2, x2) == false);
-        const char s3[] = "abc";
-        const char x3[] = "abc";
+        const char  *s3 = "abc",
+                    *x3 = "abc";
         expect(my::matchx(s3, x3) == true);
-        const char s4[] = "abd";
-        const char x4[] = "abc";
+        const char  *s4 = "abd",
+                    *x4 = "abc";
         expect(my::matchx(s4, x4) == false);
-        const char s5[] = "abcd";
-        const char x5[] = "abc";
+        const char  *s5 = "abcd",
+                    *x5 = "abc";
         expect(my::matchx(s5, x5) == true);
     };
 
