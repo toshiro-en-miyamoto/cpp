@@ -4,5 +4,10 @@ target_sources(ut INTERFACE
     BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_executable(sniff sniff.cpp)
+target_link_libraries(sniff
+    PUBLIC cxx_std
+)
+
 add_subdirectory(ch17)
 add_subdirectory(ch18)

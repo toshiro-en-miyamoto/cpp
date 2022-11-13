@@ -8,11 +8,6 @@ target_include_directories(exercise18
     PUBLIC ${PROJECT_SOURCE_DIR}/main/include
 )
 
-add_executable(exercise18_main exercise_main.cpp)
-target_link_libraries(exercise18_main
-    PUBLIC exercise18 cxx_std
-)
-
 add_library(vector18 vector.cpp)
 target_include_directories(vector18
     PUBLIC ${PROJECT_SOURCE_DIR}/main/include
