@@ -14,6 +14,8 @@ public:
     vector(std::initializer_list<double>);
     vector(const vector&);
     vector& operator=(const vector&);
+    vector(vector&&);
+    vector& operator=(vector&&);
     ~vector();
 
     double& operator[](std::size_t);

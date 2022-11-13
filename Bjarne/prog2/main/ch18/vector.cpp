@@ -2,13 +2,13 @@
 #include <algorithm>
 
 my::vector::vector()
-  : sz{0}
-  , elem{nullptr}
+    : sz{0}
+    , elem{nullptr}
 {}
 
 my::vector::vector(std::size_t s)
-  : sz{s}
-  , elem{new double[s]}
+    : sz{s}
+    , elem{new double[s]}
 {
     for (int i = 0; i < sz; ++i) {
         elem[i] = 0.0;
@@ -16,8 +16,8 @@ my::vector::vector(std::size_t s)
 }
 
 my::vector::vector(std::initializer_list<double> lst)
-  : sz{lst.size()}
-  , elem{new double[lst.size()]}
+    : sz{lst.size()}
+    , elem{new double[lst.size()]}
 {
     std::copy(lst.begin(), lst.end(), elem);
 }
@@ -28,8 +28,8 @@ my::vector::~vector()
 }
 
 my::vector::vector(const my::vector& v)
-  : sz{v.sz}
-  , elem{new double[v.sz]}
+    : sz{v.sz}
+    , elem{new double[v.sz]}
 {
     std::copy(v.elem, v.elem + v.sz, elem);
 }
@@ -42,6 +42,24 @@ my::vector& my::vector::operator=(const my::vector& v)
     delete[] elem;
     elem = p;
     sz = v.sz;
+    return *this;
+}
+
+my::vector::vector(my::vector&& v)
+    : sz{v.sz}
+    , elem{v.elem}
+{
+    v.sz = 0;           // make v the empty vector
+    v.elem = nullptr;
+}
+
+my::vector& my::vector::operator=(vector&& v)
+{
+    delete[] elem;      // throw away old elements
+    elem = v.elem;      // steal v's elements
+    sz = v.sz;
+    v.elem = nullptr;   // mak v the empty vector
+    v.sz = 0;
     return *this;
 }
 
