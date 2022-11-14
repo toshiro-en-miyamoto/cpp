@@ -1,28 +1,203 @@
 #include <ch19/vector.h>
+#include <algorithm>
 
-ch19::vector::vector()
-    : sz{0}
-    , elem{nullptr}
-    , space{0}
-{}
+namespace ch19 {
 
-void ch19::vector::reserve(std::size_t new_space)
+template<typename T>
+Vector<T>::Vector(std::size_t s)
+    : sz{s}
+    , elem{new T[s]}
+    , space{s}
 {
-    if (new_space <= space) return;
-    double* p = new double[new_space];
-    for (int i = 0; i < new_space; ++i) {
-        p[i] = elem[i];
+    for (int i = 0; i < sz; ++i) {
+        elem[i] = 0.0;
     }
-    delete[] elem;
-    elem = p;
-    space = new_space;
 }
 
-void ch19::vector::resize(std::size_t new_size)
+template<typename T>
+Vector<T>::Vector(std::initializer_list<T> lst)
+    : sz{lst.size()}
+    , elem{new T[lst.size()]}
+    , space{lst.size()}
+{
+    std::copy(lst.begin(), lst.end(), elem);
+}
+
+template<typename T>
+Vector<T>::Vector(const Vector<T>& v)
+    : sz{v.sz}
+    , elem{new T[v.sz]}
+    , space{v.space}
+{
+    std::copy(v.elem, v.elem + v.sz, elem);
+}
+
+template<typename T>
+Vector<T>& Vector<T>::operator=(const Vector<T>& v)
+{
+    if (this == &v) return *this;   // self-assignment
+    if (v.sz <= space) {
+        std::copy(v.elem, v.elem + v.sz, elem);
+        sz = v.sz;
+    } else {
+        auto p = new T[v.sz];
+        std::copy(v.elem, v.elem + v.sz, p);
+        delete[] elem;
+        elem = p;
+        space = sz = v.sz;
+    }
+    return *this;
+}
+
+template<typename T>
+Vector<T>::Vector(Vector<T>&& v)
+    : sz{v.sz}
+    , elem{v.elem}
+    , space{v.space}
+{
+    v.sz = 0;           // make v the empty vector
+    v.elem = nullptr;
+    v.space = 0;
+}
+
+template<typename T>
+Vector<T>& Vector<T>::operator=(Vector<T>&& v)
+{
+    delete[] elem;      // throw away old elements
+    elem = v.elem;      // steal v's elements
+    space = sz = v.sz;
+    v.sz = 0;           // make v the empty vector
+    v.elem = nullptr;
+    v.space = 0;
+    return *this;
+}
+
+template<typename T>
+void Vector<T>::resize(std::size_t new_size)
 {
     reserve(new_size);
     for (auto i = sz; i < new_size; ++i) {
         elem[i] = 0;
     }
     sz = new_size;
+}
+
+template<typename T>
+void Vector<T>::push_back(const T& d)
+{
+    if (space == 0) {
+        reserve(8);
+    } else if (sz == space) {
+        reserve(2 * space);
+    }
+    elem[sz] = d;
+    ++sz;
+}
+
+template<typename T>
+void Vector<T>::reserve(std::size_t new_space)
+{
+    if (new_space <= space) return;
+    auto p = new T[new_space];
+    std::copy(elem, elem + new_space, p);
+    delete[] elem;
+    elem = p;
+    space = new_space;
+}
+
+
+
+vector::vector(std::size_t s)
+    : sz{s}
+    , elem{new double[s]}
+    , space{s}
+{
+    for (int i = 0; i < sz; ++i) {
+        elem[i] = 0.0;
+    }
+}
+
+vector::vector(std::initializer_list<double> lst)
+    : sz{lst.size()}
+    , elem{new double[lst.size()]}
+    , space{lst.size()}
+{
+    std::copy(lst.begin(), lst.end(), elem);
+}
+
+vector::vector(const vector& v)
+    : sz{v.sz}
+    , elem{new double[v.sz]}
+    , space{v.space}
+{
+    std::copy(v.elem, v.elem + v.sz, elem);
+}
+
+vector& vector::operator=(const vector& v)
+{
+    if (this == &v) return *this;   // self-assignment
+    if (v.sz <= space) {
+        std::copy(v.elem, v.elem + v.sz, elem);
+        sz = v.sz;
+    } else {
+        auto p = new double[v.sz];
+        std::copy(v.elem, v.elem + v.sz, p);
+        delete[] elem;
+        elem = p;
+        space = sz = v.sz;
+    }
+    return *this;
+}
+
+vector::vector(vector&& v)
+    : sz{v.sz}
+    , elem{v.elem}
+    , space{v.space}
+{
+    v.sz = 0;           // make v the empty vector
+    v.elem = nullptr;
+    v.space = 0;
+}
+
+vector& vector::operator=(vector&& v)
+{
+    delete[] elem;      // throw away old elements
+    elem = v.elem;      // steal v's elements
+    space = sz = v.sz;
+    v.sz = 0;           // make v the empty vector
+    v.elem = nullptr;
+    v.space = 0;
+    return *this;
+}
+
+void vector::resize(std::size_t new_size)
+{
+    reserve(new_size);
+    for (auto i = sz; i < new_size; ++i) {
+        elem[i] = 0;
+    }
+    sz = new_size;
+}
+
+void vector::push_back(double d)
+{
+    if (space == 0) {
+        reserve(8);
+    } else if (sz == space) {
+        reserve(2 * space);
+    }
+    elem[sz] = d;
+    ++sz;
+}
+
+void vector::reserve(std::size_t new_space)
+{
+    if (new_space <= space) return;
+    auto p = new double[new_space];
+    std::copy(elem, elem + new_space, p);
+    delete[] elem;
+    elem = p;
+    space = new_space;
+}
+
 }
