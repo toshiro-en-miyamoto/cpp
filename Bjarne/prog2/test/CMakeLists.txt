@@ -6,7 +6,7 @@ target_sources(ut INTERFACE
 
 add_executable(sniff sniff.cpp)
 target_link_libraries(sniff
-    PUBLIC incl cxx_std vector19
+    PUBLIC incl cxx_std
 )
 
 add_subdirectory(ch17)

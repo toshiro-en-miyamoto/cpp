@@ -1,4 +1,4 @@
-#include <ch19/myvector.h>
+#include <ch19/vector.h>
 #include <iostream>
 
 class S {
@@ -13,8 +13,8 @@ public:
 
 int main()
 {
-    my::vector<S> v1{S{1}};
-    my::vector<S> v3{S{1}, S{2}, S{3}};
+    ch19::vector<S> v1{S{1}};
+    ch19::vector<S> v3{S{1}, S{2}, S{3}};
     for (auto i = 0; i < v3.size(); ++i) {
         v3[i].id();
     }

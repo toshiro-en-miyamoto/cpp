@@ -6,4 +6,3 @@ target_sources(incl INTERFACE
 
 add_subdirectory(ch17)
 add_subdirectory(ch18)
-add_subdirectory(ch19)
