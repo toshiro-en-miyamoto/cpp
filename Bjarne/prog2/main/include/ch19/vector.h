@@ -1,21 +1,74 @@
-#pragma once
-
 #include <cstddef>
 #include <initializer_list>
 #include <memory>
+#include <utility>
+#include <iostream>
 
 namespace ch19 {
 
+template<typename T, typename A>
+struct vector_base
+{
+    A alloc;            // allocator
+    T* elem;            // start of allocation
+    std::size_t sz;     // number of elements
+    std::size_t space;  // amount of allocated space
+
+    vector_base()
+        : alloc{}, elem{nullptr}, sz{0}, space{0}
+    {}
+
+    explicit vector_base(std::size_t n, const A& a = A())
+        : alloc{a}, elem{nullptr}, sz{n}, space{n}
+    {
+        if (0 < n) {
+            elem = alloc.allocate(n);
+            std::cout
+            << "new  (" << elem
+            << ", " << sz
+            << ", " << space
+            << ")\n";
+        }
+    }
+
+    ~vector_base()
+    {
+        if (elem) {
+            alloc.deallocate(elem, space);
+            std::cout
+            << "gone (" << elem
+            << ", " << sz
+            << ", " << space
+            << ")\n";
+        }
+    }
+
+    vector_base(vector_base&& b)
+        : alloc{b.alloc}, elem{b.elem}
+        , sz{b.sz}, space{b.space}
+    {
+        b.elem = nullptr;
+        b.sz = 0;
+        b.space = 0;
+    }
+
+    vector_base& operator=(vector_base&& b)
+    {
+        if (elem) alloc.deallocate(elem, space);
+        elem  = std::exchange(b.elem,  nullptr);
+        sz    = std::exchange(b.sz,    0);
+        space = std::exchange(b.space, 0);
+        return *this;
+    }
+};
+
 template<typename T, typename A = std::allocator<T>>
-class vector {
-    A alloc;
-    std::size_t sz;
-    std::size_t space;
-    T* elem;
+class vector : private vector_base<T,A>
+{
 public:
-    vector() : alloc{}, sz{0}, space{0}, elem{nullptr} {}
+    vector();
     ~vector();
-    vector(std::size_t, T = T());
+    explicit vector(std::size_t, T = T());
     vector(std::initializer_list<T>);
 
     vector(const vector&);
@@ -24,11 +77,13 @@ public:
     vector(vector&&);
     vector& operator=(vector&&);
 
-    T& operator[](std::size_t n) { return elem[n]; }
-    const T& operator[](std::size_t n) const { return elem[n]; }
+    T& operator[](std::size_t);
+    const T& operator[](std::size_t) const;
+    T& at(std::size_t);
+    const T& at(std::size_t) const;
 
-    std::size_t size() const { return sz; }
-    std::size_t capacity() const { return space; }
+    std::size_t size() const { return this->sz; }
+    std::size_t capacity() const { return this->space; }
 
     void reserve(std::size_t);
     void resize(std::size_t, T = T());
@@ -36,45 +91,33 @@ public:
 };
 
 template<typename T, typename A>
+vector<T,A>::vector()
+    : vector_base<T,A>{0}
+{}
+
+template<typename T, typename A>
 vector<T,A>::~vector()
-{
-    // for (auto i = 0; i < sz; ++i) alloc.destroy(&elem[i]);
-    std::destroy_n(elem, sz);
-    alloc.deallocate(elem, space);
-}
+{}
 
 template<typename T, typename A>
 vector<T,A>::vector(std::size_t size, T def)
-    : alloc{}
-    , sz{size}
-    , space{size}
-    , elem{alloc.allocate(size)}
+    : vector_base<T,A>{size}
 {
-    // for (auto i = 0; i < size; ++i) alloc.construct(&elem[i], def);
-    std::uninitialized_fill_n(elem, sz, def);
+    std::uninitialized_fill_n(this->elem, size, def);
 }
 
 template<typename T, typename A>
 vector<T,A>::vector(std::initializer_list<T> lst)
-    : alloc{}
-    , sz{lst.size()}
-    , space{lst.size()}
-    , elem{alloc.allocate(lst.size())}
+    : vector_base<T,A>{lst.size()}
 {
-    // auto data = std::data(lst);
-    // for (auto i = 0; i < sz; ++i) alloc.construct(&elem[i], data[i]);
-    std::uninitialized_copy_n(lst.begin(), sz, elem);
+    std::uninitialized_copy_n(lst.begin(), lst.size(), this->elem);
 }
 
 template<typename T, typename A>
 vector<T,A>::vector(const vector<T,A>& v)
-    : alloc{}
-    , sz{v.sz}
-    , space{v.sz}
-    , elem{alloc.allocate(v.sz)}
+    : vector_base<T,A>{v.sz}
 {
-    // for (auto i = 0; i < v.sz; ++i) alloc.construct(&elem[i], v.elem[i]);
-    std::uninitialized_copy_n(v.elem, sz, elem);
+    std::uninitialized_copy_n(v.elem, v.sz, this->elem);
 }
 
 template<typename T, typename A>
@@ -82,103 +125,99 @@ vector<T,A>& vector<T,A>::operator=(const vector<T,A>& v)
 {
     if (this == &v) return *this;
 
-    if (v.sz <= space) {
-        // for (auto i = 0; i < sz; ++i) alloc.destroy(&elem[i]);
-        std::destroy_n(elem, sz);
-        // for (auto i = 0; i < v.sz; ++i) alloc.construct(&elem[i], v.elem[i]);
-        std::uninitialized_copy_n(v.elem, sz, elem);
-        sz = v.sz;
+    if (v.sz <= this->space) {
+        std::destroy_n(this->elem, this->sz);
+        std::uninitialized_copy_n(v.elem, v.sz, this->elem);
+        this->sz = v.sz;
     } else {
-        T* p = alloc.allocate(v.sz);
-        // for (auto i = 0; i < v.sz; ++i) alloc.construct(&p[i], v.elem[i]);
-        std::uninitialized_copy_n(v.elem, sz, p);
-        // for (auto i = 0; i < sz; ++i) alloc.destroy(&elem[i]);
-        std::destroy_n(elem, sz);
-        alloc.deallocate(elem, space);
-
-        space = sz = v.sz;
-        elem = p;
+        vector_base<T,A> base{v.sz};
+        std::uninitialized_copy_n(v.elem, v.sz, base.elem);
+        std::destroy_n(this->elem, this->sz);
+        std::swap<vector_base<T,A>>(*this, base);
     }
     return *this;
 }
 
 template<typename T, typename A>
 vector<T,A>::vector(vector<T,A>&& v)
-    : alloc{}
-    , sz{v.sz}
-    , space{v.space}
-    , elem{v.elem}
+    : vector_base<T,A>{0}
 {
-    v.sz = 0;           // make v the empty vector
-    v.space = 0;
-    v.elem = nullptr;
+    std::swap<vector_base<T,A>>(*this, v);
 }
 
 template<typename T, typename A>
 vector<T,A>& vector<T,A>::operator=(vector<T,A>&& v)
 {
-    if (this == v) return *this;
+    if (this == &v) return *this;
 
-    // destroy old elements, deallocate old space
-    // for (auto i = 0; i < sz; ++i) alloc.destroy(&elem[i]);
-    std::destroy_n(elem, sz);
-    alloc.deallocate(elem, space);
+    std::destroy_n(this->elem, this->sz);
+    this->sz = 0;
+    this->space = 0;
 
-    elem = v.elem;      // steal v's elements
-    space = sz = v.sz;
-
-    v.sz = 0;           // make v the empty vector
-    v.space = 0;
-    v.elem = nullptr;
+    std::swap<vector_base<T,A>>(*this, v);
     return *this;
+}
+
+template<typename T, typename A>
+T& vector<T,A>::operator[](std::size_t n)
+{
+    return this->elem[n];
+}
+
+template<typename T, typename A>
+const T& vector<T,A>::operator[](std::size_t n) const
+{
+    return this->elem[n];
+}
+
+template<typename T, typename A>
+T& vector<T,A>::at(std::size_t n)
+{
+    if (n < 0 || this->sz <= n) throw std::out_of_range();
+    return this->elem[n];
+}
+
+template<typename T, typename A>
+const T& vector<T,A>::at(std::size_t n) const
+{
+    if (n < 0 || this->sz <= n) throw std::out_of_range();
+    return this->elem[n];
 }
 
 template<typename T, typename A>
 void vector<T,A>::reserve(std::size_t new_space)
 {
-    if (new_space <= space) return;
+    if (new_space <= this->space) return;
 
-    // double* p = new T[new_size];
-    T* p = alloc.allocate(new_space);
-    // for (int i = 0; i < sz; ++i) { p[i] = elem[i]; }
-    // for (auto i = 0; i < sz; ++i) alloc.construct(&p[i], elem[i]);
-    std::uninitialized_copy_n(elem, sz, p);
+    vector_base<T,A> base{new_space};
+    std::uninitialized_copy_n(this->elem, this->sz, base.elem);
 
-    // delete[] elem;
-    // for (auto i = 0; i < sz; ++i) alloc.destroy(&elem[i]);
-    std::destroy_n(elem, sz);
-    alloc.deallocate(elem, space);
+    std::destroy_n(this->elem, this->sz);
+    this->sz = 0;
+    this->space = 0;
 
-    space = new_space;
-    elem = p;
+    std::swap<vector_base<T,A>>(*this, base);
 }
 
 template<typename T, typename A>
 void vector<T,A>::resize(std::size_t new_sz, T def)
 {
     reserve(new_sz);
-
-    // for (int i = sz; i < new_size; ++i) { elem[i] = 0.0; }
-    // for (auto i = sz; i < new_sz; ++i) alloc.construct(&elem[i], def);
-    std::uninitialized_fill(elem + sz, elem + new_sz, def);
-
-    // vector of double didn't care about [new_size, sz)
-    // for (auto i = new_sz; i < sz; ++i) alloc.destroy(&elem[i]);
-    std::destroy(elem + new_sz, elem + sz);
-
-    sz = new_sz;
+    std::uninitialized_fill(
+        this->elem + this->sz, this->elem + new_sz, def
+    );
+    std::destroy(this->elem + new_sz, this->elem + this->sz);
+    this->sz = new_sz;
 }
 
 template<typename T, typename A>
 void vector<T,A>::push_back(const T& val)
 {
-    if (space == 0) reserve(8);
-    else if (sz == space) reserve(2 * space);
+    if (this->space == 0) reserve(8);
+    else if (this->sz == this->space) reserve(2 * this->space);
 
-    // elem[sz] = val;
-    // alloc.construct(&elem[sz], val);
-    std::uninitialized_fill_n(elem + sz, 1, val);
-    ++sz;
+    std::uninitialized_fill_n(this->elem + this->sz, 1, val);
+    ++(this->sz);
 }
 
 }

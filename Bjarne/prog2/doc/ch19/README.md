@@ -199,18 +199,19 @@ namespace ch19 {
  * Invariant:
  *  if 0 ≤ n < sz, elem[n] is element n;
  *  sz ≤ space;
- *  if sz < space, there is space for (space - sz) doubles after elem[sz - 1];
+ *  if sz < space, there is space for (space-sz) elements after elem[sz-1];
  */
 template<typename T, typename A = std::allocator<T>>
-class vector {
+class vector
+{
     A alloc;
+    T* elem;
     std::size_t sz;
     std::size_t space;
-    T* elem;
 public:
-    vector() : alloc{}, sz{0}, space{0}, elem{nullptr} {}
+    vector();
     ~vector();
-    vector(std::size_t, T = T());
+    explicit vector(std::size_t, T = T());
     vector(std::initializer_list<T>);
 
     vector(const vector&);
@@ -219,8 +220,10 @@ public:
     vector(vector&&);
     vector& operator=(vector&&);
 
-    T& operator[](std::size_t n) { return elem[n]; }
-    const T& operator[](std::size_t n) const { return elem[n]; }
+    T& operator[](std::size_t);
+    const T& operator[](std::size_t) const;
+    T& at(std::size_t);
+    const T& at(std::size_t) const;
 
     std::size_t size() const { return sz; }
     std::size_t capacity() const { return space; }
@@ -231,44 +234,38 @@ public:
 };
 
 template<typename T, typename A>
+vector<T,A>::vector()
+    : alloc{}, elem{nullptr}, sz{0}, space{0}
+{}
+
+template<typename T, typename A>
 vector<T,A>::~vector()
 {
-    // for (auto i = 0; i < sz; ++i) alloc.destroy(&elem[i]);
     std::destroy_n(elem, sz);
     alloc.deallocate(elem, space);
 }
 
 template<typename T, typename A>
 vector<T,A>::vector(std::size_t size, T def)
-    : alloc{}
-    , sz{size}
-    , space{size}
-    , elem{alloc.allocate(size)}
+    : alloc{}, elem{alloc.allocate(size)}
+    , sz{size}, space{size}
 {
-    // for (auto i = 0; i < size; ++i) alloc.construct(&elem[i], def);
     std::uninitialized_fill_n(elem, sz, def);
 }
 
 template<typename T, typename A>
 vector<T,A>::vector(std::initializer_list<T> lst)
-    : alloc{}
-    , sz{lst.size()}
-    , space{lst.size()}
-    , elem{alloc.allocate(lst.size())}
+    : alloc{}, elem{alloc.allocate(lst.size())}
+    , sz{lst.size()}, space{lst.size()}
 {
-    // auto data = std::data(lst);
-    // for (auto i = 0; i < sz; ++i) alloc.construct(&elem[i], data[i]);
     std::uninitialized_copy_n(lst.begin(), sz, elem);
 }
 
 template<typename T, typename A>
 vector<T,A>::vector(const vector<T,A>& v)
-    : alloc{}
-    , sz{v.sz}
-    , space{v.sz}
-    , elem{alloc.allocate(v.sz)}
+    : alloc{}, elem{alloc.allocate(v.sz)}
+    , sz{v.sz}, space{v.sz}
 {
-    // for (auto i = 0; i < v.sz; ++i) alloc.construct(&elem[i], v.elem[i]);
     std::uninitialized_copy_n(v.elem, sz, elem);
 }
 
@@ -278,35 +275,29 @@ vector<T,A>& vector<T,A>::operator=(const vector<T,A>& v)
     if (this == &v) return *this;
 
     if (v.sz <= space) {
-        // for (auto i = 0; i < sz; ++i) alloc.destroy(&elem[i]);
         std::destroy_n(elem, sz);
-        // for (auto i = 0; i < v.sz; ++i) alloc.construct(&elem[i], v.elem[i]);
         std::uninitialized_copy_n(v.elem, sz, elem);
         sz = v.sz;
     } else {
         T* p = alloc.allocate(v.sz);
-        // for (auto i = 0; i < v.sz; ++i) alloc.construct(&p[i], v.elem[i]);
         std::uninitialized_copy_n(v.elem, sz, p);
-        // for (auto i = 0; i < sz; ++i) alloc.destroy(&elem[i]);
+
         std::destroy_n(elem, sz);
         alloc.deallocate(elem, space);
 
-        space = sz = v.sz;
         elem = p;
+        space = sz = v.sz;
     }
     return *this;
 }
 
 template<typename T, typename A>
 vector<T,A>::vector(vector<T,A>&& v)
-    : alloc{}
-    , sz{v.sz}
-    , space{v.space}
-    , elem{v.elem}
+    : alloc{}, elem{v.elem}, sz{v.sz}, space{v.space}
 {
-    v.sz = 0;           // make v the empty vector
+    v.elem = nullptr;   // make v the empty vector
+    v.sz = 0;
     v.space = 0;
-    v.elem = nullptr;
 }
 
 template<typename T, typename A>
@@ -314,18 +305,42 @@ vector<T,A>& vector<T,A>::operator=(vector<T,A>&& v)
 {
     if (this == v) return *this;
 
-    // destroy old elements, deallocate old space
-    // for (auto i = 0; i < sz; ++i) alloc.destroy(&elem[i]);
     std::destroy_n(elem, sz);
     alloc.deallocate(elem, space);
 
     elem = v.elem;      // steal v's elements
     space = sz = v.sz;
 
-    v.sz = 0;           // make v the empty vector
+    v.elem = nullptr;   // make v the empty vector
+    v.sz = 0;
     v.space = 0;
-    v.elem = nullptr;
     return *this;
+}
+
+template<typename T, typename A>
+T& vector<T,A>::operator[](std::size_t n)
+{
+    return elem[n];
+}
+
+template<typename T, typename A>
+const T& vector<T,A>::operator[](std::size_t n) const
+{
+    return elem[n];
+}
+
+template<typename T, typename A>
+T& vector<T,A>::at(std::size_t n)
+{
+    if (n < 0 || sz <= n) throw std::out_of_range();
+    return elem[n];
+}
+
+template<typename T, typename A>
+const T& vector<T,A>::at(std::size_t n) const
+{
+    if (n < 0 || sz <= n) throw std::out_of_range();
+    return elem[n];
 }
 
 template<typename T, typename A>
@@ -333,34 +348,22 @@ void vector<T,A>::reserve(std::size_t new_space)
 {
     if (new_space <= space) return;
 
-    // double* p = new T[new_size];
     T* p = alloc.allocate(new_space);
-    // for (int i = 0; i < sz; ++i) { p[i] = elem[i]; }
-    // for (auto i = 0; i < sz; ++i) alloc.construct(&p[i], elem[i]);
     std::uninitialized_copy_n(elem, sz, p);
 
-    // delete[] elem;
-    // for (auto i = 0; i < sz; ++i) alloc.destroy(&elem[i]);
     std::destroy_n(elem, sz);
     alloc.deallocate(elem, space);
 
-    space = new_space;
     elem = p;
+    space = new_space;
 }
 
 template<typename T, typename A>
 void vector<T,A>::resize(std::size_t new_sz, T def)
 {
     reserve(new_sz);
-
-    // for (int i = sz; i < new_size; ++i) { elem[i] = 0.0; }
-    // for (auto i = sz; i < new_sz; ++i) alloc.construct(&elem[i], def);
     std::uninitialized_fill(elem + sz, elem + new_sz, def);
-
-    // vector of double didn't care about [new_size, sz)
-    // for (auto i = new_sz; i < sz; ++i) alloc.destroy(&elem[i]);
     std::destroy(elem + new_sz, elem + sz);
-
     sz = new_sz;
 }
 
@@ -370,8 +373,6 @@ void vector<T,A>::push_back(const T& val)
     if (space == 0) reserve(8);
     else if (sz == space) reserve(2 * space);
 
-    // elem[sz] = val;
-    // alloc.construct(&elem[sz], val);
     std::uninitialized_fill_n(elem + sz, 1, val);
     ++sz;
 }
@@ -379,4 +380,359 @@ void vector<T,A>::push_back(const T& val)
 }
 ```
 
-## Range checking and exceptions (§19.4)
+## Resources and exceptions (§19.5)
+
+We don’t like repetitive and ugly code because
+- *repetitive* translates into code that is a maintenance hazard, and
+- *ugly* translates into code that is hard to get right, hard to read, and a maintenance hazard.
+
+We can add a `try`-block to deal with the possibility of a `throw`:
+
+```c++
+vector<int>* make_vec()
+{
+    vector<int>* p = new vector<int>;
+    try {
+        // fill the vector with data; this may throw an exception
+        return p;
+    } catch(...) {
+        delete p;
+        throw;      // re-throw
+    }
+}
+```
+
+This `make_vec()` function illustrates a very common style of error handling: it tries to do its job and if it can’t, it cleans up any local resources (here the vector on the free store) and indicates failure by throwing an exception. Here, the exception thrown is one that some other function (e.g., `vector::at()`) threw; `make_vec()` simply re-throws it using `throw;`. This is a simple and effective way of dealing with errors and can be used systematically.
+
+- The purpose of the `try ... catch` code is to ensure that `make_vec()` either succeeds or throws an exception without having leaked any resources. That’s often called the *basic guarantee*.
+
+So, `make_vec()` is a useful kind of function that obeys the basic rules for good resource management in the presence of exceptions. It provides the basic guarantee when we want to recover from exception throws. Unless something nasty is done with nonlocal data in the "fill the vector with data" part, it even provides the strong guarantee.
+
+- If, in addition to providing the basic guarantee, a function also ensures that all observable values (all values not local to the function) are the same after failure as they were when we called the function, that function is said to provide the *strong guarantee*. The strong guarantee is the ideal when we write a function: either the function succeeded at doing everything it was asked to do or else nothing happened except that an exception was thrown to indicate failure.
+
+However, that `try ... catch` code is still ugly. The solution is obvious: somehow we must use RAII; that is, we need to provide an object to hold that `vector<int>` so that it can delete the `vector` if an exception occurs. In `<memory>`, the standard library provides `unique_ptr` for that:
+
+```c++
+vector<int>* make_vec()
+{
+    std::unique_ptr<vector<int>> p {new vector<int>};
+    // fill the vector with data; this may throw an exception
+    return p.release();     // return tge pointer held by p
+}
+```
+
+The `unique_ptr` owns the object pointed to: when the `unique_ptr` is destroyed, it deletes the object it points to. That means that if an exception is thrown while the `vector<int>` is being filled, or if we return prematurely from `make_vec`, the `vector<int>` is properly destroyed.
+
+The `p.release()` extracts the contained pointer (to the `vector<int>`) from `p` so that we can return it, and it also makes `p` hold the `nullptr` so that destroying `p` (as is done by the return) does not destroy anything.
+
+- The version of `make_vec()` that uses a `unique_ptr` is fine, except that it still returns a pointer, so that someone still has to remember to delete that pointer.
+
+The technique of returning a lot of information by placing it on the free store and returning a pointer to it is very common. It is also a source of a lot of complexity and one of the major sources of memory management errors:
+
+- Who deletes a pointer to the free store returned from a function?
+- Are we sure that a pointer to an object on the free store is properly deleted in case of an exception?
+
+Fortunately, when we added move operations to `vector`, we solved that problem for `vector`s: just use a move constructor to get the ownership of the elements out of the function. For example:
+
+```c++
+vector<int> make_vec()
+{
+    vector<int> res;
+    // fill the vector with data; this may throw an exception
+    return res;         // the move constructor efficiently transfers ownership
+}
+```
+
+## RAII for `vector` (§19.5.6)
+
+Consider `reserve()`:
+
+```c++
+template<typename T, typename A>
+void vector<T,A>::reserve(std::size_t new_space)
+{
+    if (new_space <= space) return;
+
+    T* p = alloc.allocate(new_space);
+    std::uninitialized_copy_n(elem, sz, p);
+
+    std::destroy_n(elem, sz);
+    alloc.deallocate(elem, space);
+
+    elem = p;
+    space = new_space;
+}
+```
+
+We use the standard library function `std::uninitialized_copy_n` to construct copies of the elements in `p` because it correctly handles throws from an element copy constructor and because calling a function is simpler than writing a loop.
+
+Note that the copy operation for old elements, `std::uninitialized_copy_n`, might throw an exception. So, `p` is an example of the problem we warned about with `make_vec()`. We could apply the `unique_ptr` solution. A better solution is to step back and realize that *memory for a vector"* is a resource; that is, we can define a class `vector_base` to represent the fundamental concept we have been using all the time:
+
+```c++
+template<typename T, typename A>
+struct vector_base
+{
+    A alloc;            // allocator
+    T* elem;            // start of allocation
+    std::size_t sz;     // number of elements
+    std::size_t space;  // amount of allocated space
+
+    vector_base(std::size_t n, const A& a = A())
+        : alloc{a}, elem{nullptr}
+        , sz{n}, space{n}
+    {
+        if (0 < n) elem = alloc.allocate(n);
+    }
+
+    ~vector_base()
+    {
+        if (elem) alloc.deallocate(elem, space);
+    }
+};
+
+template<typename T, typename A = std::allocator<T>>
+class vector : private vector_base<T,A>
+{
+public:
+    // ...
+};
+
+#include <utility>  // for std::swap
+
+template<class T, class A>
+void vector<T,A>::reserve(int new_space)
+{
+    if (new_space <= capacity()) return;
+
+    vector_base<T,A> b {this->alloc, new_space};
+    std::uninitialized_copy_n(this->elem, this->sz, b.elem);
+
+    std::destroy_n(this->elem, this->sz);
+    this->sz = 0;
+    this->space = 0;
+
+    std::swap<vector_base<T,A>>(*this, b);
+}
+```
+
+Note that `vector_base` deals with memory rather than (typed) objects. Our `vector` implementation can use that to hold objects of the desired element type. Basically, `vector` is simply a convenient interface to `vector_base`.
+
+When we exit `reserve()`, the old allocation is automatically freed by `vector_base`’s destructor if the copy operation succeeded. If instead that exit is caused by the copy operation throwing an exception, the new allocation is freed. The `swap()` function is a standard library algorithm (from `<algorithm>`) that exchanges the value of two objects.
+
+- We used `swap<vector_base<T,A>>(*this,b)` rather than the simpler `swap(*this,b)` because `*this` and `b` are of different types (`vector` and `vector_base`, respectively), so we had to be explicit about which swap specialization we wanted.
+- Similarly, we have to explicitly use `this–>` when we refer to a member of the base class `vector_base<T,A>` from a member of the derived class `vector<T,A>`, such as `vector<T,A>::reserve()`.
+
+
+Since C++20, the type parameter `T` of [`std::swap()`](https://en.cppreference.com/w/cpp/algorithm/swap) must meet the requirements of `MoveConstructible` and `MoveAssignable`. Therefore, `vector_base` must provide the move consturctor and the move assignment operator.
+
+```c++
+template<typename T, typename A>
+struct vector_base
+{
+    A alloc;            // allocator
+    T* elem;            // start of allocation
+    std::size_t sz;     // number of elements
+    std::size_t space;  // amount of allocated space
+
+    vector_base()
+        : alloc{}, elem{nullptr}, sz{0}, space{0}
+    {}
+
+    explicit vector_base(std::size_t n, const A& a = A())
+        : alloc{a}, elem{nullptr}, sz{n}, space{n}
+    {
+        if (0 < n) elem = alloc.allocate(n);
+    }
+
+    ~vector_base()
+    {
+        if (elem) alloc.deallocate(elem, space);
+    }
+
+    vector_base(vector_base&& b)
+        : alloc{b.alloc}, elem{b.elem}, sz{b.sz}, space{b.space}
+    {
+        b.elem = nullptr;
+        b.sz = 0;
+        b.space = 0;
+    }
+
+    vector_base& operator=(vector_base&& b)
+    {
+        if (elem) alloc.deallocate(elem, space);
+        elem  = std::exchange(b.elem, nullptr);
+        sz    = std::exchange(b.sz, 0);
+        space = std::exchange(b.space, 0);
+        return *this;
+    }
+};
+```
+
+`std::exchange()` of `<utility>` replaces the value of `obj` with `new_value` and returns the old value of `obj`. `T` must meet the requirements of `MoveConstructible`. Also, it must be possible to move-assign objects of type `U` to objects of type `T`.
+
+```c++
+template< class T, class U = T >
+T exchange( T& obj, U&& new_value );        // since C++14
+```
+
+With `vector_base`, we can implment `vector`:
+
+```c++
+template<typename T, typename A = std::allocator<T>>
+class vector : private vector_base<T,A>
+{
+public:
+    vector();
+    ~vector();
+    explicit vector(std::size_t, T = T());
+    vector(std::initializer_list<T>);
+
+    vector(const vector&);
+    vector& operator=(const vector&);
+
+    vector(vector&&);
+    vector& operator=(vector&&);
+
+    T& operator[](std::size_t);
+    const T& operator[](std::size_t) const;
+    T& at(std::size_t);
+    const T& at(std::size_t) const;
+
+    std::size_t size() const { return this->sz; }
+    std::size_t capacity() const { return this->space; }
+
+    void reserve(std::size_t);
+    void resize(std::size_t, T = T());
+    void push_back(const T&);
+};
+
+template<typename T, typename A>
+vector<T,A>::vector()
+    : vector_base<T,A>{0}
+{}
+
+template<typename T, typename A>
+vector<T,A>::~vector()
+{}
+
+template<typename T, typename A>
+vector<T,A>::vector(std::size_t size, T def)
+    : vector_base<T,A>{size}
+{
+    std::uninitialized_fill_n(this->elem, size, def);
+}
+
+template<typename T, typename A>
+vector<T,A>::vector(std::initializer_list<T> lst)
+    : vector_base<T,A>{lst.size()}
+{
+    std::uninitialized_copy_n(lst.begin(), lst.size(), this->elem);
+}
+
+template<typename T, typename A>
+vector<T,A>::vector(const vector<T,A>& v)
+    : vector_base<T,A>{v.sz}
+{
+    std::uninitialized_copy_n(v.elem, v.sz, this->elem);
+}
+
+template<typename T, typename A>
+vector<T,A>& vector<T,A>::operator=(const vector<T,A>& v)
+{
+    if (this == &v) return *this;
+
+    if (v.sz <= this->space) {
+        std::destroy_n(this->elem, this->sz);
+        std::uninitialized_copy_n(v.elem, v.sz, this->elem);
+        this->sz = v.sz;
+    } else {
+        vector_base<T,A> base{v.sz};
+        std::uninitialized_copy_n(v.elem, v.sz, base.elem);
+        std::destroy_n(this->elem, this->sz);
+        std::swap<vector_base<T,A>>(*this, base);
+    }
+    return *this;
+}
+
+template<typename T, typename A>
+vector<T,A>::vector(vector<T,A>&& v)
+    : vector_base<T,A>{0}
+{
+    std::swap<vector_base<T,A>>(*this, v);
+}
+
+template<typename T, typename A>
+vector<T,A>& vector<T,A>::operator=(vector<T,A>&& v)
+{
+    if (this == &v) return *this;
+
+    std::destroy_n(this->elem, this->sz);
+    this->sz = 0;
+    this->space = 0;
+
+    std::swap<vector_base<T,A>>(*this, v);
+    return *this;
+}
+
+template<typename T, typename A>
+T& vector<T,A>::operator[](std::size_t n)
+{
+    return this->elem[n];
+}
+
+template<typename T, typename A>
+const T& vector<T,A>::operator[](std::size_t n) const
+{
+    return this->elem[n];
+}
+
+template<typename T, typename A>
+T& vector<T,A>::at(std::size_t n)
+{
+    if (n < 0 || this->sz <= n) throw std::out_of_range();
+    return this->elem[n];
+}
+
+template<typename T, typename A>
+const T& vector<T,A>::at(std::size_t n) const
+{
+    if (n < 0 || this->sz <= n) throw std::out_of_range();
+    return this->elem[n];
+}
+
+template<typename T, typename A>
+void vector<T,A>::reserve(std::size_t new_space)
+{
+    if (new_space <= this->space) return;
+
+    vector_base<T,A> base{new_space};
+    std::uninitialized_copy_n(this->elem, this->sz, base.elem);
+
+    std::destroy_n(this->elem, this->sz);
+    this->sz = 0;
+    this->space = 0;
+
+    std::swap<vector_base<T,A>>(*this, base);
+}
+
+template<typename T, typename A>
+void vector<T,A>::resize(std::size_t new_sz, T def)
+{
+    reserve(new_sz);
+    std::uninitialized_fill(
+        this->elem + this->sz, this->elem + new_sz, def
+    );
+    std::destroy(this->elem + new_sz, this->elem + this->sz);
+    this->sz = new_sz;
+}
+
+template<typename T, typename A>
+void vector<T,A>::push_back(const T& val)
+{
+    if (this->space == 0) reserve(8);
+    else if (this->sz == this->space) reserve(2 * this->space);
+
+    std::uninitialized_fill_n(this->elem + this->sz, 1, val);
+    ++(this->sz);
+}
+```
