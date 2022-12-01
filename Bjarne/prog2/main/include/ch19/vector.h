@@ -3,8 +3,9 @@
 #include <memory>
 #include <utility>
 #include <initializer_list>
-// for debug
+#ifndef NDEBUG
 #include <iostream>
+#endif
 
 namespace ch19 {
 
@@ -41,20 +42,26 @@ template<typename T>
 mem<T>::mem(T* p, std::size_t n)
     : alloc {}, p {p}, n {n}
 {
+#ifndef NDEBUG
     std::cout << "new  " << n << '\n';
+#endif
 }
  
 template<typename T>
 mem<T>::mem()
     : alloc {}, p {nullptr}, n {0}
 {
+#ifndef NDEBUG
     std::cout << "new  0\n";
+#endif
 }
 
 template<typename T>
 mem<T>::~mem()
 {
+#ifndef NDEBUG
     std::cout << "del  " << n << '\n';
+#endif
     alloc.deallocate(p, n);
 }
 
@@ -62,7 +69,9 @@ template<typename T>
 mem<T>::mem(std::size_t n)
     : alloc {}, p {nullptr}, n {n}
 {
+#ifndef NDEBUG
     std::cout << "size " << n << '\n';
+#endif
     p = alloc.allocate(n);
     // std::uninitialized_fill_n(p, n, T {});
 }
@@ -71,7 +80,9 @@ template<typename T>
 mem<T>::mem(const mem<T>& that)
     : alloc {}, p {nullptr}, n {that.n}
 {
+#ifndef NDEBUG
     std::cout << "ctor " << n << '\n';
+#endif
     p = alloc.allocate(n);
     std::uninitialized_copy_n(that.p, n, p);
 }
@@ -79,11 +90,12 @@ mem<T>::mem(const mem<T>& that)
 template<typename T>
 mem<T>& mem<T>::operator=(const mem<T>& that)
 {
-    if (this == &that) return *this;
-
+#ifndef NDEBUG
     std::cout << "copy " << that.n
     << ':' << n
     << '\n';
+#endif
+    if (this == &that) return *this;
 
     if (n < that.n) {
         mem<T> new_mem { alloc.allocate(that.n), that.n };
@@ -102,7 +114,9 @@ template<typename T>
 mem<T>::mem(mem<T>&& that)
     : alloc {}, p {that.p}, n {that.n}
 {
+#ifndef NDEBUG
     std::cout << "mtor " << n << '\n';
+#endif
     that.p = nullptr;
     that.n = 0;
 }
@@ -110,7 +124,9 @@ mem<T>::mem(mem<T>&& that)
 template<typename T>
 mem<T>& mem<T>::operator=(mem<T>&& that)
 {
+#ifndef NDEBUG
     std::cout << "move " << that.n << '\n';
+#endif
     if (this == &that) return *this;
 
     std::destroy_n(p, n);
@@ -123,11 +139,12 @@ mem<T>& mem<T>::operator=(mem<T>&& that)
 template<typename T>
 void mem<T>::reserve(std::size_t new_n)
 {
-    if (new_n <= n) return;
-
+#ifndef NDEBUG
     std::cout << "resv " << n
     << ':' << new_n
     << '\n';
+#endif
+    if (new_n <= n) return;
 
     mem<T> new_mem {alloc.allocate(new_n), new_n};
     std::uninitialized_copy_n(p, n, new_mem.p);
