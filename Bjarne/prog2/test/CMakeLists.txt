@@ -12,3 +12,4 @@ target_link_libraries(sniff
 add_subdirectory(ch17)
 add_subdirectory(ch18)
 add_subdirectory(ch19)
+add_subdirectory(ch26)
