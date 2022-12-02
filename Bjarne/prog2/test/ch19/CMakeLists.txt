@@ -5,6 +5,13 @@ target_link_libraries(vector19_ut
 
 add_test(NAME vector19_UT COMMAND vector19_ut)
 
+add_executable(vector_ptr19_ut vector_ptr_ut.cpp)
+target_link_libraries(vector_ptr19_ut
+    PUBLIC incl ut cxx_std
+)
+
+add_test(NAME vector_ptr19_UT COMMAND vector_ptr19_ut)
+
 add_executable(drill19_ut drill_ut.cpp)
 target_link_libraries(drill19_ut
     PUBLIC incl ut cxx_std
