@@ -25,3 +25,10 @@ target_link_libraries(exercise19_ut
 )
 
 add_test(NAME exercise19_UT COMMAND exercise19_ut)
+
+add_executable(uniq_file_ut uniq_file_ut.cpp)
+target_link_libraries(uniq_file_ut
+    PUBLIC incl ut cxx_std
+)
+
+add_test(NAME uniq_file_UT COMMAND uniq_file_ut)
