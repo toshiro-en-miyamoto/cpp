@@ -28,4 +28,142 @@ If `p` and `q` are iterators to elements of the same sequence:
 | `++p`      | makes `p` refer to the next element (*1)
 |            | (*1): or one beyond the last element (i.e., `end`)
 
+## Generalizing `vector` yet again
 
+```c++
+template<typename T>
+class vector
+{
+public:
+    using size_type = unsigned long;
+    using value_type = T;
+    using iterator = T*;
+    using const_iterator = const T*;
+
+    iterator begin();
+    const_iterator begin() const;
+    iterator end();
+    const_iterator end() const;
+
+    size_type size();
+};
+```
+
+All the standard library algorithms are defined in terms of these member type names, such as `iterator` and `size_type`, so that they don’t unnecessarily depend on the implementations of containers or exactly which kind of container they operate on.
+
+```c++
+// using iterator = T*;
+// using const_iterator = T*;
+vector<int>::iterator p = find(v.begin(), v.end(), 32);
+// using size_type = unsigned long
+for (vector<int>::size_type i = 0; i < v.size(); ++i) print(v[i]);
+```
+
+A `using` declaration is a C++11 notation for and a generalization of what was known in C and C++ as a `typedef`.
+
+### Container traversal
+
+We can traverse a standard library `vector` and `list` using the simpler range-`for`-loop:
+
+```c++
+void print2(const std::vector<double>& v)
+{
+    for (double x : v)
+        std::cout << x << '\n';
+}
+```
+
+The trick is that the range-`for`-loop is defined in terms of `begin()` and `end()` functions returning iterators to the first and one beyond the end of our `vector` elements. The range-`for`-loop is simply syntactic sugar for a loop over a sequence using iterators.
+
+### `auto`
+
+When we have to write out loops over a generic structure, naming the iterators can be a real nuisance.
+
+```c++
+template<typename T>
+void user(std::vector<T>& v, std::list<T>& lst)
+{
+    for (std::vector<T>::iterator p = v.begin; p != end(); ++p)
+        std::cout << *p << '\n';
+
+    list<T>::iterator q = find(lst.begin(), lst.end(), T{42});
+}
+```
+
+Fortunately, we don’t have to: we can declare a variable `auto`, meaning use the type of the `iterator` as the type of the variable:
+
+```c++
+template<typename T>
+void user(std::vector<T>& v, std::list<T>& lst)
+{
+    for (auto p = v.begin; p != end(); ++p)
+        std::cout << *p << '\n';
+
+    auto q = find(lst.begin(), lst.end(), T{42});
+}
+```
+
+One common use of `auto` is to specify the loop variable in a range-`for`-loop.
+
+```c++
+template<typename C>    // requires Container<T>
+void print3(const C& cont)
+{
+    for (const auto& x : cont)
+        std::cout << x << '\n';
+}
+```
+
+Here, we use
+
+- `auto` because it is not all that easy to name the element type of the container `cont`, 
+- `const` because we are not writing to the container elements, and 
+- `&` (for reference) in case the elements are so large that copying them would be costly.
+
+## Adapting built-in arrays to STL
+
+```c++
+template <typename T, int N>
+class array
+{
+    T elems[N];
+    // no explicit construct/copy/destroy needed
+public:
+    using value_type = T;
+    using iterator = T*;
+    using const_iterator = const T*;
+    using size_type = unsigned long;
+
+    iterator begin() { return elems; }
+    const_iterator begin() const { return elems; }
+    iterator end() { return elems + N; }
+    const_iterator end() const { return elems + N; }
+
+    size_type size() const { return N; }
+
+    T& operator[](size_type n) { return elems[n]; }
+    const T& operator[](size_type n) const { return elems[n]; }
+
+    T* data() { return elems; }
+    const T* data() const { return elems; }
+};
+```
+
+## Iterator categories
+
+Five categories:
+
+- input iterator (in)
+- output iterator (out)
+- forward iterator (forw)
+- bidirectional iterator (bidi)
+- random-access iterator (rand)
+
+| ops   | operation | in | out | forw | bidi | rand |
+|:-----:|-----------|:--:|:---:|:----:|:----:|:----:|
+| `*`   | read      | v  |     | v    | v    | v    |
+| `*`   | write     |    | v   | v    | v    | v    |
+| `++`  | forward   | v  | v   | v    | v    | v    |
+| `--`  | backward  |    |     |      | v    | v    |
+| `+ n` | forward   |    |     |      |      | v    |
+| `- n` | backward  |    |     |      |      | v    |
