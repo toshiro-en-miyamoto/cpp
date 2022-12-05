@@ -4,7 +4,7 @@
             "name": "(gdb) vector19_ut",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/test/ch19/vector19_ut",
+            "program": "${workspaceFolder}/build/test/ch20/vector20_ut",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
