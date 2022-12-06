@@ -17,6 +17,8 @@ public:
     using const_reference = mem<T,A>::const_reference;
     using pointer = mem<T,A>::pointer;
     using const_pointer = mem<T,A>::const_pointer;
+    using iterator = mem<T,A>::pointer;
+    using const_iterator = mem<T,A>::const_pointer;
 
     vector();
     ~vector();
@@ -36,6 +38,15 @@ public:
     using mem<T,A>::reserve;
     void resize(size_type, value_type = value_type());
     void push_back(const_reference);
+
+    iterator begin()
+    { return this->data(); }
+    const_iterator begin() const
+    { return this->data(); }
+    iterator end()
+    { return this->data() + sz; }
+    const_iterator end() const
+    { return this->data() + sz; }
 
 private:
     size_type sz;               // the number of Ts

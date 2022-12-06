@@ -1,11 +1,16 @@
 #include <ch20/vector.h>
 #include <boost/ut.hpp>
 #include <my/hijack.h>
+#include <algorithm>
 
 struct int_char
 {
     int n;
     char c;
+
+    // std::find() requires '=='
+    bool operator==(const int_char& other)
+    { return n == other.n && c == other.c; }
 };
 
 int main()
@@ -623,6 +628,54 @@ int main()
                         "del  8\n"
                         "del  16\n"
                     ) << actual;
+                };
+            };
+        };
+        "iterating"_test = [] {
+            given("ten-slot vector") = [] {
+                when("manipulating iterators") = [] {
+                    my::hijack hj(std::cout);
+                    {
+                        vector_t v {
+                            {1, 'a'}, {2, 'b'}, {3, 'c'}, {4, 'd'},
+                            {5, 'e'}, {6, 'f'}, {7, 'g'}, {8, 'h'},
+                            {9, 'i'}, {10, 'j'}
+                        };
+                        int sum = 0;
+                        for (auto i = v.begin(); i != v.end(); ++i) {
+                            auto [num, ch] = *i;
+                            sum += num;
+                        }
+                        expect(sum == 55_i) << sum;
+                    }
+                };
+                when("using range-for-loop") = [] {
+                    my::hijack hj(std::cout);
+                    {
+                        vector_t v {
+                            {1, 'a'}, {2, 'b'}, {3, 'c'}, {4, 'd'},
+                            {5, 'e'}, {6, 'f'}, {7, 'g'}, {8, 'h'},
+                            {9, 'i'}, {10, 'j'}
+                        };
+                        int sum = 0;
+                        for (auto [num, ch] : v) {
+                            sum += num;
+                        }
+                        expect(sum == 55_i) << sum;
+                    }
+                };
+                when("finding an element") = [] {
+                    my::hijack hj(std::cout);
+                    {
+                        vector_t v {
+                            {1, 'a'}, {2, 'b'}, {3, 'c'}, {4, 'd'},
+                            {5, 'e'}, {6, 'f'}, {7, 'g'}, {8, 'h'},
+                            {9, 'i'}, {10, 'j'}
+                        };
+                        vector_t::value_type e {5, 'e'};
+                        auto p = std::find(v.begin(), v.end(), e);
+                        expect(*p == e);
+                    }
                 };
             };
         };
