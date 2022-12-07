@@ -92,4 +92,67 @@ When universal references are in use, type deduction distinguishes between lvalu
 
 ### Case 3: `ParamType` is Neither a Pointer nor a Reference
 
+When `ParamType` is neither a pointer nor a reference, we’re dealing with pass-by-value:
+
+```c++
+template<typename T>
+void f(T param);
+```
+
+That means that `param` will be a copy of whatever is passed in — a completely new object.
+
+1. As before, if `expr`'s type is a reference, ignore the reference part.
+2. If, after ignoring `expr`'s reference-ness, `expr` is `const`, ignore that, too.
+
+| argument             | call    | `T`   | `param`
+|----------------------|---------|-------|------------
+| `int x = 27;`        | `f(x)`  | `int` | `int`
+| `const int cx = x;`  | `f(cx)` | `int` | `int`
+| `const int& rx = x;` | `f(rx)` | `int` | `int`
+
+Even though `cx` and `rx` represent `const` values, `param` isn’t `const`. That makes sense. `param` is an object that’s completely independent of `cx` and `rx` — a copy of `cx` or `rx`.
+
+### Case 4: Array Arguments
+
+Here, the `const char*` ponter `p` is being initialized with `name`, which is a `const char[13]`. These types, `const char*` and `const char[13]`, are not the same, but because of the *array-to-pointer decay rule*, the code compiles.
+
+```c++
+const char name[] = "J. P. Briggs";
+const char* p = name;
+```
+
+We begin with the observation that there is no such thing as a function parameter that’s an array. Yes, yes, the syntax is legal,
+
+```c++
+void f(int param[]);
+```
+
+but the array declaration is treated as a pointer declaration, meaning that `f()` could equivalently be declared like this:
+
+```c++
+void f(int* param);
+```
+
+Try to compile the code below; it won't compile.
+
+```c++
+void f(int param[]);
+void f(int* param);
+
+//  error: redefinition of ‘void f(int*)’
+```
+
+But what if an array is passed to a template taking a by-value parameter?
+
+```c++
+template<typename T>
+void f(T param);
+
+
+f(name);
+```
+
+| argument  | call    | `T`   | `param`
+|---------------------------------------|---------|-------|------------
+| `const char name[] = "J. P. Briggs";` | `f(name)` | `const char*` | `const char*`
 
