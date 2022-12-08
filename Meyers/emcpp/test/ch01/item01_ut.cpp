@@ -1,45 +1,70 @@
 #include <typeinfo>
 #include <boost/ut.hpp>
 
-using namespace boost::ut;
-using namespace boost::ut::bdd;
+// these five template functions help cheet how our compiler
+// deduces the types of 'T' and 'arg'
+using type_inf = const std::type_info&;
 
 template<typename T>
-bool f_val(T arg, const std::type_info& type_t, const std::type_info& arg_t
+bool f_val(T arg, type_inf type_t, type_inf arg_t
 ) { return typeid(T) == type_t && typeid(arg) == arg_t; }
 
 template<typename T>
-bool f_refref(T&& arg, const std::type_info& type_t, const std::type_info& arg_t
+bool f_ptr(T* arg, type_inf type_t, type_inf arg_t
 ) { return typeid(T) == type_t && typeid(arg) == arg_t; }
 
 template<typename T>
-bool f_const_ref(const T& arg, const std::type_info& type_t, const std::type_info& arg_t
+bool f_ref(T& arg, type_inf type_t, type_inf arg_t
 ) { return typeid(T) == type_t && typeid(arg) == arg_t; }
 
 template<typename T>
-bool f_ref(T& arg, const std::type_info& type_t, const std::type_info& arg_t
+bool f_conref(const T& arg, type_inf type_t, type_inf arg_t
 ) { return typeid(T) == type_t && typeid(arg) == arg_t; }
 
 template<typename T>
-bool f_ptr(T* arg, const std::type_info& type_t, const std::type_info& arg_t
+bool f_refref(T&& arg, type_inf type_t, type_inf arg_t
 ) { return typeid(T) == type_t && typeid(arg) == arg_t; }
+
+// for "functions decay to pointers"_test
+void func(int, char)
+{}
 
 int main()
 {
-    "case4"_test = [] {
+    using namespace boost::ut;
+    using namespace boost::ut::bdd;
+
+    "functions decay to pointers"_test = [] {
+        given("a function") = [] {
+            when("calling f() taking T") = [] {
+                using func_ptr_t = void (*)(int, char);
+                expect(f_val(func, typeid(func_ptr_t), typeid(func_ptr_t)));
+            };
+            when("calling f() taking T&") = [] {
+                using func_ref_t = void (&)(int, char);
+                expect(f_ref(func, typeid(func_ref_t), typeid(func_ref_t)));
+            };
+        };
+    };
+    "arrays decay to pointers"_test = [] {
         given("array argument") = [] {
+            when("calling f() taking T") = [] {
+                const char name[] = "Briggs";
+
+                using ch_ptr_t = const char*;
+                expect(f_val(name, typeid(ch_ptr_t), typeid(ch_ptr_t)));
+            };
             when("calling f() taking T&") = [] {
                 const char name[] = "Briggs";
-                expect(f_ref(name, typeid(const char[7]), typeid(const char (&)[7])));
-            };
-            when("calling f() taking T") = [] {
-                const char name[] = "Briggs";
-                expect(f_val(name, typeid(const char*), typeid(const char*)));
+
+                using arr_t = const char[7];
+                using arr_ref_t = const char (&)[7];
+                expect(f_ref(name, typeid(arr_t), typeid(arr_ref_t)));
             };
         };
     };
 
-    "case3"_test = [] {
+    "case3: pass-by-value"_test = [] {
         given("non-const argument") = [] {
             when("calling f() taking T") = [] {
                 int arg = 27;
@@ -61,24 +86,30 @@ int main()
         };
     };
 
-    "case2"_test = [] {
+    "case2: pass by universal ref"_test = [] {
         given("non-const argument") = [] {
             when("calling f() taking T&&") = [] {
                 int arg = 27;
-                expect(f_refref(arg, typeid(int&), typeid(int&)));
+
+                using ref_t = int&;
+                expect(f_refref(arg, typeid(ref_t), typeid(ref_t)));
             };
         };
         given("const argument") = [] {
             when("calling f() taking T&&") = [] {
                 const int arg = 27;
-                expect(f_refref(arg, typeid(const int&), typeid(const int&)));
+
+                using ref_t = const int&;
+                expect(f_refref(arg, typeid(ref_t), typeid(ref_t)));
             };
         };
         given("const ref argument") = [] {
             when("calling f() taking T&&") = [] {
                 int x = 27;
                 const int& arg = x;
-                expect(f_refref(arg, typeid(const int&), typeid(const int&)));
+
+                using ref_t = const int&;
+                expect(f_refref(arg, typeid(ref_t), typeid(ref_t)));
             };
         };
         given("literal argument") = [] {
@@ -91,15 +122,22 @@ int main()
     "case1c"_test = [] {
         given("non-const argument") = [] {
             when("calling f() taking T*") = [] {
-                int arg = 27;
-                expect(f_ptr(&arg, typeid(int), typeid(int*)));
+                int x = 27;
+                int *arg = &x;
+
+                using val_t = int;
+                using ptr_t = int*;
+                expect(f_ptr(arg, typeid(val_t), typeid(ptr_t)));
             };
         };
         given("const pointer argument") = [] {
             when("calling f() taking T*") = [] {
                 int x = 27;
                 const int *arg = &x;
-                expect(f_ptr(arg, typeid(const int), typeid(const int*)));
+
+                using val_t = const int;
+                using ptr_t = const int*;
+                expect(f_ptr(arg, typeid(val_t), typeid(ptr_t)));
             };
         };
     };
@@ -108,20 +146,29 @@ int main()
         given("non-const argument") = [] {
             when("calling f() taking const T&") = [] {
                 int arg = 27;
-                expect(f_const_ref(arg, typeid(int), typeid(const int&)));
+
+                using val_t = int;
+                using ref_t = const int&;
+                expect(f_conref(arg, typeid(val_t), typeid(ref_t)));
             };
         };
         given("const argument") = [] {
             when("calling f() taking const T&") = [] {
                 const int arg = 27;
-                expect(f_const_ref(arg, typeid(int), typeid(const int&)));
+
+                using val_t = int;
+                using ref_t = const int&;
+                expect(f_conref(arg, typeid(val_t), typeid(ref_t)));
             };
         };
         given("const ref argument") = [] {
             when("calling f() taking const T&") = [] {
                 int x = 27;
                 const int& arg = x;
-                expect(f_const_ref(arg, typeid(int), typeid(const int&)));
+
+                using val_t = int;
+                using ref_t = const int&;
+                expect(f_conref(arg, typeid(val_t), typeid(ref_t)));
             };
         };
     };
@@ -130,20 +177,29 @@ int main()
         given("non-const argument") = [&] {
             when("calling f() taking T&") = [&] {
                 int arg = 27;
-                expect(f_ref(arg, typeid(int), typeid(int&)));
+
+                using val_t = int;
+                using ref_t = int&;
+                expect(f_ref(arg, typeid(val_t), typeid(ref_t)));
             };
         };
         given("const argument") = [] {
             when("calling f() taking T&") = [] {
                 const int arg = 27;
-                expect(f_ref(arg, typeid(const int), typeid(const int&)));
+
+                using val_t = const int;
+                using ref_t = const int&;
+                expect(f_ref(arg, typeid(val_t), typeid(ref_t)));
             };
         };
         given("const ref argument") = [] {
             when("calling f() taking T&") = [] {
                 int x = 27;
                 const int& arg = x;
-                expect(f_ref(arg, typeid(const int), typeid(const int&)));
+
+                using val_t = const int;
+                using ref_t = const int&;
+                expect(f_ref(arg, typeid(val_t), typeid(ref_t)));
             };
         };
     };
