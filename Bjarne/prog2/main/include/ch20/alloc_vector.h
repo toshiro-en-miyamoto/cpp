@@ -1,6 +1,6 @@
 #include <cstddef>
 #include <memory>
-#include <utility>
+#include <initializer_list>
 
 namespace ch20 {
 
@@ -19,6 +19,7 @@ public:
     using const_iterator = const_pointer;
 
     explicit vector(size_type capacity);
+    vector(std::initializer_list<value_type>);
     ~vector();
 
     vector(const vector<T,A>&);
@@ -75,7 +76,7 @@ void vector<T,A>::reserve(size_type capacity)
 {
     if (capa_ < capacity) {
         vector<T,A> lhs(capacity);
-        std::copy_n(ptr_, size_, lhs.ptr_);
+        std::uninitialized_copy_n(ptr_, size_, lhs.ptr_);
         lhs.size_ = size_;
         lhs.swap(*this);
     }
@@ -116,7 +117,7 @@ vector<T,A>& vector<T,A>::operator=(const vector<T,A>& rhs)
         // if (rhs.capa_ <= capa_) then use this
         // meaning ptr_ and _capa_ don't change
         std::destroy_n(ptr_, size_);
-        std::copy_n(rhs.ptr_, rhs.size_, ptr_);
+        std::uninitialized_copy_n(rhs.ptr_, rhs.size_, ptr_);
         size_ = rhs.size_;
     }
 
@@ -130,7 +131,7 @@ vector<T,A>::vector(const vector<T,A>& rhs)
 {
     if (0 < capa_) {
         ptr_ = alloc.allocate(capa_);
-        std::copy_n(rhs.ptr_, rhs.size_, ptr_);
+        std::uninitialized_copy_n(rhs.ptr_, rhs.size_, ptr_);
     }
 }
 
@@ -146,6 +147,17 @@ void vector<T,A>::swap(vector<T,A>& rhs) noexcept
     std::swap(ptr_, rhs.ptr_);
     std::swap(capa_, rhs.capa_);
     std::swap(size_, rhs.size_);
+}
+
+template<typename T, typename A>
+vector<T,A>::vector(std::initializer_list<value_type> list)
+    : alloc {}, ptr_ {nullptr}
+    , capa_ {list.size()}, size_ {list.size()}
+{
+    if (0 < capa_) {
+        ptr_ = alloc.allocate(capa_);
+        std::uninitialized_copy_n(list.begin(), size_, ptr_);
+    }
 }
 
 template<typename T, typename A>
