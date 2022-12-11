@@ -1121,17 +1121,6 @@ int main()
                 ) << actual;
             };
             when("from zero-slot") = [] {
-                ch20::vector<int_char> v(5);
-                ch20::vector<int_char> v0(0);
-                v = std::move(v0);
-                expect(v.capacity() == 0_ul);
-                expect(v.size() == 0_ul);
-                expect(v.data() == nullptr);
-                expect(v0.capacity() == 0_ul);
-                expect(v0.size() == 0_ul);
-                expect(v0.data() == nullptr);
-            };
-            when("from zero-slot") = [] {
                 my::hijack hj {std::cout};
                 {
                     ch20::vector<int_char> v {

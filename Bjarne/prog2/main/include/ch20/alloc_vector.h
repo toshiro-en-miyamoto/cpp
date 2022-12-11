@@ -1,4 +1,3 @@
-#include <cstddef>
 #include <memory>
 #include <initializer_list>
 
@@ -30,9 +29,9 @@ public:
     size_type capacity() const noexcept { return capa_; }
     size_type size() const noexcept { return size_; }
 
-    reference operator[](size_type i)
+    reference operator[](size_type i) noexcept
     { return *(ptr_ + i); }
-    const_reference operator[](size_type i) const
+    const_reference operator[](size_type i) const noexcept
     { return *(ptr_ + i); }
     pointer data() noexcept { return ptr_; };
     const_pointer data () const noexcept { return ptr_; }
@@ -50,7 +49,7 @@ public:
     void push_back(const_reference);
 
 private:
-    void swap(vector<T,A>& rhs) noexcept;
+    void swap(vector<T,A>&) noexcept;
 
     template<typename VT, typename AT>
     friend void swap(vector<VT,AT>& ,vector<VT,AT>&) noexcept;
@@ -131,7 +130,7 @@ vector<T,A>::vector(const vector<T,A>& rhs)
 {
     if (0 < capa_) {
         ptr_ = alloc.allocate(capa_);
-        std::uninitialized_copy_n(rhs.ptr_, rhs.size_, ptr_);
+        std::uninitialized_copy_n(rhs.ptr_, size_, ptr_);
     }
 }
 
