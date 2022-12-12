@@ -1,3 +1,5 @@
+#pragma once
+
 #include <memory>
 #include <initializer_list>
 
@@ -26,23 +28,27 @@ public:
     vector(vector<T,A>&&) noexcept;
     vector<T,A>& operator=(vector<T,A>&&) noexcept;
 
-    size_type capacity() const noexcept { return capa_; }
-    size_type size() const noexcept { return size_; }
+    inline size_type capacity() const noexcept
+    { return capa_; }
+    inline size_type size() const noexcept
+    { return size_; }
 
-    reference operator[](size_type i) noexcept
+    inline reference operator[](size_type i) noexcept
     { return *(ptr_ + i); }
-    const_reference operator[](size_type i) const noexcept
+    inline const_reference operator[](size_type i) const noexcept
     { return *(ptr_ + i); }
-    pointer data() noexcept { return ptr_; };
-    const_pointer data () const noexcept { return ptr_; }
+    inline pointer data() noexcept
+    { return ptr_; };
+    inline const_pointer data () const noexcept
+    { return ptr_; }
 
-    iterator begin()
+    inline iterator begin()
     { return ptr_; }
-    const_iterator begin() const
+    inline const_iterator begin() const
     { return ptr_; }
-    iterator end()
+    inline iterator end()
     { return ptr_ + size_; }
-    const_iterator end() const
+    inline const_iterator end() const
     { return ptr_ + size_; }
 
     void reserve(size_type);
