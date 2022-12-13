@@ -1,10 +1,10 @@
 {
     "configurations": [
         {
-            "name": "(gdb) alloc_vector20_ut",
+            "name": "(gdb) mem_vector20_ut",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/test/ch20/alloc_vector20_ut",
+            "program": "${workspaceFolder}/build/test/ch20/mem_vector20_ut",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
