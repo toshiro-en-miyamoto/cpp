@@ -61,7 +61,7 @@ int_char::int_char()
     : n {0}, c {0}
 {
 #ifndef NDEBUG
-    std::cout << "default\n";
+    std::cout << "new  default\n";
 #endif
 }
 
