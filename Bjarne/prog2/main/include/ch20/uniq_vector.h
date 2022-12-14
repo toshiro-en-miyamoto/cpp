@@ -22,6 +22,11 @@ public:
     vector(std::initializer_list<value_type>);
     ~vector() = default;
 
+    vector(const vector<T>&);
+    vector<T>& operator=(const vector<T>&);
+    vector(vector<T>&&) noexcept;
+    vector<T>& operator=(vector<T>&&) noexcept;
+
     inline size_type capacity() const noexcept
     { return capa_; }
     inline size_type size() const noexcept
@@ -45,6 +50,8 @@ public:
     inline const_iterator end() const
     { return ptr_.get() + size_; }
 
+    void reserve(size_type);
+    void push_back(const_reference);
 private:
     void swap(vector<T>&) noexcept;
 
@@ -57,15 +64,85 @@ private:
 };
 
 template<typename T>
-vector<T>::vector(std::initializer_list<value_type> list)
-    : ptr_ {nullptr}, capa_ {list.size()}
+vector<T>& vector<T>::operator=(vector<T>&& rhs) noexcept
 {
-    if (0 < capa_) {
-        auto p = std::make_unique<value_type[]>(capa_);
-        std::copy(list.begin(), list.end(), p.get());
-        ptr_ = std::move(p);
+    if (this == &rhs) return *this;
+
+    vector<T> temp(std::move(*this));
+    rhs.swap(*this);
+
+    return *this;
+}
+
+template<typename T>
+vector<T>::vector(vector<T>&& rhs) noexcept
+    : ptr_  {std::exchange(rhs.ptr_, nullptr)}
+    , capa_ {std::exchange(rhs.capa_, 0)}
+    , size_ {std::exchange(rhs.size_, 0)}
+{}
+
+template<typename T>
+vector<T>& vector<T>::operator=(const vector<T>& rhs)
+{
+    if (this == &rhs) return *this;
+
+    if (capa_ < rhs.capa_) {
+        vector<T> copy(rhs);
+        copy.swap(*this);
+    } else {
+        std::copy(rhs.begin(), rhs.end(), begin());
+        size_ = rhs.size_;
     }
-    size_ = capa_;
+
+    return *this;
+}
+
+template<typename T>
+vector<T>::vector(const vector<T>& rhs)
+    : ptr_ {nullptr}, capa_ {0}, size_ {0}
+{
+    if ( 0 < rhs.capa_) {
+        vector<T> temp(rhs.capa_);
+        std::copy(rhs.begin(), rhs.end(), temp.begin());
+        temp.size_ = rhs.size_;
+        temp.swap(*this);
+    }
+}
+
+template<typename T>
+void vector<T>::push_back(const_reference val)
+{
+    if (capa_ == 0) reserve(4);
+    else if (size_ == capa_) reserve(2 * capa_);
+
+    std::fill_n(end(), 1, val);
+    ++size_;
+}
+
+template<typename T>
+void vector<T>::reserve(size_type capacity)
+{
+    if (capa_ < capacity) {
+        vector<T> lhs(capacity);
+        std::copy(begin(), end(), lhs.begin());
+        lhs.size_ = size_;
+        lhs.swap(*this);
+    } else if (capacity < size_) {
+        size_ = capacity;
+    }
+}
+
+template<typename T>
+vector<T>::vector(std::initializer_list<value_type> list)
+    : ptr_ {nullptr}, capa_ {0}, size_ {0}
+{
+    auto new_capa = list.size();
+    if (0 < new_capa) {
+        vector<T> v {new_capa};
+        std::copy(list.begin(), list.end(), v.begin());
+        v.size_ = new_capa;
+        v.swap(*this);
+    }
 }
 
 template<typename T>
