@@ -74,8 +74,201 @@ The initial value may be provided in the initializer section of a declarator or 
 | `{` initializer-list `}`
 
 ## Default initialization
+
+Default initialization is perform when an object is constructed with no initializer.
+
+| Syntax
+|------------
+| T object;
+| new T
+
+The effects of default initialization are:
+
+1.  if `T` is a (possibly cv-qualified) class type, the constructors are considered and subjected to overload resolution against the empty argument list. The constructor selected (which is one of the default constructors) is called to provide the initial value for the new object;
+
+    ```c++
+    std::string s;      // default-inited, the value is ""
+    ```
+
+2.  if `T` is an array type, every element of the array is default-initialized;
+
+    ```c++
+    std::string a[2];   // default-initializes the elements,
+                        // the value is {"",""}
+    int na[2];          // default-initializes the elements,
+                        // each int is indeterminate
+    ```
+
+3.  otherwise, no initialization is performed: the objects with automatic storage duration (and their subobjects) contain indeterminate values.
+
+    ```c++
+    int n;              // the value is indeterminate
+    ```
+
+Use of an indeterminate value obtained by default-initializing a non-class variable of any type is undefined behavior.
+
+Notes:
+-   Static and thread-local objects get zero-initialized.
+-   References and const scalar objects cannot be default-initialized.
+
+    ```c++
+    int n;
+    // static non-class, a two-phase initialization is done:
+    // 1) zero initialization; n = 0
+    // 2) default initialization; nothing done
+
+    int main() {
+    //  int& r;         error: cannot be default-inited
+    //  const int n;
+    }
+    ```
+
+-   If a program calls for the default-initialization of an object of a const-qualified type `T`, `T` shall be a const-default-constructible class type or array thereof. A class type `T` is const-default-constructible if default initialization of `T` would invoke a user-provided constructor of `T`.
+
+    ```c++
+    struct T1
+    {
+        int mem;
+    };
+
+    struct T2
+    {
+        int mem;
+        T2();           // user-provided default constructor
+    };
+
+    void f() {
+    //  const T1 t1;     error:
+        T1 t1;          // OK, calls imlicit default ctor
+        const T2 t2;    // OK, calls the user-provided default ctor
+    }
+    ```
+
 ## Value initialization
-## Direct initialization 
+
+Value initialization is performed when an object is constructed with an empty initializer.
+
+| Syntax                                | (*)
+|---------------------------------------|-----
+| T`()`                                 | (1)
+| new T`()`                             | (2)
+| class::class(...) : member`()` {...}  | (3)
+| T object `{}`;                        | (4)
+| T `{}`                                | (5)
+| new T `{}`                            | (6)
+| class::class(...) : member`{}` {...}  | (7)
+
+Note on (4):
+- `T object {};` value-initializes the named object.
+- `T object();` does not initialize an object; it declares a function that takes no arguments and returns `T`.
+- The way to value-initialize a named variable before C++11 was `T object = T();`, which value-initializes a temporary and then copy-initializes the object: most compilers optimize out the copy in this case.
+
+All standard containers (`std::vector`, `std::list`, etc.) value-initialize their elements when constructed with a single `size_type` argument or when grown by a call to `resize()`, unless their allocator customizes the behavior of construct.
+
+The effects of value initialization are:
+
+1.  if `T` is a class type with no default constructor or with a user-provided or deleted default constructor, the object is default-initialized;
+
+    ```c++
+    struct T3
+    {
+        int mem1;
+        std::string mem2;
+        T3() {}
+    };  // user-provided default constructor
+
+    T3 t3 {};
+    // t3 is default initialized, thus
+    // t3.mem1 is default-inited to intermediate value
+    // t3.mem2 is default-inited to the value ""
+
+    struct T2
+    {
+        int mem1;
+        std::string mem2;
+        T2(const T&) {}
+    };  // given user-provided copy constructor,
+        // no default ctor defined implicitly
+    
+    // T2 t2 {};    error: no default ctor
+    ```
+
+2.  if `T` is a class type with a default constructor that is neither user-provided nor deleted (that is, it may be a class with an implicitly-defined or defaulted default constructor), the object is zero-initialized and the semantic constraints for default-initialization are checked, and if `T` has a non-trivial default constructor, the object is default-initialized;
+
+    ```c++
+    struct T1
+    {
+        int mem1;
+        std::string mem2;
+    };  // implicit default constructor
+
+    T1 t1 {};
+    // t1 is zero-initialized, thus
+    // t1.mem1 is zero-inited to the value 0
+    // t1.mem2 is default-inited to the vale ""
+    ```
+
+3.  if `T` is an array type, each element of the array is value-initialized;
+
+    ```c++
+    int* a = new int[10]();
+    // value-initialized of each element
+    // the value of each element is 0
+    ```
+
+4.  otherwise, the object is zero-initialized.
+
+    ```c++
+    int n {};               // zero-init, the value is 0
+    double f = double();    // zero-init, the value is 0.0
+    ```
+
+## Direct initialization
+
+Direct initialization initializes an object from explicit set of constructor arguments.
+
+| Syntax                                        | (*)
+|-----------------------------------------------|-----
+| T object`(`arg`)`;                            | (1)
+| T object`(`arg1, arg2,...`)`;                 | (1)
+| T object `{`arg`}`;                           | (2)
+| T`(`other`)`                                  | (3)
+| T`(`arg1, arg2,...`)`                         | (3)
+| `static_cast<`T`>(`other`)`                   | (4)
+| `new` T`(`args,...`)`                         | (5)
+| class::class() : member`(`args,...`)` {...}   | (6)
+| `[`arg`]()` {...}                             | (7)
+
+(2) initialization of an object of non-class type with a single brace-enclosed initializer (note: for class types and other uses of braced-init-list, see list-initialization)
+
+(7) initialization of closure object members from the variables caught by copy in a lambda-expression
+
+Direct-initialization is more permissive than copy-initialization:
+
+-   suppose
+
+    ```c++
+    struct A
+    {
+        explicit A(int i = 0) {}
+    };
+    ```
+
+-   copy-initialization only considers non-explicit constructors and non-explicit user-defined conversion functions,
+
+    ```c++
+    // error: implicit copy-list-initialization of b[1]
+    //        from {} selected explicit constructor
+    // A b[2]{A(1)};
+    ```
+
+-   direct-initialization considers all constructors and all user-defined conversion functions.
+
+    ```c++
+    // OK: initializes a[0] with A(1) and a[1] with A()
+    A a[2](A(1));
+    ```
+
 ## Copy initialization
 
 Copy initialization initializes an object from another object.
@@ -92,9 +285,44 @@ Copy initialization initializes an object from another object.
 
 (*1) As of C++11, this is classified as list-initialization, and narrowing conversion is not allowed.
 
-1.  First, if `T` is a class type and the initializer is a prvalue expression whose cv-unqualified type is the same class as `T`, the initializer expression itself, rather than a temporary materialized from it, is used to initialize the destination object: see copy elision
+The equals sign `=` in copy-initialization of a named variable is not related to the assignment operator. Assignment operator overloads have no effect on copy-initialization.
+
+1.  First, if `T` is a class type and the initializer is a prvalue expression whose cv-unqualified type is the same class as `T`, the initializer expression itself, rather than a temporary materialized from it, is used to initialize the destination object: see [copy elision](https://en.cppreference.com/w/cpp/language/copy_elision).
+
+    ```c++
+    struct Topic1
+    {
+        Topic1() {}
+    };
+
+    Topic1 f1() { return Topic1(); }
+
+    Topic1 t1 = f1();   // only one call to default ctor
+    ```
 
 2.  If `T` is a class type and the cv-unqualified version of the type of `other` is `T` or a class derived from `T`, the *non-explicit constructors* of `T` are examined and the best match is selected by overload resolution. The constructor is then called to initialize the object.
+
+    ```c++
+    struct Imp
+    {
+        Imp(const Imp&) {}
+    } imp;
+
+    // direct-init
+    Imp i1 {imp};
+    // copy-init
+    Imp i2 = imp;
+
+    struct Exp
+    {
+        explicit Exp(const Exp&) {}
+    } exp;
+
+    // direct-init
+    Exp e1 {exp};
+    // copy-init does not consider explicit ctor
+    // Exp e2 = exp;
+    ```
 
 3.  User-defined conversion sequences that can convert from the type of `other` to `T` are examined and the best one is selected through overload resolution
 
@@ -102,6 +330,61 @@ Copy initialization initializes an object from another object.
     - if `T` is non-class type but the type of `other` is a class type
 
     The result of conversion, which is a prvalue expression of the cv-qualified version of `T` if a converting constructor was used, is then used to direct-initialization.
+
+    ```c++
+    struct C
+    {
+        const int n;
+        constexpr C(int val) : n {val} {}
+        constexpr operator int() const { return n; }
+    };
+
+    constexpr C c1 = 1;
+    static_assert(c1.n == 1);
+
+    constexpr int i1 = c1;
+    static_assert(i1 == 1);
+    ```
+
+4.  Otherwise (if neither `T` nor the type of `other` are class types), standard conversions are used, if necessary, to convert the value of `other` to the cv-unqualified version of `T`.
+
+    ```c++
+    int n = 3.14;       // floating-integral conversion
+    const int b = n;    // const doesn't matter
+    int c = b;          // ...either way
+    ```
+
+In addition,
+-   the implicit conversion in copy-initialization must produce `T` directly from the initializer,
+
+    ```c++
+    // implicitly convertible from std::string
+    struct S
+    {
+        S(std::string) {}
+    };
+
+    // Error: no conversion from const char[4] to S
+    // S s = "abc";
+
+    // OK: conversion from std::string to S
+    S s = "abc"s;
+    ```
+
+-   while, e.g. direct-initialization expects an implicit conversion from the initializer to an argument of `T`'s constructor.
+
+    ```c++
+    // implicitly convertible from std::string
+    struct S
+    {
+        S(std::string) {}
+    };
+
+    // OK: conversion from const char[4] to std::string
+    S s("abc");
+    ```
+
+If `other` is an rvalue expression, move constructor will be selected by overload resolution and called during copy-initialization. There is no such term as move-initialization.
 
 ## List initialization
 
