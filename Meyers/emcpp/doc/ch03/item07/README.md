@@ -1,3 +1,14 @@
+# Item 7: `()` and `{}` when creating objects
+
+-   Braced initializers
+    -   prevent narrowing conversions
+    -   are immune to the most vexing parse
+        ```c++
+        T object();     // declares a function
+        T object{};     // value-initializes an object
+        ```
+    -   are matched to `std::initializer-list` if at all possible
+
 # [Converting constructor](https://en.cppreference.com/w/cpp/language/converting_constructor)
 
 A constructor that is not declared with the specifier `explicit` is called a *converting constructor*.
@@ -489,10 +500,10 @@ List initialization initializes an object from *braced-init-list*.
     int main()
     {
         X x;
-        X x2 = X{x}; // copy-ctor (not aggregate initialization)
+        X x2 = X {x};   // copy-ctor (not aggregate initialization)
 
         Q q;
-        Q q2 = Q{q}; // initializer-list ctor (not copy ctor)
+        Q q2 = Q {q};   // initializer-list ctor (not copy ctor)
     }
     ```
 
@@ -563,8 +574,8 @@ Each designator in a designated initializer must name a direct non-static data m
 ```c++
 struct A { int x; int y; int z; };
  
-A a{.y = 2, .x = 1}; // error; not the same order
-A b{.x {1}, .z = 2}; // ok, b.y initialized to 0
+//  A a{.y = 2, .x = 1};    error; not the same order
+    A b{.x {1}, .z = 2};    // ok, b.y initialized to 0
 ```
 
 All designators used in the expression must appear in the same order as the data members.
