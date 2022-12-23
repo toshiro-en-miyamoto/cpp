@@ -572,37 +572,3 @@ static_assert(std::is_same_v<decltype(f3), int()>);
 decltype(auto) f4() { return (x); }
 static_assert(std::is_same_v<decltype(f4), int&()>);
 ```
-
-### [Value categories](https://en.cppreference.com/w/cpp/language/value_category)
-
-With the introduction of move semantics in C++11, value categories were redefined to characterize two independent properties of expressions:
-
-- has identity: it's possible to determine whether the expression refers to the same entity as another expression, such as by comparing addresses of the objects or the functions they identify (obtained directly or indirectly);
-- can be moved from: move constructor, move assignment operator, or another function overload that implements move semantics can bind to the expression.
-
-In C++11, expressions that:
-
-- have identity and cannot be moved from are called *lvalue* expressions;
-- have identity and can be moved from are called *xvalue* expressions;
-- do not have identity and can be moved from are called *prvalue* (pure rvalue) expressions;
-- do not have identity and cannot be moved from are not used.
-
-|              | is movable | not movable |
-|--------------|:----------:|:-----------:|
-| has identity | xvalue     | lvalue      |
-| no identity  | prvalue    | (n/a)       |
-
-The expressions that have identity are called *glvalue expressions* (glvalue stands for generalized lvalue). Both lvalues and xvalues are glvalue expressions.
-
-The expressions that can be moved from are called *rvalue expressions*. Both prvalues and xvalues are rvalue expressions.
-
-For example:
-
-```c++
-void f(std::vector<std::string>& vs)
-{
-    std::vector<std::string> v2 = std::move(vs);
-}
-```
-
-Here, `std::move(vs)` is an xvalue: it clearly has identity (we can refer to it as `vs`), but we have explicitly given ermission for it to be moved from (by calling `std::move()`).
