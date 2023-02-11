@@ -5,3 +5,4 @@
 - Item 13: Prefer `const_iterator` to `iterator`.
 - [Item 14](./item14.md): Declare functions `noexcept` if they won't emit exceptions.
 - [Item 15](./item15.md): Use `constexpr` whenever possible
+- [Item 17](./item17.md): Understand special member function generation
