@@ -5,6 +5,8 @@
 - `std::move` unconditionally casts its argument to an rvalue
 - `std::forward` performs this cast only if a particular condition is fulfilled
 
+## `std::move`
+
 ```c++
 // <utility>
 
@@ -47,3 +49,55 @@ But `text` is not moved into `value`, it's *copied*. The member initialization `
 - the rvalue can’t be passed to `std::string`’s move constructor, because the move constructor takes an rvalue reference to a non-const `std::string`, but
 - the rvalue can be passed to the copy constructor, because an lvalue-reference-to-const is permitted to bind to a const rvalue.
 
+## `std::forward`
+
+`std::forward` is a conditional cast. The most common scenario is a function template taking a universal reference parameter that is to be passed to another function:
+
+```c++
+void process(const Widget& lvalArg);
+void process(Widget&& rvalArg);
+
+template<typename T>
+void logAndProcess(T&& param);
+
+void invoke()
+{
+    Widget w;
+    logAndProcess(w);               // call with lvalue
+    logAndProcess(std::move(w));    // call with rvalue
+}
+```
+
+Suppose that `logAndProcess` calls `process`:
+
+```c++
+template<typename T>
+void logAndProcess(T&& param)
+{
+    process(param);
+}
+```
+
+`param` that `logAndProcess` takes therefore is an lvalue. Every call to `process` inside `logAndProcess` will thus want to invoke the lvalue overload for process.
+
+> Recall a parameter is always an lvalue, even if its type is an rvalue reference. That is, given `void f(Widget&& w)`, the parameter `w` is an lvalue, even though its type is rvalue-reference-to-`Widget`.
+
+```c++
+void f(Widget&& w);     // w is an lvalue
+```
+
+When we call `logAndProcess` with an lvalue, we naturally expect that lvalue to be forwarded to `process` as an lvalue, and when we call `logAndProcess` with an rvalue, we expect the rvalue overload of `process` to be invoked.
+
+We need a mechanism for `param` to be cast to an rvalue if and only if the argument with which `param` was initialized — the argument passed to `logAndProcess` — was an rvalue. This is precisely what `std::forward` does.
+
+```c++
+template<typename T>
+void logAndProcess(T&& param)
+{
+    process(std::forward<T>(param));
+}
+```
+
+That’s why `std::forward` is a conditional cast: it casts to an rvalue only if its argument was initialized with an rvalue.
+
+The use of `std::move` conveys an unconditional cast to an rvalue, while the use of `std::forward` indicates a cast to an rvalue only for references to which rvalues have been bound. Those are two very different actions.
