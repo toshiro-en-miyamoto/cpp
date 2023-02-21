@@ -11,3 +11,4 @@ void f(Widget&& w);
 the parameter `w` is an lvalue, even though its type is rvalue-reference-to-`Widget`.
 
 - [Item 23](./item23.md): Understand s`td::move` and `std::forward`.
+- [Item 24](./item24.md): Distinguish universal references from rvalue references.
