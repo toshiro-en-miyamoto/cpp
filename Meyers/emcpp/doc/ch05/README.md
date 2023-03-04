@@ -15,3 +15,6 @@ the parameter `w` is an lvalue, even though its type is rvalue-reference-to-`Wid
 - [Item 25](./item25.md): Use `std::move` on rvalue references, `std::forward` on universal references.
 - Item 26: Avoid overloading on universal references.
 - Item 27: Familiarize yourself with alternatives to overloading on universal references.
+- Item 28: Understand reference collapsing.
+- Item 29: Assume that move operations are not present, not cheap, and not used.
+- Item 30: Familiarize yourself with perfect forwarding failure cases.
