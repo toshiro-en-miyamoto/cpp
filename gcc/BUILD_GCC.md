@@ -1,8 +1,40 @@
 # Building GCC
 
+## The filesystem hierarchy
+
+Reference: [HIER(7) the filesystem hierarchy](https://www.man7.org/linux/man-pages/man7/hier.7.html)
+
+| dir | description
+|-----|-------------
+| `/bin` | Contains executable programs which are needed in single user mode and to bring the system up or repair it.
+| `/usr` | Should hold only shareable, read-only data, so that it can be mounted by various machines running Linux.
+| `/usr/bin` | Is the primary directory for executable programs. Most programs executed by normal users which are not needed for booting or for repairing the system and which are not installed locally should be placed in this directory.
+| `/usr/include` | Includes files for the C compiler.
+| `/usr/include/g++` | Includes files to use with the GNU C++ compiler.
+| `/usr/local` | Is where programs which are local to the site typically go.
+| `/usr/local/bin` | Includes binaries for programs local to the site.
+| `/usr/local/include` | Includes header files for the local C compiler.
+
+For example, with Debian Bulleyes:
+
+```
+$ lsb_release -a
+No LSB modules are available.
+Distributor ID: Debian
+Description:    Debian GNU/Linux 11 (bullseye)
+Release:        11
+Codename:       bullseye
+
+$ g++ --version
+g++ (Debian 10.2.1-6) 10.2.1 20210110
+
+$ which g++
+/usr/bin/g++
+```
+
 ## Prerequisites
 
-[General prerequisites for GCC](https://gcc.gnu.org/install/prerequisites.html)
+Reference: [General prerequisites for GCC](https://gcc.gnu.org/install/prerequisites.html)
 
 - C++11 compiler
 - C standard library and headers
