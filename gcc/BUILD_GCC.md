@@ -61,25 +61,107 @@ Thread model: posix
 Supported LTO compression algorithms: zlib zstd
 ```
 
-It turns out that `cpp` and `g++` have the same configuration:
+It turns out that `cpp` and `g++` have the same configuration.
 
-<style type="text/css">
-b { color: Khaki;
-    font-family: "Lucida Console", "Courier New", monospace;
-    font-weight: normal;
-}
-</style>
+## Prerequisites
+
+Reference: [General prerequisites for GCC](https://gcc.gnu.org/install/prerequisites.html)
+
+Required compilers include:
+
+- C++11 compiler
+- C standard library and headers
+
+Required tools include:
+
+- `bash` (`zsh` will not work)
+- `awk`
+- `binutils` 2.35 or newer is required for LTO
+- `gzip` 1.2.4 (or later) or `bzip2` 1.0.2 (or later)
+- `make`
+- `tar`
+- `python3`
+
+Debian Bullseye 10.2 installs the tools by default.
+
+| pack name  | ver    | description
+|------------|--------|-------------
+| `bash`     | 5.1.2  | GNU Bourne Again SHell
+| `gawk`     | 5.1.0  | GNU awk
+| `binutils` | 2.35.2 | GNU assembler, linker and binary utilities
+| `gzip`     | 1.10   | GNU compression utilities
+| `make`     | 4.3    | utility for directing compilation
+| `tar`      | 1.34   | GNU version of the tar archiving utility
+| `python3`  | 3.9.2  | interactive high-level object-oriented language
+
+Required libraries include:
+
+- GMP version 4.3.2 (or later)
+- MPFR Library version 3.1.0 (or later)
+- MPC Library version 1.0.1 (or later)
+- `isl` Library version 0.15 or later
+- `zstd` Library
+
+Debian Bullseye 10.2 installs the libraries by default.
+
+| pack name  | ver   | description
+|------------|-------|-------------
+| `libgmp10` | 6.2.1 | Multiprecision arithmetic library
+| `libmpfr6` | 4.1.0 | multiple precision floating-point computation
+| `libmpc3`  | 1.2.0 | multiple precision complex floating-point library
+| `libisl23` | 0.23  | manipulating sets and relations of integer points
+| `libzstd1` | 1.4.8 | fast lossless compression algorithm
+
+## Configuration
+
+[Installing GCC: Configuration](https://gcc.gnu.org/install/configure.html)
+
+- `srcdir`: the toplevel source directory
+- `objdir`: the toplevel build/object directory
+
+Recommending `srcdir != objdir`. Building where `objdir` is a subdirectory of `srcdir` is unsupported.
+
+`cc` or `gcc` must be in your path.
+
+To configure GCC:
+
+```
+% mkdir objdir
+% cd objdir
+% srcdir/configure [options] [target]
+```
+
+### Distributor options
 
 If you will be distributing binary versions of GCC, with modifications to the source code, you should use the *distributor options* to make clear that your version contains modifications.
 
 - `with-pkgversion`
   - This version string will be included in the output of `gcc --version`. The default value is `GCC`.
   - Deb: `Debian 10.2.1-6`
-  - pi4: TBD
+  - pi4: N/A (`GCC`)
 - `with-bugurl`
   - Specify the URL that users should visit if they wish to report a bug. The default value refers to the FSF’s GCC bug tracker.
   - Deb: `file:///usr/share/doc/gcc-10/README.Bugs`
   - pi4: N/A (default URL)
+
+### Host, Build, and Target specification
+
+If you are building a compiler to produce code for the machine it runs on (a native compiler), you normally do not need to specify any operands to `configure`; it will try to guess the type of machine you are on and use that as the build, host and target machines.
+
+- `build`
+  - The *build* machine is the system which you are using.
+  - Deb: `aarch64-linux-gnu`
+  - pi4: N/A (building a a native compiler)
+- `host`
+  - The *host* machine is the system where you want to run the resulting compiler (normally the build machine).
+  - Deb: `aarch64-linux-gnu`
+  - pi4: N/A (building a a native compiler)
+- `target`
+  - The *target* machine is the system for which you want the compiler to generate code.
+  - Deb: `aarch64-linux-gnu`
+  - pi4: N/A (building a a native compiler)
+
+### General options
 
 Use options to override several configure time options for GCC. A list of supported options follows; ‘configure --help’ may list other options, but those not listed below may not work and should not normally be used.
 
@@ -136,9 +218,9 @@ Use options to override several configure time options for GCC. A list of suppor
   - Deb: enable
   - pi4: enable
 - `enable-bootstrap`
-  - For a native build, the default configuration is to perform a 3-stage bootstrap of the compiler when `make` is invoked, testing that GCC can compile itself correctly. If you want to disable this process, you can configure with `--disable-bootstrap`.
+  - For a native build, the default configuration is to perform a 3-stage bootstrap of the compiler when `make` is invoked, testing that GCC can compile itself correctly.`--disable-bootstrap`.
   - Deb: enable
-  - pi4: TBD
+  - pi4: enable
 - `disable-libquadmath`
   - Specify that the GCC quad-precision math library should not be built. On some systems, the library is required to be linkable when building the Fortran front end.
   - Deb: disable
@@ -175,11 +257,21 @@ Use options to override several configure time options for GCC. A list of suppor
   - Tells GCC to use the `gnu_unique_object` relocation for C++ template static data members and inline function local statics.
   - Deb: enable
   - pi4: enable
+- `with-system-zlib`
+  - Use installed `libz` (*1)
+  - Deb: with
+  - pi4: with
+
+>> `libz` (*1): fast lossless compression algorithm. Debian 10.2 Bullseye installs the `libzstd1` package (ver. 1.4.8) by default.
+
+### Objective-C-specific options
 
 The following options apply to the build of the Objective-C runtime library.
 
 - `enable-objc-gc`
   - Deb: `auto`
+
+### D-specific options
 
 The following options apply to the build of the D runtime library.
 
@@ -188,157 +280,75 @@ The following options apply to the build of the D runtime library.
 - `with-target-system-zlib`
   - Deb: `auto`
 
+### `aarch64`-specific notes
 
-| General option        | value (blank: enabled)
-|-----------------------|---------------------
-| --build                           | aarch64-linux-gnu
-| --host                            | aarch64-linux-gnu
-| --target                          | aarch64-linux-gnu
-| --enable-clocale                  | gnu
-| --enable-fix-cortex-a53-843419    |
-| --enable-libstdcxx-debug          |*1
-| --enable-libstdcxx-time           | yes
-| --enable-plugin                   |
-| --with-build-config               | bootstrap-lto-lean
-| --with-default-libstdcxx-abi      | new
-| --with-system-zlib                |
+- `enable-fix-cortex-a53-843419`
+  - Enable a workaround for the Cortex-A53 erratum number 843419 by default (for all CPUs regardless of -mcpu option given)
+  - Deb: enable
+  - pi4: disable
 
-## Prerequisites
+For [Raspberry Pi 4B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/specifications/), the `fix-cortex-a53-843419` option should not be necessary because its CPU is Broadcom BCM2711, Quad core Cortex-A72 (ARM v8) 64-bit SoC.
 
-Reference: [General prerequisites for GCC](https://gcc.gnu.org/install/prerequisites.html)
+### Deprecated options
 
-Required compilers include:
+The following options used by GCC 10.2 are no longer supported by `configure` of GCC 12.2:
 
-- C++11 compiler
-- C standard library and headers
+- `enable-clocale`
+  - Deb: `gnu`
+- `enable-libstdcxx-debug`
+  - Deb: enable
+- `enable-libstdcxx-time`
+  - Deb: enable
+- `enable-plugin`
+  - Deb: enable
+- `with-default-libstdcxx-abi`
+  - Deb: `new`
 
-Required tools include:
+### Configuration for Raspberry Pi 4B
 
-- `bash` (`zsh` will not work)
-- `awk`
-- `gzip` 1.2.4 (or later) or `bzip2` 1.0.2 (or later)
-- `make`
-- `tar`
-- `python3`
+## Building
 
-Debian Bullseye 10.2 installs the tools by default.
+It is normal to have compiler warnings when compiling certain files. Unless you are a GCC developer, you can generally ignore these warnings unless they cause compilation to fail. Developers should attempt to fix any warnings encountered, however they can temporarily continue past warnings-as-errors by specifying the configure flag `--disable-werror`.
 
-| pack name  | ver   | description
-|------------|-------|-------------
-| `bash`     | 5.1.2 | GNU Bourne Again SHell
-| `gawk`     | 5.1.0 | GNU awk
-| `gzip`     | 1.10  | GNU compression utilities
-| `make`     | 4.3   | utility for directing compilation
-| `tar`      | 1.34  | GNU version of the tar archiving utility
-| `python3`  | 3.9.2 | interactive high-level object-oriented language
-
-Required libraries include:
-
-- GMP version 4.3.2 (or later)
-- MPFR Library version 3.1.0 (or later)
-- MPC Library version 1.0.1 (or later)
-- `isl` Library version 0.15 or later
-- `zstd` Library
-
-Debian Bullseye 10.2 installs the libraries by default.
-
-| pack name  | ver   | description
-|------------|-------|-------------
-| `libgmp10` | 6.2.1 | Multiprecision arithmetic library
-| `libmpfr6` | 4.1.0 | multiple precision floating-point computation
-| `libmpc3`  | 1.2.0 | multiple precision complex floating-point library
-| `libisl23` | 0.23  | manipulating sets and relations of integer points
-| `libzstd1` | 1.4.8 | fast lossless compression algorithm
-
-## Configuration
-
-[Installing GCC: Configuration](https://gcc.gnu.org/install/configure.html)
-
-- `srcdir`: the toplevel source directory
-- `objdir`: the toplevel build/object directory
-
-Recommending `srcdir != objdir`. Building where `objdir` is a subdirectory of `srcdir` is unsupported.
-
-`cc` or `gcc` must be in your path.
-
-To configure GCC:
+To build GCC:
 
 ```
 % mkdir objdir
 % cd objdir
-% srcdir/configure [options] [target]
+% make -j5
 ```
 
-If you will be distributing binary versions of GCC, with modifications to the source code, you should use the options to make clear that your version contains modifications.
+Giving the `j5` option to `make` to use five threads to build GCC. For [Raspberry Pi 4B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/specifications/), it should be five because its CPU is Broadcom BCM2711, Quad core Cortex-A72 (ARM v8) 64-bit SoC.
 
-### Host, Build, and Target specification
+> [Building GCC, OS Dev org](https://wiki.osdev.org/Building_GCC): As the build can take a long time, it is recommended to make use of make's `-jN` option. This will allow make to use multiple threads to compile the programs, which will speed up things a LOT. Substitute `N` with a number; a good guideline is the number of core you CPU has, plus one.
 
-If you are building a compiler to produce code for the machine it runs on (a native compiler), you normally do not need to specify any operands to `configure`; it will try to guess the type of machine you are on and use that as the build, host and target machines.
+### Building a native compiler
 
-- The *build* machine is the system which you are using,
-- the *host* machine is the system where you want to run the resulting compiler (normally the build machine), and
-- the *target* machine is the system for which you want the compiler to generate code.
+For a native build, the default configuration is to perform a 3-stage bootstrap of the compiler when `make` is invoked. This will build the entire GCC system and ensure that it compiles itself correctly. It can be disabled with the `--disable-bootstrap` parameter to *configure*, but bootstrapping is suggested because the compiler will be tested more completely and could also have better performance.
 
-### Options specification
+If you are short on disk space you might consider `make bootstrap-lean` instead. The sequence of compilation is the same described above, but object files from the stage1 and stage2 of the 3-stage bootstrap of the compiler are deleted as soon as they are no longer needed.
 
-#### `--prefix=dirname`:
+- `with-build-config`
+  - The configuration option `bootstrap-lto-lean` lets the build process delete object files from the stage1 and stage2 of the 3-stage bootstrap of the compiler as soon as they are no longer needed.
+  - Deb: `bootstrap-lto-lean`
+  - pi4: `bootstrap-lto-lean`
 
-- Specify the top level installation directory. This is the recommended way to install the tools into a directory other than the default. The top level installation directory defaults to `/usr/local`.
-- We highly recommend against *dirname* being the same or a subdirectory of *objdir* or vice versa. If specifying a directory beneath a user’s home directory tree, some shells will not expand *dirname* correctly.
+`BUILD_CONFIG` can be used to bring in additional customization to the build. It can be set to a whitespace-separated list of names. For each such `NAME`, top-level `config/NAME.mk` will be included by the top-level `Makefile`, bringing in any settings it contains. The default `BUILD_CONFIG` can be set using the configure option `--with-build-config=NAME...`. Some examples of supported build configurations are:
 
-Default directories:
+- `bootstrap-lto`: Enables Link-Time Optimization for host tools during bootstrapping.
+- `bootstrap-lto-lean`: This option is similar to `bootstrap-lto`, but is intended for faster build by only using LTO in the final bootstrap stage. With `make profiledbootstrap` the LTO frontend is trained only on generator files.
 
-- `/usr/local`: the top level installation directory
-- `/usr/local/bin`: the executables called by users
-- `/usr/local/lib`: object code libraries
-- `/usr/local/lib`: the shared `libgcc` library
-- `/usr/local/libexec`: internal executables of GCC
-- `/usr/local/share`: arch-independent data files
-- `/usr/local/share/info`: documentation in `info` format
-- `/usr/local/share/doc`: documentation other than `info`
-- `/usr/local/share/man`: manual pages
+## What is bootstrap?
 
-#### Include path
+Reference: [Building GCC, OS Dev org](https://wiki.osdev.org/Building_GCC)
 
-The purpose of `--prefix` (a.k.a GCC-prefix) is to specify where to install GCC. GCC installs its own header files in another directory which is based on the `--prefix` value.
+Compilers are upgraded through a process called *bootstrapping*. At first you have your old system compiler that produces slow code and doesn't support all the new language features. You then use this old system compiler to build the new version of the compiler, hoping that the old compiler is able to build the new compiler (it supports all needed features). This produces a new compiler that produces fast code and supports all the new features, however the compiler itself is slow, because it was compiled with a compiler that produces slow code. In addition, the new compiler may be buggy because your old compiler was buggy, or perhaps the new compiler release has a bug.
 
-The local header files in `/usr/local/include`—if you put any in that directory—are not part of GCC. They are part of other programs—perhaps many others. ()
+The next step is to use your new slow compiler that produces fast code, and then build the new compiler again. This produces a fast compiler that produces fast code. However, the first compiler we built could be buggy, and the compiler we just built using it may be defect. We need to verify the correctness of our new fast compiler that produces fast code.
 
-`--with-local-prefix=dirname` specifies the installation directory for *local-prefix* include files. The default is `/usr/local` regardless of the value of `--prefix`, which lets the compiler to search directory `/usr/local/include`.
+To solve that problem, we build the compiler a third time. Once we have built the third compiler using the second compiler, it should produce the very same output as the first compiler building the second, as both times we are using compilers that produce fast code and use the same source code. The compiler build system will then verify that the second and third compilers are identical, which gives you confidence in the bootstrap. If the second and third compilers are not identical, the bootstrap failed and you have encountered a compiler bug. Bootstrapping takes three times as long as just building a regular compiler, but it makes sure your toolchain is stable.
+
+The last thing to do is run the compiler test suite so you can verify that it works correctly.
 
 
-#### Program name
 
-`--program-prefix=prefix`:
-
-- GCC supports some transformations of the names of its programs when installing them. This option prepends `prefix` to the names of programs to install in `bin` (see above).
-- For example, specifying `--program-prefix=foo-` would result in ‘gcc’ being installed as `/usr/local/bin/foo-gcc`.
-
-`--program-suffix=suffix`:
-
-Appends `suffix` to the names of programs to install in `bin` (see above). For example, specifying `--program-suffix=-3.1` would result in `gcc` being installed as `/usr/local/bin/gcc-3.1`.
-
-#### Languages
-
-`--enable-languages=lang1,lang2,…`:
-
-Specify that only a particular subset of compilers and their runtime libraries should be built: `all`, `default`, and,
-
-- default: `c`, `c++`, `fortran`, `lto`, `objc`
-- not default: `ada`, `d`, `go`, `jit`, `m2`, `obj-c++`
-
-The following options build `c++` only:
-
-```
---enable-languages=c++
-```
-
-Support for link-time optimization (LTO) is enabled by default.
-
-#### National Language Support (NLS)
-
-NLS is enabled by default, which lets GCC output diagnostics in languages other than American English.
-
-```
---disable-nls
-```
