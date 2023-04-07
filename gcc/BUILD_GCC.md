@@ -63,7 +63,7 @@ Supported LTO compression algorithms: zlib zstd
 
 It turns out that `cpp` and `g++` have the same configuration:
 
-<style>
+<style type="text/css">
 b { color: Khaki;
     font-family: "Lucida Console", "Courier New", monospace;
     font-weight: normal;
