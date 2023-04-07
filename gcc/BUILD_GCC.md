@@ -192,15 +192,15 @@ Use options to override several configure time options for GCC. A list of suppor
 - `program-prefix`
   - Prepends prefix to the names of programs to install in `${bindir}`. For example, specifying `--program-prefix=foo-` would result in `gcc` being installed as `/usr/local/bin/foo-gcc`.
   - Deb: `aarch64-linux-gnu-`
-  - pi4: TBD
+  - pi4: N/A
 - `program-suffix`
   - Appends suffix to the names of programs to install in `${bindir}`. For example, specifying `--program-suffix=-3.1` would result in `gcc` being installed as `/usr/local/bin/gcc-3.1`.
   - Deb: `-10`
-  - pi4: TBD
+  - pi4: N/A
 - `with-gcc-major-version-only`
   - Specifies that GCC should use only the major number rather than `major.minor.patchlevel` in filesystem paths.
   - Deb: with
-  - pi4: TBD
+  - pi4: N/A
 - `enable-shared`
   - Build shared versions of libraries, if shared libraries are supported on the target platform.
   - Deb: enable
@@ -208,7 +208,7 @@ Use options to override several configure time options for GCC. A list of suppor
 - `enable-multiarch`
   - Specify whether to enable or disable multiarch support. The default is to check for `glibc` start files in a multiarch location, and enable it if the files are found.
   - Deb: enable
-  - pi4: TBD
+  - pi4: N/A
 - `enable-threads`
   - Specify that the target supports threads. This affects exception handling for C++.
   - Deb: `posix`
@@ -230,9 +230,9 @@ Use options to override several configure time options for GCC. A list of suppor
   - Deb: disable
   - pi4: disable
 - `enable-default-pie`
-  - Turn on `-fPIE` and `-pie` by default.
+  - Enable Position Independent Executable by default.
   - Deb: enable
-  - pi4: TBD
+  - pi4: enable
 - `disable-werror`
   - When you specify this option, it controls whether certain files in the compiler are built with `-Werror` in bootstrap stage2 and later.
   - Deb: disable
@@ -261,6 +261,26 @@ Use options to override several configure time options for GCC. A list of suppor
   - Use installed `libz` (*1)
   - Deb: with
   - pi4: with
+- `enable-plugin`
+  - enable plugin support
+  - Deb: enable
+  - pi4: enable
+- `enable-clocale[=MODEL]`
+  - use MODEL for target locale package, default=`auto`.
+  - Deb: `gnu`
+  - pi4: `gnu`
+- `enable-libstdcxx-debug`
+  - build extra debug library, default=`no`.
+  - Deb: enable
+  - pi4: enable
+- `enable-libstdcxx-time[=KIND]`
+  - use `KIND` for check type, default=`auto`.
+  - Deb: `yes`
+  - pi4: `yes`
+- `with-default-libstdcxx-abi`
+  - set the `std::string` ABI to use by default
+  - Deb: `new`
+  - pi4: `new`
 
 >> `libz` (*1): fast lossless compression algorithm. Debian 10.2 Bullseye installs the `libzstd1` package (ver. 1.4.8) by default.
 
@@ -289,22 +309,33 @@ The following options apply to the build of the D runtime library.
 
 For [Raspberry Pi 4B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/specifications/), the `fix-cortex-a53-843419` option should not be necessary because its CPU is Broadcom BCM2711, Quad core Cortex-A72 (ARM v8) 64-bit SoC.
 
-### Deprecated options
+### Options of GCC 12.2 build `configure`
 
-The following options used by GCC 10.2 are no longer supported by `configure` of GCC 12.2:
-
-- `enable-clocale`
-  - Deb: `gnu`
-- `enable-libstdcxx-debug`
-  - Deb: enable
-- `enable-libstdcxx-time`
-  - Deb: enable
-- `enable-plugin`
-  - Deb: enable
-- `with-default-libstdcxx-abi`
-  - Deb: `new`
-
-### Configuration for Raspberry Pi 4B
+```
+$ cd objdir
+$ srcdir/configure \
+--enable-languages=c++ \
+--enable-bootstrap \
+--without-gcc-major-version-only \
+--disable-nls \
+--enable-default-pie \
+--disable-werror \
+--enable-checking=release \
+--without-included-gettext \
+--enable-shared \
+--enable-threads=posix \
+--enable-link-mutex \
+--disable-libquadmath \
+--disable-libquadmath-support \
+--enable-linker-build-id \
+--enable-gnu-unique-object \
+--enable-plugin \
+--with-system-zlib \
+--enable-clocale=gnu \
+--enable-libstdcxx-debug \
+--enable-libstdcxx-time=yes \
+--with-default-libstdcxx-abi=new
+```
 
 ## Building
 
@@ -349,6 +380,4 @@ The next step is to use your new slow compiler that produces fast code, and then
 To solve that problem, we build the compiler a third time. Once we have built the third compiler using the second compiler, it should produce the very same output as the first compiler building the second, as both times we are using compilers that produce fast code and use the same source code. The compiler build system will then verify that the second and third compilers are identical, which gives you confidence in the bootstrap. If the second and third compilers are not identical, the bootstrap failed and you have encountered a compiler bug. Bootstrapping takes three times as long as just building a regular compiler, but it makes sure your toolchain is stable.
 
 The last thing to do is run the compiler test suite so you can verify that it works correctly.
-
-
 
