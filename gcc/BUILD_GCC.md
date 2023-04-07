@@ -72,217 +72,122 @@ b { color: Khaki;
 
 If you will be distributing binary versions of GCC, with modifications to the source code, you should use the *distributor options* to make clear that your version contains modifications.
 
-<table>
-<tr><th colspan="3">Distributor options</th></tr>
-
-<tr><td colspan="3"><b>with-pkgversion</b></td></tr>
-<tr><td></td><td colspan="2">
-This version string will be included in the output of <b>gcc --version</b>. The default value is <b>GCC</b>.</td></tr>
-<tr><td></td><td>Deb</td><td><b>Debian 10.2.1-6</b></td></tr>
-<tr><td></td><td>pi4</td><td>TBD</td></tr>
-
-<tr><td colspan="3"><b>with-bugurl</b></td></tr>
-<tr><td></td><td colspan="2">
-Specify the URL that users should visit if they wish to report a bug. The default value refers to the FSF’s GCC bug tracker.</td></tr>
-<tr><td></td><td>Deb</td><td><b>file:///usr/share/doc/gcc-10/README.Bugs</b></td></tr>
-<tr><td></td><td>pi4</td><td>N/A (default URL)</td></tr>
-
-</table>
+- `with-pkgversion`
+  - This version string will be included in the output of `gcc --version`. The default value is `GCC`.
+  - Deb: `Debian 10.2.1-6`
+  - pi4: TBD
+- `with-bugurl`
+  - Specify the URL that users should visit if they wish to report a bug. The default value refers to the FSF’s GCC bug tracker.
+  - Deb: `file:///usr/share/doc/gcc-10/README.Bugs`
+  - pi4: N/A (default URL)
 
 Use options to override several configure time options for GCC. A list of supported options follows; ‘configure --help’ may list other options, but those not listed below may not work and should not normally be used.
 
-<table>
-<tr><th colspan="3">General options</th></tr>
-
-<tr><td colspan="3"><b></b></td></tr>
-<tr><td></td><td colspan="2">
-</td></tr>
-<tr><td></td><td>Deb</td><td><b></b></td></tr>
-<tr><td></td><td>pi4</td><td></td></tr>
-
-<tr><td colspan="3"><b></b></td></tr>
-<tr><td></td><td colspan="2">
-</td></tr>
-<tr><td></td><td>Deb</td><td><b></b></td></tr>
-<tr><td></td><td>pi4</td><td></td></tr>
-
-<tr><td colspan="3"><b></b></td></tr>
-<tr><td></td><td colspan="2">
-</td></tr>
-<tr><td></td><td>Deb</td><td><b></b></td></tr>
-<tr><td></td><td>pi4</td><td></td></tr>
-
-<tr><td colspan="3"><b>enable-languages</b></td></tr>
-<tr><td></td><td colspan="2">
-Specify that only a particular subset of compilers and their runtime libraries should be built. The <b>default</b> option includes <b>c</b>, <b>c++</b>, <b>fortran</b>, and <b>objc</b>.</td></tr>
-<tr><td></td><td>Deb</td><td><b>c,ada,c++,go,d,fortran,objc,obj-c++,m2</b></td></tr>
-<tr><td></td><td>pi4</td><td><b>c++</b></td></tr>
-
-<tr><td colspan="3"><b>prefix</b></td></tr>
-<tr><td></td><td colspan="2">
-Specify the toplevel installation directory. Recommended way to install the tools into a directory other than the default <b>/usr/local</b>.</td></tr>
-<tr><td></td><td>Deb</td><td><b>/usr</b></td></tr>
-<tr><td></td><td>pi4</td><td>N/A (<b>/usr/local</b>)</td></tr>
-
-<tr><td colspan="3"><b>exec-prefix</b></td></tr>
-<tr><td></td><td colspan="2">
-Specify the toplevel installation directory for architecture-dependent files. The default is <b>${prefix}</b>.</td></tr>
-<tr><td></td><td>Deb</td><td>N/A (<b>/usr</b>)</td></tr>
-<tr><td></td><td>pi4</td><td>N/A (<b>/usr/local</b>)</td></tr>
-
-<tr><td colspan="3"><b>bindir</b></td></tr>
-<tr><td></td><td colspan="2">
-Specify the installation directory for the executables called by users (such as <b>gcc</b> and <b>g++</b>). The default is <b>${exec-prefix}/bin</b>.</td></tr>
-<tr><td></td><td>Deb</td><td>N/A (<b>/usr/bin</b><)/td></tr>
-<tr><td></td><td>pi4</td><td>N/A (<b>/usr/local/bin</b>)</td></tr>
-
-<tr><td colspan="3"><b>libdir</b></td></tr>
-<tr><td></td><td colspan="2">
-Specify the installation directory for object code libraries and internal data files of GCC. The default is <b>${exec-prefix}/lib</b>.</td></tr>
-<tr><td></td><td>Deb</td><td><b>/usr/lib</b></td></tr>
-<tr><td></td><td>pi4</td><td>N/A (<b>/usr/local/lib</b>)</td></tr>
-
-<tr><td colspan="3"><b>libexecdir</b></td></tr>
-<tr><td></td><td colspan="2">
-Specify the installation directory for internal executables of GCC. The default is <b>${exec-prefix}/libexec</b>.</td></tr>
-<tr><td></td><td>Deb</td><td><b>/usr/lib</b></td></tr>
-<tr><td></td><td>pi4</td><td>N/A (<b>/usr/local/libexec</b>)</td></tr>
-
-<tr><td colspan="3"><b>program-prefix</b></td></tr>
-<tr><td></td><td colspan="2">
-Prepends prefix to the names of programs to install in <b>${bindir}</b>. For example, specifying <b>--program-prefix=foo-</b> would result in <b>gcc</b> being installed as <b>/usr/local/bin/foo-gcc</b>.</td></tr>
-<tr><td></td><td>Deb</td><td><b>aarch64-linux-gnu-</b></td></tr>
-<tr><td></td><td>pi4</td><td>TBD</td></tr>
-
-<tr><td colspan="3"><b>program-suffix</b></td></tr>
-<tr><td></td><td colspan="2">
-Appends suffix to the names of programs to install in <b>${bindir}</b>. For example, specifying <b>--program-suffix=-3.1</b> would result in <i>gcc</i> being installed as <b>/usr/local/bin/gcc-3.1</b>.</td></tr>
-<tr><td></td><td>Deb</td><td><b>-10</b></td></tr>
-<tr><td></td><td>pi4</td><td>TBD</td></tr>
-
-<tr><td colspan="3"><b>with-gcc-major-version-only</b></td></tr>
-<tr><td></td><td colspan="2">
-Specifies that GCC should use only the major number rather than <b>major.minor.patchlevel</b> in filesystem paths.</td></tr>
-<tr><td></td><td>Deb</td><td><b>with</b></td></tr>
-<tr><td></td><td>pi4</td><td>TBD</td></tr>
-
-<tr><td colspan="3"><b>enable-shared</b></td></tr>
-<tr><td></td><td colspan="2">
-Build shared versions of libraries, if shared libraries are supported on the target platform.</td></tr>
-<tr><td></td><td>Deb</td><td><b>enable</b></td></tr>
-<tr><td></td><td>pi4</td><td><b>enable</b></td></tr>
-
-<tr><td colspan="3"><b>enable-multiarch</b></td></tr>
-<tr><td></td><td colspan="2">
-Specify whether to enable or disable multiarch support. The default is to check for <b>glibc</b> start files in a multiarch location, and enable it if the files are found.</td></tr>
-<tr><td></td><td>Deb</td><td><b>enable</b></td></tr>
-<tr><td></td><td>pi4</td><td>TBD</td></tr>
-
-<tr><td colspan="3"><b>enable-threads</b></td></tr>
-<tr><td></td><td colspan="2">
-Specify that the target supports threads. This affects exception handling for C++.</td></tr>
-<tr><td></td><td>Deb</td><td><b>posix</b></td></tr>
-<tr><td></td><td>pi4</td><td><b>posix</b></td></tr>
-
-<tr><td colspan="3"><b>enable-link-mutex</b></td></tr>
-<tr><td></td><td colspan="2">
-When building GCC, use a mutex to avoid linking the compilers for multiple languages at the same time, to avoid thrashing on build systems with limited free memory.</td></tr>
-<tr><td></td><td>Deb</td><td><b>enable</b></td></tr>
-<tr><td></td><td>pi4</td><td><b>enable</b></td></tr>
-
-<tr><td colspan="3"><b>enable-bootstrap</b></td></tr>
-<tr><td></td><td colspan="2">
-For a native build, the default configuration is to perform a 3-stage bootstrap of the compiler when <b>make</b> is invoked, testing that GCC can compile itself correctly. If you want to disable this process, you can configure with <b>--disable-bootstrap</b>.</td></tr>
-<tr><td></td><td>Deb</td><td><b>enable</b></td></tr>
-<tr><td></td><td>pi4</td><td><b>TBD</b></td></tr>
-
-<tr><td colspan="3"><b></b>disable-libquadmath</td></tr>
-<tr><td></td><td colspan="2">
-Specify that the GCC quad-precision math library should not be built. On some systems, the library is required to be linkable when building the Fortran front end.</td></tr>
-<tr><td></td><td>Deb</td><td><b>disable</b></td></tr>
-<tr><td></td><td>pi4</td><td><b>disable</b></td></tr>
-
-<tr><td colspan="3"><b>disable-libquadmath-support</b></td></tr>
-<tr><td></td><td colspan="2">
-Specify that the Fortran front end and libgfortran do not add support for libquadmath on systems supporting it.</td></tr>
-<tr><td></td><td>Deb</td><td><b>disable</b></td></tr>
-<tr><td></td><td>pi4</td><td><b>disable</b></td></tr>
-
-<tr><td colspan="3"><b>enable-default-pie</b></td></tr>
-<tr><td></td><td colspan="2">
-Turn on -fPIE and -pie by default.</td></tr>
-<tr><td></td><td>Deb</td><td><b>enable</b></td></tr>
-<tr><td></td><td>pi4</td><td>TBD</td></tr>
-
-<tr><td colspan="3"><b>disable-werror</b></td></tr>
-<tr><td></td><td colspan="2">
-When you specify this option, it controls whether certain files in the compiler are built with <b>-Werror</b> in bootstrap stage2 and later.</td></tr>
-<tr><td></td><td>Deb</td><td><b>disable</b></td></tr>
-<tr><td></td><td>pi4</td><td><b>disable</b></td></tr>
-
-<tr><td colspan="3"><b>enable-checking</b></td></tr>
-<tr><td></td><td colspan="2">
-This option controls performing internal consistency checks in the compiler. It does not change the generated code, but adds error checking of the requested complexity. This slows down the compiler and may only work properly if you are building the compiler with GCC. <b>release</b> is a cheapest checks <b>assert,runtime</b>.</td></tr>
-<tr><td></td><td>Deb</td><td><b>release</b></td></tr>
-<tr><td></td><td>pi4</td><td><b>release</b></td></tr>
-
-<tr><td colspan="3"><b>enable-nls</b></td></tr>
-<tr><td></td><td colspan="2">
-The <b>--enable-nls</b> option enables Native Language Support (NLS), which lets GCC output diagnostics in languages other than American English.</td></tr>
-<tr><td></td><td>Deb</td><td><b>enable</b></td></tr>
-<tr><td></td><td>pi4</td><td><b>disable</b></td></tr>
-
-<tr><td colspan="3"><b>without-included-gettext</b></td></tr>
-<tr><td></td><td colspan="2">
-</td></tr>
-<tr><td></td><td>Deb</td><td><b>without</b></td></tr>
-<tr><td></td><td>pi4</td><td><b>without</b></td></tr>
-
-<tr><td colspan="3"><b>enable-linker-build-id</b></td></tr>
-<tr><td></td><td colspan="2">
-Tells GCC to pass <b>--build-id</b> option to the linker for all final links (links performed without the <b>-r</b> or <b>--relocatable</b> option), if the linker supports it.</td></tr>
-<tr><td></td><td>Deb</td><td><b>enable</b></td></tr>
-<tr><td></td><td>pi4</td><td><b>enable</b></td></tr>
-
-<tr><td colspan="3"><b>enable-gnu-unique-object</b></td></tr>
-<tr><td></td><td colspan="2">
-Tells GCC to use the <b>gnu_unique_object</b> relocation for C++ template static data members and inline function local statics.</td></tr>
-<tr><td></td><td>Deb</td><td><b>enable</b></td></tr>
-<tr><td></td><td>pi4</td><td><b>enable</b></td></tr>
-
-</table>
+- `enable-languages`
+  - Specify that only a particular subset of compilers and their runtime libraries should be built. The `default` option includes `c`, `c++`, `fortran`, and `objc`.
+  - Deb: `c,ada,c++,go,d,fortran,objc,obj-c++,m2`
+  - pi4: `c++`
+- `prefix`
+  - Specify the toplevel installation directory. Recommended way to install the tools into a directory other than the default `/usr/local`.
+  - Deb: `/usr`
+  - pi4: N/A (`/usr/local`)
+- `exec-prefix`
+  - Specify the toplevel installation directory for architecture-dependent files. The default is `${prefix}`.
+  - Deb: N/A (`/usr`)
+  - pi4: N/A (`/usr/local`)
+- `bindir`
+  - Specify the installation directory for the executables called by users (such as `gcc` and `g++`). The default is `${exec-prefix}/bin`.
+  - Deb: N/A (`/usr/bin`)
+  - pi4: N/A (`/usr/local/bin`)
+- `libdir`
+  - Specify the installation directory for object code libraries and internal data files of GCC. The default is `${exec-prefix}/lib`.
+  - Deb: `/usr/lib`
+  - pi4: N/A (`/usr/local/lib`)
+- `libexecdir`
+  - Specify the installation directory for internal executables of GCC. The default is `${exec-prefix}/libexec`.
+  - Deb: `/usr/lib`
+  - pi4: N/A (`/usr/local/libexec`)
+- `program-prefix`
+  - Prepends prefix to the names of programs to install in `${bindir}`. For example, specifying `--program-prefix=foo-` would result in `gcc` being installed as `/usr/local/bin/foo-gcc`.
+  - Deb: `aarch64-linux-gnu-`
+  - pi4: TBD
+- `program-suffix`
+  - Appends suffix to the names of programs to install in `${bindir}`. For example, specifying `--program-suffix=-3.1` would result in `gcc` being installed as `/usr/local/bin/gcc-3.1`.
+  - Deb: `-10`
+  - pi4: TBD
+- `with-gcc-major-version-only`
+  - Specifies that GCC should use only the major number rather than `major.minor.patchlevel` in filesystem paths.
+  - Deb: with
+  - pi4: TBD
+- `enable-shared`
+  - Build shared versions of libraries, if shared libraries are supported on the target platform.
+  - Deb: enable
+  - pi4: enable
+- `enable-multiarch`
+  - Specify whether to enable or disable multiarch support. The default is to check for `glibc` start files in a multiarch location, and enable it if the files are found.
+  - Deb: enable
+  - pi4: TBD
+- `enable-threads`
+  - Specify that the target supports threads. This affects exception handling for C++.
+  - Deb: `posix`
+  - pi4: `posix`
+- `enable-link-mutex`
+  - When building GCC, use a mutex to avoid linking the compilers for multiple languages at the same time, to avoid thrashing on build systems with limited free memory.
+  - Deb: enable
+  - pi4: enable
+- `enable-bootstrap`
+  - For a native build, the default configuration is to perform a 3-stage bootstrap of the compiler when `make` is invoked, testing that GCC can compile itself correctly. If you want to disable this process, you can configure with `--disable-bootstrap`.
+  - Deb: enable
+  - pi4: TBD
+- `disable-libquadmath`
+  - Specify that the GCC quad-precision math library should not be built. On some systems, the library is required to be linkable when building the Fortran front end.
+  - Deb: disable
+  - pi4: disable
+- `disable-libquadmath-support`
+  - Specify that the Fortran front end and libgfortran do not add support for libquadmath on systems supporting it.
+  - Deb: disable
+  - pi4: disable
+- `enable-default-pie`
+  - Turn on `-fPIE` and `-pie` by default.
+  - Deb: enable
+  - pi4: TBD
+- `disable-werror`
+  - When you specify this option, it controls whether certain files in the compiler are built with `-Werror` in bootstrap stage2 and later.
+  - Deb: disable
+  - pi4: disable
+- `enable-checking`
+  - This option controls performing internal consistency checks in the compiler. It does not change the generated code, but adds error checking of the requested complexity. This slows down the compiler and may only work properly if you are building the compiler with GCC. `release` is a cheapest checks `assert,runtime`.
+  - Deb: `release`
+  - pi4: `release`
+- `enable-nls`
+  - Enables Native Language Support (NLS), which lets GCC output diagnostics in languages other than American English.
+  - Deb: enable
+  - pi4: disable
+- `without-included-gettext`
+  - If NLS is enabled, the `--with-included-gettext` option causes the build procedure to prefer its copy of GNU `gettext`.
+  - Deb: without
+  - pi4: N/A (without)
+- `enable-linker-build-id`
+  - Tells GCC to pass `--build-id` option to the linker for all final links (links performed without the `-r` or `--relocatable` option), if the linker supports it.
+  - Deb: enable
+  - pi4: enable
+- `enable-gnu-unique-object`
+  - Tells GCC to use the `gnu_unique_object` relocation for C++ template static data members and inline function local statics.
+  - Deb: enable
+  - pi4: enable
 
 The following options apply to the build of the Objective-C runtime library.
 
-<table>
-<tr><th colspan="3">Object-C-specific options</th></tr>
-
-<tr><td colspan="3"><b>enable-objc-gc</b></td></tr>
-<tr><td></td><td>Deb</td><td><b>auto</b></td></tr>
-<tr><td></td><td>pi4</td><td>N/A</td></tr>
-
-</table>
+- `enable-objc-gc`
+  - Deb: `auto`
 
 The following options apply to the build of the D runtime library.
 
-<table>
-<tr><th colspan="3">D-specific options</th></tr>
+- `enable-libphobos-checking`
+  - Deb: `release`
+- `with-target-system-zlib`
+  - Deb: `auto`
 
-<tr><td colspan="3"><b>enable-libphobos-checking</b></td></tr>
-<tr><td></td><td>Deb</td><td><b>release</b></td></tr>
-<tr><td></td><td>pi4</td><td>N/A</td></tr>
-
-<tr><td colspan="3"><b>with-target-system-zlib</b></td></tr>
-<tr><td></td><td>Deb</td><td><b>auto</b></td></tr>
-<tr><td></td><td>pi4</td><td>N/A</td></tr>
-
-<tr><td colspan="3"><b></b></td></tr>
-<tr><td></td><td colspan="2">
-</td></tr>
-<tr><td></td><td>Deb</td><td><b></b></td></tr>
-<tr><td></td><td>pi4</td><td></td></tr>
-
-</table>
 
 | General option        | value (blank: enabled)
 |-----------------------|---------------------
