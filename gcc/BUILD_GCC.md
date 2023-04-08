@@ -200,7 +200,7 @@ Use options to override several configure time options for GCC. A list of suppor
 - `with-gcc-major-version-only`
   - Specifies that GCC should use only the major number rather than `major.minor.patchlevel` in filesystem paths.
   - Deb: with
-  - pi4: N/A
+  - pi4: without
 - `enable-shared`
   - Build shared versions of libraries, if shared libraries are supported on the target platform.
   - Deb: enable
@@ -248,7 +248,7 @@ Use options to override several configure time options for GCC. A list of suppor
 - `without-included-gettext`
   - If NLS is enabled, the `--with-included-gettext` option causes the build procedure to prefer its copy of GNU `gettext`.
   - Deb: without
-  - pi4: N/A (without)
+  - pi4: N/A (as `nls` disabled)
 - `enable-linker-build-id`
   - Tells GCC to pass `--build-id` option to the linker for all final links (links performed without the `-r` or `--relocatable` option), if the linker supports it.
   - Deb: enable
@@ -258,7 +258,7 @@ Use options to override several configure time options for GCC. A list of suppor
   - Deb: enable
   - pi4: enable
 - `with-system-zlib`
-  - Use installed `libz` (*1)
+  - Use installed `libz`, a fast lossless compression algorithm.
   - Deb: with
   - pi4: with
 - `enable-plugin`
@@ -281,8 +281,6 @@ Use options to override several configure time options for GCC. A list of suppor
   - set the `std::string` ABI to use by default
   - Deb: `new`
   - pi4: `new`
-
->> `libz` (*1): fast lossless compression algorithm. Debian 10.2 Bullseye installs the `libzstd1` package (ver. 1.4.8) by default.
 
 ### Objective-C-specific options
 
@@ -315,22 +313,21 @@ For [Raspberry Pi 4B](https://www.raspberrypi.com/products/raspberry-pi-4-model-
 $ cd objdir
 $ srcdir/configure \
 --enable-languages=c++ \
---enable-bootstrap \
 --without-gcc-major-version-only \
---disable-nls \
---enable-default-pie \
---disable-werror \
---enable-checking=release \
---without-included-gettext \
 --enable-shared \
 --enable-threads=posix \
 --enable-link-mutex \
+--enable-bootstrap \
 --disable-libquadmath \
 --disable-libquadmath-support \
+--enable-default-pie \
+--disable-werror \
+--enable-checking=release \
+--disable-nls \
 --enable-linker-build-id \
 --enable-gnu-unique-object \
---enable-plugin \
 --with-system-zlib \
+--enable-plugin \
 --enable-clocale=gnu \
 --enable-libstdcxx-debug \
 --enable-libstdcxx-time=yes \
