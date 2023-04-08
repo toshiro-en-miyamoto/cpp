@@ -112,6 +112,22 @@ Debian Bullseye 10.2 installs the libraries by default.
 | `libisl23` | 0.23  | manipulating sets and relations of integer points
 | `libzstd1` | 1.4.8 | fast lossless compression algorithm
 
+In addition to the libraries above, the following source distributions are required but not installed by default. Without them, `configure` tells like:
+
+```
+checking for the correct version of gmp.h... no
+configure: error: Building GCC requires GMP 4.2+, MPFR 3.1.0+ and MPC 0.8.0+.
+```
+
+Let's download the latest version of the source distributions, and place them in the GCC sources:
+
+| DIR    | tar file     | URL to download
+|--------|--------------|-----------------
+| `gmp`  | `gmp-6.2.1`  | https://gmplib.org/#DOWNLOAD
+| `mpfr` | `mpfr-4.2.0` | https://www.mpfr.org/mpfr-current/
+| `mpc`  | `mpc-1.3.1`  | https://www.multiprecision.org/mpc/download.html
+| `isl`  | `isl-0.24`   | https://gcc.gnu.org/pub/gcc/infrastructure/
+
 ## Configuration
 
 [Installing GCC: Configuration](https://gcc.gnu.org/install/configure.html)
@@ -334,6 +350,11 @@ $ srcdir/configure \
 --with-default-libstdcxx-abi=new
 ```
 
+With Raspberry Pi 4B, 8GB RAM, 32 GB memory disk:
+- Started: 11:47
+- End: 17:51
+- Elapsed: 6 hours 4 minutes
+
 ## Building
 
 It is normal to have compiler warnings when compiling certain files. Unless you are a GCC developer, you can generally ignore these warnings unless they cause compilation to fail. Developers should attempt to fix any warnings encountered, however they can temporarily continue past warnings-as-errors by specifying the configure flag `--disable-werror`.
@@ -365,6 +386,194 @@ If you are short on disk space you might consider `make bootstrap-lean` instead.
 
 - `bootstrap-lto`: Enables Link-Time Optimization for host tools during bootstrapping.
 - `bootstrap-lto-lean`: This option is similar to `bootstrap-lto`, but is intended for faster build by only using LTO in the final bootstrap stage. With `make profiledbootstrap` the LTO frontend is trained only on generator files.
+
+## Installing
+
+`/usr/local` of Debian 10.2 Bullseye has the following directories files:
+
+```
+$ find /usr/local -type d
+/usr/local
+/usr/local/games
+/usr/local/lib
+/usr/local/lib/pypy2.7
+/usr/local/lib/pypy2.7/dist-packages
+/usr/local/lib/python3.9
+/usr/local/lib/python3.9/dist-packages
+/usr/local/etc
+/usr/local/include
+/usr/local/src
+/usr/local/share
+/usr/local/share/sgml
+/usr/local/share/sgml/declaration
+/usr/local/share/sgml/stylesheet
+/usr/local/share/sgml/misc
+/usr/local/share/sgml/dtd
+/usr/local/share/sgml/entities
+/usr/local/share/fonts
+/usr/local/share/xml
+/usr/local/share/xml/declaration
+/usr/local/share/xml/misc
+/usr/local/share/xml/entities
+/usr/local/share/xml/schema
+/usr/local/share/man
+/usr/local/share/ca-certificates
+/usr/local/sbin
+/usr/local/bin
+
+$ find /usr/local -type f
+/usr/local/share/fonts/.uuid
+```
+
+Let's install GCC 12.2. Because we are installing it to `/usr/local`, `sudo` is required to run `make`:
+
+```
+% cd objdir
+% sudo make install
+```
+
+We have the following directories:
+
+```
+$ find /usr/local -type d
+/usr/local
+/usr/local/games
+/usr/local/lib
+/usr/local/lib/pypy2.7
+/usr/local/lib/pypy2.7/dist-packages
+/usr/local/lib/python3.9
+/usr/local/lib/python3.9/dist-packages
+/usr/local/lib/gcc
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/include
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/include/ssp
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/include/sanitizer
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/plugin
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/plugin/include
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/plugin/include/d
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/plugin/include/ada
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/plugin/include/ada/gcc-interface
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/plugin/include/objc
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/plugin/include/cp
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/plugin/include/config
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/plugin/include/config/aarch64
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/plugin/include/config/arm
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/plugin/include/c-family
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/install-tools
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/install-tools/include
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/include-fixed
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/include-fixed/python3.9m
+/usr/local/lib/gcc/aarch64-unknown-linux-gnu/12.2.0/include-fixed/python3.9m/pygame
+/usr/local/etc
+/usr/local/lib64
+/usr/local/lib64/debug
+/usr/local/include
+/usr/local/include/c++
+/usr/local/include/c++/12.2.0
+/usr/local/include/c++/12.2.0/ext
+/usr/local/include/c++/12.2.0/ext/pb_ds
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/gp_hash_table_map_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/binomial_heap_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/cc_hash_table_map_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/rb_tree_map_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/trie_policy
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/splay_tree_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/pat_trie_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/eq_fn
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/tree_policy
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/rc_binomial_heap_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/pairing_heap_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/binary_heap_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/thin_heap_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/list_update_policy
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/bin_search_tree_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/binomial_heap_base_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/list_update_map_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/left_child_next_sibling_heap_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/unordered_iterator
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/ov_tree_map_
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/resize_policy
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/branch_policy
+/usr/local/include/c++/12.2.0/ext/pb_ds/detail/hash_fn
+/usr/local/include/c++/12.2.0/decimal
+/usr/local/include/c++/12.2.0/tr2
+/usr/local/include/c++/12.2.0/experimental
+/usr/local/include/c++/12.2.0/experimental/bits
+/usr/local/include/c++/12.2.0/debug
+/usr/local/include/c++/12.2.0/tr1
+/usr/local/include/c++/12.2.0/bits
+/usr/local/include/c++/12.2.0/pstl
+/usr/local/include/c++/12.2.0/aarch64-unknown-linux-gnu
+/usr/local/include/c++/12.2.0/aarch64-unknown-linux-gnu/ext
+/usr/local/include/c++/12.2.0/aarch64-unknown-linux-gnu/bits
+/usr/local/include/c++/12.2.0/backward
+/usr/local/include/c++/12.2.0/parallel
+/usr/local/src
+/usr/local/share
+/usr/local/share/sgml
+/usr/local/share/sgml/declaration
+/usr/local/share/sgml/stylesheet
+/usr/local/share/sgml/misc
+/usr/local/share/sgml/dtd
+/usr/local/share/sgml/entities
+/usr/local/share/gcc-12.2.0
+/usr/local/share/gcc-12.2.0/python
+/usr/local/share/gcc-12.2.0/python/libstdcxx
+/usr/local/share/gcc-12.2.0/python/libstdcxx/v6
+/usr/local/share/fonts
+/usr/local/share/xml
+/usr/local/share/xml/declaration
+/usr/local/share/xml/misc
+/usr/local/share/xml/entities
+/usr/local/share/xml/schema
+/usr/local/share/man
+/usr/local/share/man/man7
+/usr/local/share/man/man1
+/usr/local/share/info
+/usr/local/share/ca-certificates
+/usr/local/sbin
+/usr/local/bin
+/usr/local/libexec
+/usr/local/libexec/gcc
+/usr/local/libexec/gcc/aarch64-unknown-linux-gnu
+/usr/local/libexec/gcc/aarch64-unknown-linux-gnu/12.2.0
+/usr/local/libexec/gcc/aarch64-unknown-linux-gnu/12.2.0/plugin
+/usr/local/libexec/gcc/aarch64-unknown-linux-gnu/12.2.0/install-tools
+```
+
+For shorter directory names, the configuration should have had the following options:
+
+- `build`
+  - The *build* machine is the system which you are using.
+  - Deb: `aarch64-linux-gnu`
+  - pi4: `aarch64-linux-gnu`
+- `host`
+  - The *host* machine is the system where you want to run the resulting compiler (normally the build machine).
+  - Deb: `aarch64-linux-gnu`
+  - pi4: `aarch64-linux-gnu`
+- `target`
+  - The *target* machine is the system for which you want the compiler to generate code.
+  - Deb: `aarch64-linux-gnu`
+  - pi4: `aarch64-linux-gnu`
+- `with-gcc-major-version-only`
+  - Specifies that GCC should use only the major number rather than `major.minor.patchlevel` in filesystem paths.
+  - Deb: with
+  - pi4: with
+
+Thanks to the default `PATH` setting, which puts `/usr/local/bin` before `usr/bin`:
+
+```
+$ which g++
+/usr/local/bin/g++
+
+$ echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games
+
+$ g++ --version
+g++ (GCC) 12.2.0
+```
 
 ## What is bootstrap?
 
