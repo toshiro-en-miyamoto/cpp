@@ -15,6 +15,17 @@ Reference: [HIER(7) the filesystem hierarchy](https://www.man7.org/linux/man-pag
 | `/usr/local/bin` | Includes binaries for programs local to the site.
 | `/usr/local/include` | Includes header files for the local C compiler.
 
+## Filesystem requirements
+
+1.7GB of free space at minimum is required to build GCC 12.2 C++.
+
+| used (KB)     | difference    | upon
+|--------------:|---------------|------
+|          0    |  4,074,696    | OS & VS Code installed
+| 14,265,580    | 10,190,884    | GCC/lib source in place
+| 15,770,612    |  1,505,032    | Build completed, c++ installed
+|  5,653,628    | 10,116,984    | source & build deleted
+
 ## Configuration of GCC 10.2.1
 
 For example, with Debian Bulleyes 10.2:
@@ -353,11 +364,6 @@ $ srcdir/configure \
 --with-build-config=bootstrap-lto-lean
 ```
 
-With Raspberry Pi 4B, 8GB RAM, 32 GB memory disk:
-- Started:09:06
-- End: 15:01
-- Elapsed: 5 hours 55 minutes
-
 ## Building
 
 It is normal to have compiler warnings when compiling certain files. Unless you are a GCC developer, you can generally ignore these warnings unless they cause compilation to fail. Developers should attempt to fix any warnings encountered, however they can temporarily continue past warnings-as-errors by specifying the configure flag `--disable-werror`.
@@ -370,9 +376,16 @@ To build GCC:
 % make -j5
 ```
 
-Giving the `j5` option to `make` to use five threads to build GCC. For [Raspberry Pi 4B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/specifications/), it should be five because its CPU is Broadcom BCM2711, Quad core Cortex-A72 (ARM v8) 64-bit SoC.
+Giving the `-j5` option to `make` to use five threads to build GCC. For [Raspberry Pi 4B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/specifications/), it should be five because its CPU is Broadcom BCM2711, Quad core Cortex-A72 (ARM v8) 64-bit SoC.
+
+If your hard drive is slow, don't use `-jN`, otherwise `lock-and-run.sh` of GCC causes many file-locks, resulting in longer time to finish a build.
 
 > [Building GCC, OS Dev org](https://wiki.osdev.org/Building_GCC): As the build can take a long time, it is recommended to make use of make's `-jN` option. This will allow make to use multiple threads to compile the programs, which will speed up things a LOT. Substitute `N` with a number; a good guideline is the number of core you CPU has, plus one.
+
+With Raspberry Pi 4B, 8GB RAM, 32 GB memory disk:
+- Started: 10:02
+- End: 23:43
+- Elapsed: 13 hours 41 minutes
 
 ### Building a native compiler
 
@@ -410,6 +423,93 @@ $ echo $PATH
 
 $ g++ --version
 g++ (GCC) 12.2.0
+```
+
+### Upon Installation
+
+| before                            | after
+|-----------------------------------|-------
+| /usr/local                        | /usr/local
+| /usr/local/bin                    | /usr/local/bin
+| /usr/local/etc                    | /usr/local/etc
+| /usr/local/games                  | /usr/local/games
+| /usr/local/include                | /usr/local/include
+|                                   | /usr/local/include/c++
+|                                   | /usr/local/include/c++/12
+| /usr/local/lib                    | /usr/local/lib
+| /usr/local/lib/pypy2.7            | /usr/local/lib/pypy2.7
+| /usr/local/lib/python3.9          | /usr/local/lib/python3.9
+|                                   | /usr/local/lib/gcc
+|                                   | /usr/local/lib/gcc/aarch64-linux-gnu
+|                                   | /usr/local/lib/gcc/aarch64-linux-gnu/12
+|                                   | /usr/local/lib64
+|                                   | /usr/local/libexec
+|                                   | /usr/local/libexec/gcc
+|                                   | /usr/local/libexec/gcc/aarch64-linux-gnu
+|                                   | /usr/local/libexec/gcc/aarch64-linux-gnu/12
+| /usr/local/sbin                   | /usr/local/sbin
+| /usr/local/src                    | /usr/local/src
+| /usr/local/share/sgml             | /usr/local/share/sgml
+| /usr/local/share/fonts            | /usr/local/share/fonts
+|                                   | /usr/local/share/gcc-12
+| /usr/local/share/xml              | /usr/local/share/xml
+| /usr/local/share/man              | /usr/local/share/man
+|                                   | /usr/local/share/man/man7
+|                                   | /usr/local/share/man/man1
+|                                   | /usr/local/share/info
+| /usr/local/share/ca-certificates  | /usr/local/share/ca-certificates
+| /usr/local/share                  | /usr/local/share
+
+```
+$ ls -l /usr/local
+total 40
+drwxr-xr-x 2 root root 4096 Apr 10 23:49 bin
+drwxr-xr-x 2 root root 4096 Feb 21 11:51 etc
+drwxr-xr-x 2 root root 4096 Feb 21 11:51 games
+drwxr-xr-x 3 root root 4096 Apr 10 23:50 include
+drwxr-xr-x 5 root root 4096 Apr 10 23:47 lib
+drwxr-xr-x 3 root root 4096 Apr 10 23:50 lib64
+drwxr-xr-x 3 root root 4096 Apr 10 23:47 libexec
+lrwxrwxrwx 1 root root    9 Feb 21 11:51 man -> share/man
+drwxr-xr-x 2 root root 4096 Feb 21 11:51 sbin
+drwxr-xr-x 9 root root 4096 Apr 10 23:50 share
+drwxr-xr-x 2 root root 4096 Feb 21 11:51 src
+
+$ ls -l /usr/local/bin
+total 339772
+-rwxr-xr-x 4 root root   5612904 Apr 10 23:47 aarch64-linux-gnu-c++
+-rwxr-xr-x 4 root root   5612904 Apr 10 23:47 aarch64-linux-gnu-g++
+-rwxr-xr-x 3 root root   5605944 Apr 10 23:49 aarch64-linux-gnu-gcc
+-rwxr-xr-x 3 root root   5605944 Apr 10 23:49 aarch64-linux-gnu-gcc-12
+-rwxr-xr-x 2 root root    114576 Apr 10 23:49 aarch64-linux-gnu-gcc-ar
+-rwxr-xr-x 2 root root    114680 Apr 10 23:49 aarch64-linux-gnu-gcc-nm
+-rwxr-xr-x 2 root root    114696 Apr 10 23:49 aarch64-linux-gnu-gcc-ranlib
+-rwxr-xr-x 4 root root   5612904 Apr 10 23:47 c++
+-rwxr-xr-x 1 root root   5608896 Apr 10 23:49 cpp
+-rwxr-xr-x 4 root root   5612904 Apr 10 23:47 g++
+-rwxr-xr-x 3 root root   5605944 Apr 10 23:49 gcc
+-rwxr-xr-x 2 root root    114576 Apr 10 23:49 gcc-ar
+-rwxr-xr-x 2 root root    114680 Apr 10 23:49 gcc-nm
+-rwxr-xr-x 2 root root    114696 Apr 10 23:49 gcc-ranlib
+-rwxr-xr-x 1 root root   4603208 Apr 10 23:49 gcov
+-rwxr-xr-x 1 root root   2457560 Apr 10 23:49 gcov-dump
+-rwxr-xr-x 1 root root   2623216 Apr 10 23:49 gcov-tool
+-rwxr-xr-x 1 root root 292639120 Apr 10 23:47 lto-dump
+
+$ ls -l /usr/local/include
+total 4
+drwxr-xr-x 3 root root 4096 Apr 10 23:50 c++
+
+ $ ls -l /usr/local/lib
+total 12
+drwxr-xr-x 3 root root 4096 Apr 10 23:47 gcc
+drwxr-xr-x 3 root root 4096 Feb 21 12:01 pypy2.7
+drwxr-xr-x 3 root root 4096 Feb 21 11:54 python3.9
+
+$ ls -l /usr/local/share/man
+total 8
+drwxr-xr-x 2 root root 4096 Apr 10 23:49 man1
+drwxr-xr-x 2 root root 4096 Apr 10 23:49 man7
 ```
 
 ## What is bootstrap?
