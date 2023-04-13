@@ -425,6 +425,12 @@ $ g++ --version
 g++ (GCC) 12.2.0
 ```
 
+You still need to set LD_LIBRARY_PATH telling OS where GCC shared libraries are located. Edit `~/.bashrc` to append the following line:
+
+```
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib64
+```
+
 ### Upon Installation
 
 | before                            | after
