@@ -9,12 +9,12 @@ If we have a `future<X>` called `fx`, we can `get()` a value of type `X` from it
 ```c++
 void g(std::future<X>& fx)
 {
-    try {
-        X value = fx.get();
-        // use value ...
-    } catch (...) {
-        // handle error ...
-    }
+  try {
+    X value = fx.get();
+    // use value ...
+  } catch (...) {
+    // handle error ...
+  }
 }
 ```
 
@@ -27,12 +27,12 @@ The main purpose of a `promise` is to provide simple "put" operations (called `s
 
 void f(promise<X>& px)
 {
-    try {
-        X res = compute_a_value_for_res();
-        px.set_value(res);
-    } catch (...) {
-        px.set_exception(std::current_exception());
-    }
+  try {
+    X res = compute_a_value_for_res();
+    px.set_value(res);
+  } catch (...) {
+    px.set_exception(std::current_exception());
+  }
 }
 ```
 
@@ -46,18 +46,18 @@ double accum(it begin, it end, double init);
 
 double comp4(std::vector<double>& v)
 {
-    auto beg = v.begin();
-    auto sz = v.size() / 4;
-    auto p1 = beg + sz;
-    auto p2 = beg + 2 * sz;
-    auto p3 = beg + 3 * sz;
+  auto beg = v.begin();
+  auto sz = v.size() / 4;
+  auto p1 = beg + sz;
+  auto p2 = beg + 2 * sz;
+  auto p3 = beg + 3 * sz;
 
-    auto f0 = std::async(accum, beg, p1, 0.0);
-    auto f1 = std::async(accum, p1, p2, 0.0);
-    auto f2 = std::async(accum, p2, p3, 0.0);
-    auto f3 = std::async(accum, p3, v.end(), 0.0);
+  auto f0 = std::async(accum, beg, p1, 0.0);
+  auto f1 = std::async(accum, p1, p2, 0.0);
+  auto f2 = std::async(accum, p2, p3, 0.0);
+  auto f3 = std::async(accum, p3, v.end(), 0.0);
 
-    return f0.get() + f1.get() + f2.get() + f3.get();
+  return f0.get() + f1.get() + f2.get() + f3.get();
 }
 ```
 
@@ -79,11 +79,11 @@ constexpr int CYCLE = 5;
 
 int counting(std::stop_token token, int value)
 {
-    while (!token.stop_requested()) {
-        value++;
-        std::this_thread::sleep_for(INTERVAL);
-    }
-    return value;
+  while (!token.stop_requested()) {
+    value++;
+    std::this_thread::sleep_for(INTERVAL);
+  }
+  return value;
 }
 ```
 
@@ -92,13 +92,13 @@ Here, `!token.stop_requested()` tests whether some other `thread` has requested 
 ```c++
 int stop_counting()
 {
-    std::stop_source ss {};
-    auto count = std::async(counting, ss.get_token(), 0);
+  std::stop_source ss {};
+  auto count = std::async(counting, ss.get_token(), 0);
 
-    std::this_thread::sleep_for(INTERVAL * CYCLE);
-    ss.request_stop();
+  std::this_thread::sleep_for(INTERVAL * CYCLE);
+  ss.request_stop();
 
-    return count.get();
+  return count.get();
 }
 ```
 

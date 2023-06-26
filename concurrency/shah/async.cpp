@@ -4,15 +4,15 @@
 
 int square(int x)
 {
-    return x * x;
+  return x * x;
 }
 
 int main()
 {
-    std::future<int> async_func = std::async(&square, 12);
-    std::cout
-        << "result: "
-        << async_func.get()
-        << std::endl;
-    return 0;
+  std::future<int> async_func = std::async(&square, 12);
+  std::cout
+    << "result: "
+    << async_func.get()
+    << std::endl;
+  return 0;
 }

@@ -3,11 +3,11 @@
 #include <numeric>
 
 double accum(
-    std::vector<double>::iterator beg,
-    std::vector<double>::iterator end,
-    double init
+  std::vector<double>::iterator beg,
+  std::vector<double>::iterator end,
+  double init
 ) {
-    return std::accumulate(beg, end, init);
+  return std::accumulate(beg, end, init);
 }
 
 #include <future>
@@ -19,18 +19,18 @@ double accum(
 
 double comp2(std::vector<double>& v)
 {
-    using it = std::vector<double>::iterator;
-    std::packaged_task<double(it, it, double)> pt0 {accum};
-    std::packaged_task<double(it, it, double)> pt1 {accum};
+  using it = std::vector<double>::iterator;
+  std::packaged_task<double(it, it, double)> pt0 {accum};
+  std::packaged_task<double(it, it, double)> pt1 {accum};
 
-    std::future<double> f0 = {pt0.get_future()};
-    std::future<double> f1 = {pt1.get_future()};
+  std::future<double> f0 = {pt0.get_future()};
+  std::future<double> f1 = {pt1.get_future()};
 
-    auto mid = v.begin() + v.size()/2;
-    std::jthread t0 {std::move(pt0), v.begin(), mid, 0.0};
-    std::jthread t1 {std::move(pt1), mid, v.end(), 0.0};
+  auto mid = v.begin() + v.size()/2;
+  std::jthread t0 {std::move(pt0), v.begin(), mid, 0.0};
+  std::jthread t1 {std::move(pt1), mid, v.end(), 0.0};
 
-    return f0.get() + f1.get();
+  return f0.get() + f1.get();
 }
 
 /**
@@ -41,18 +41,18 @@ double comp2(std::vector<double>& v)
 */
 double comp4(std::vector<double>& v)
 {
-    auto beg = v.begin();
-    auto sz = v.size() / 4;
-    auto p1 = beg + sz;
-    auto p2 = beg + 2 * sz;
-    auto p3 = beg + 3 * sz;
+  auto beg = v.begin();
+  auto sz = v.size() / 4;
+  auto p1 = beg + sz;
+  auto p2 = beg + 2 * sz;
+  auto p3 = beg + 3 * sz;
 
-    auto f0 = std::async(accum, beg, p1, 0.0);
-    auto f1 = std::async(accum, p1, p2, 0.0);
-    auto f2 = std::async(accum, p2, p3, 0.0);
-    auto f3 = std::async(accum, p3, v.end(), 0.0);
+  auto f0 = std::async(accum, beg, p1, 0.0);
+  auto f1 = std::async(accum, p1, p2, 0.0);
+  auto f2 = std::async(accum, p2, p3, 0.0);
+  auto f3 = std::async(accum, p3, v.end(), 0.0);
 
-    return f0.get() + f1.get() + f2.get() + f3.get();
+  return f0.get() + f1.get() + f2.get() + f3.get();
 }
 
 #include <stop_token>
@@ -64,55 +64,55 @@ constexpr int CYCLE = 5;
 
 int counting(std::stop_token token, int value)
 {
-    while (!token.stop_requested()) {
-        value++;
-        std::this_thread::sleep_for(INTERVAL);
-    }
-    return value;
+  while (!token.stop_requested()) {
+    value++;
+    std::this_thread::sleep_for(INTERVAL);
+  }
+  return value;
 }
 
 int stop_counting()
 {
-    std::stop_source stop {};
-    auto count = std::async(counting, stop.get_token(), 0);
+  std::stop_source stop {};
+  auto count = std::async(counting, stop.get_token(), 0);
 
-    std::this_thread::sleep_for(INTERVAL * CYCLE);
-    stop.request_stop();
+  std::this_thread::sleep_for(INTERVAL * CYCLE);
+  stop.request_stop();
 
-    return count.get();
+  return count.get();
 }
 
 #include <boost/ut.hpp>
 
 int main()
 {
-    using namespace boost::ut;
+  using namespace boost::ut;
 
-    "accum"_test = []
-    {
-        std::vector<double> v {1.0, 2.0, 3.0, 4.0};
-        double sum = accum(v.begin(), v.end(), 0);
-        expect(sum == 10.0_d);
-    };
+  "accum"_test = []
+  {
+    std::vector<double> v {1.0, 2.0, 3.0, 4.0};
+    double sum = accum(v.begin(), v.end(), 0);
+    expect(sum == 10.0_d);
+  };
 
-    "comp2"_test = []
-    {
-        std::vector<double> v {1.0, 2.0, 3.0, 4.0, 5.0};
-        double sum = comp2(v);
-        expect(sum == 15.0_d);
-    };
+  "comp2"_test = []
+  {
+    std::vector<double> v {1.0, 2.0, 3.0, 4.0, 5.0};
+    double sum = comp2(v);
+    expect(sum == 15.0_d);
+  };
 
-    "comp4"_test = []
-    {
-        std::vector<double> v {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
-        double sum = comp4(v);
-        expect(sum == 21.0_d);
-    };
+  "comp4"_test = []
+  {
+    std::vector<double> v {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+    double sum = comp4(v);
+    expect(sum == 21.0_d);
+  };
 
-    "stop_counting"_test = []
-    {
-        expect(that % stop_counting() == CYCLE);
-    };
+  "stop_counting"_test = []
+  {
+    expect(that % stop_counting() == CYCLE);
+  };
 
-    return 0;
+  return 0;
 }

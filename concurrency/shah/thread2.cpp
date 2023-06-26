@@ -3,14 +3,14 @@
 
 int main()
 {
-    auto lambda = [](int x) {
-        std::cout << "Hello from thread!" << std::endl;
-        std::cout << "Argument passed in: " << x << std::endl;
-    };
+  auto lambda = [](int x) {
+    std::cout << "Hello from thread!" << std::endl;
+    std::cout << "Argument passed in: " << x << std::endl;
+  };
 
-    std::thread myThread(lambda, 100);
-    myThread.join();
+  std::thread myThread(lambda, 100);
+  myThread.join();
 
-    std::cout << "Main is complete" << std::endl;
-    return 0;
+  std::cout << "Main is complete" << std::endl;
+  return 0;
 }
