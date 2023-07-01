@@ -11,17 +11,17 @@ Let's start with constructors and a destructor:
 
 struct X
 {
-    char c_;
+  char c_;
 
-    X() : c_ {'~'}
-    { std::cout << "new  ~\n"; }
-    X(char c) : c_ {c}
-    { std::cout << "new  " << c_ << '\n'; }
-    ~X()
-    { std::cout << "del  " << c_ << '\n'; }
+  X() : c_ {'~'}
+  { std::cout << "new  ~\n"; }
+  X(char c) : c_ {c}
+  { std::cout << "new  " << c_ << '\n'; }
+  ~X()
+  { std::cout << "del  " << c_ << '\n'; }
 
-    const auto addr() const
-    { return this; }
+  const auto addr() const
+  { return this; }
 };
 ```
 
@@ -32,26 +32,26 @@ Run the above code, then things happen under the hood:
 ```c++
 int main()
 {
-    using namespace boost::ut;
-    using namespace boost::ut::bdd;
+  using namespace boost::ut;
+  using namespace boost::ut::bdd;
 
-    "object lifetime"_test = [] {
-        given("constructors") = [] {
-            my::hijack hj(std::cout);
-            when("constructed") = [] {
-                X xA {'A'};
-                X xB {'B'};
-                expect(xA.addr() != xB.addr());
-            };
-            auto actual = hj.release();
-            expect(actual ==
-                "new  A\n"
-                "new  B\n"
-                "del  B\n"
-                "del  A\n"
-            ) << actual;
-        };
+  "object lifetime"_test = [] {
+    given("constructors") = [] {
+      my::hijack hj(std::cout);
+      when("constructed") = [] {
+        X xA {'A'};
+        X xB {'B'};
+        expect(xA.addr() != xB.addr());
+      };
+      auto actual = hj.release();
+      expect(actual ==
+        "new  A\n"
+        "new  B\n"
+        "del  B\n"
+        "del  A\n"
+      ) << actual;
     };
+  };
 }
 ```
 
@@ -69,34 +69,34 @@ Here an assignment `xA = xB` is added. Notice that the value of `xA` is `'B'` wh
 ```c++
 int main()
 {
-    using namespace boost::ut;
-    using namespace boost::ut::bdd;
+  using namespace boost::ut;
+  using namespace boost::ut::bdd;
 
-    "object lifetime"_test = [] {
-        given("constructors") = [] {
-        };
-        given("copy assign") = [] {
-            my::hijack hj(std::cout);
-            when("copied") = [] {
-                X xA {'A'};
-                auto xAaddr = xA.addr();
-                X xB {'B'};
-                auto xBaddr = xB.addr();
-                xA = xB;
-                expect(xAaddr == xA.addr());
-                expect(xBaddr == xB.addr());
-                expect(xA.addr() != xB.addr());
-            };
-            auto actual = hj.release();
-            expect(actual ==
-                "new  A\n"
-                "new  B\n"
-                "copy B over A\n"
-                "del  B\n"
-                "del  B\n"
-            ) << actual;
-        };
+  "object lifetime"_test = [] {
+    given("constructors") = [] {
     };
+    given("copy assign") = [] {
+      my::hijack hj(std::cout);
+      when("copied") = [] {
+        X xA {'A'};
+        auto xAaddr = xA.addr();
+        X xB {'B'};
+        auto xBaddr = xB.addr();
+        xA = xB;
+        expect(xAaddr == xA.addr());
+        expect(xBaddr == xB.addr());
+        expect(xA.addr() != xB.addr());
+      };
+      auto actual = hj.release();
+      expect(actual ==
+        "new  A\n"
+        "new  B\n"
+        "copy B over A\n"
+        "del  B\n"
+        "del  B\n"
+      ) << actual;
+    };
+  };
 }
 ```
 
@@ -112,24 +112,24 @@ Member-wise copy is also known as *shallow copy*. It is easy to define such simp
 ```c++
 struct X
 {
-    char c_;
+  char c_;
 
-    X() : c_ {'~'}
-    { std::cout << "new  ~\n"; }
-    X(char c) : c_ {c}
-    { std::cout << "new  " << c_ << '\n'; }
-    ~X()
-    { std::cout << "del  " << c_ << '\n'; }
-    X& operator=(const X& rhs)
-    {
-        std::cout   << "copy " << rhs.c_
-                    << " over " << c_ << '\n';
-        c_ = rhs.c_;
-        return *this;
-    }
+  X() : c_ {'~'}
+  { std::cout << "new  ~\n"; }
+  X(char c) : c_ {c}
+  { std::cout << "new  " << c_ << '\n'; }
+  ~X()
+  { std::cout << "del  " << c_ << '\n'; }
+  X& operator=(const X& rhs)
+  {
+    std::cout   << "copy " << rhs.c_
+          << " over " << c_ << '\n';
+    c_ = rhs.c_;
+    return *this;
+  }
 
-    const auto addr() const
-    { return this; }
+  const auto addr() const
+  { return this; }
 };
 ```
 
@@ -142,26 +142,26 @@ We often define *copy constructors* along with copy assignment operators.
 ```c++
 struct X
 {
-    char c_;
+  char c_;
 
-    X() : c_ {'~'}
-    { std::cout << "new  ~\n"; }
-    X(char c) : c_ {c}
-    { std::cout << "new  " << c_ << '\n'; }
-    ~X()
-    { std::cout << "del  " << c_ << '\n'; }
-    X& operator=(const X& rhs)
-    {
-        std::cout   << "copy " << rhs.c_
-                    << " over " << c_ << '\n';
-        c_ = rhs.c_;
-        return *this;
-    }
-    X(const X& rhs) : c_ {rhs.c_}
-    { std::cout << "ctor " << c_ << '\n'; }
+  X() : c_ {'~'}
+  { std::cout << "new  ~\n"; }
+  X(char c) : c_ {c}
+  { std::cout << "new  " << c_ << '\n'; }
+  ~X()
+  { std::cout << "del  " << c_ << '\n'; }
+  X& operator=(const X& rhs)
+  {
+    std::cout   << "copy " << rhs.c_
+          << " over " << c_ << '\n';
+    c_ = rhs.c_;
+    return *this;
+  }
+  X(const X& rhs) : c_ {rhs.c_}
+  { std::cout << "ctor " << c_ << '\n'; }
 
-    const auto addr() const
-    { return this; }
+  const auto addr() const
+  { return this; }
 };
 ```
 
@@ -171,64 +171,64 @@ The copy constructor takes part in function call. Suppose we call a function `id
 template<typename T>
 T ident(T arg)
 {
-    return arg;
+  return arg;
 }
 
 int main()
 {
-    using namespace boost::ut;
-    using namespace boost::ut::bdd;
+  using namespace boost::ut;
+  using namespace boost::ut::bdd;
 
-    "object lifetime"_test = [] {
-        given("constructors") = [] {
-        };
-        given("copy assign") = [] {
-        };
-        given("copy constructor") = [] {
-            my::hijack hj(std::cout);
-            when("constructed") = [] {
-                X xA1 {'A'};
-                X xA2 {xA1};
-                expect(xA1.addr() != xA2.addr());
-            };
-            auto actual = hj.release();
-            expect(actual ==
-                "new  A\n"
-                "ctor A\n"
-                "del  A\n"
-                "del  A\n"
-            ) << actual;
-        };
-        given("without move ctor & assign") = [] {
-            my::hijack hj(std::cout);
-            when("copied") = [] {
-                X xA {'A'};
-                X xB {'B'};
-                auto xAaddr = xA.addr();
-                xA = ident(xB);
-                expect(xAaddr == xA.addr());
-            };
-            auto actual = hj.release();
-            expect(actual ==
-                "new  A\n"
-                "new  B\n"
-                // call to 'indent(xB)' copies xB to arg
-                "ctor B\n"
-                // 'return arg' creates a copy of arg
-                "ctor B\n"
-                // assign the copy to xA
-                "copy B over A\n"
-                // leaving indent()
-                // a copy of arg is destructed
-                "del  B\n"
-                // arg is going out of scope
-                "del  B\n"
-                // xB and xA are going out of scope
-                "del  B\n"
-                "del  B\n"
-            ) << actual;
-        };
+  "object lifetime"_test = [] {
+    given("constructors") = [] {
     };
+    given("copy assign") = [] {
+    };
+    given("copy constructor") = [] {
+      my::hijack hj(std::cout);
+      when("constructed") = [] {
+        X xA1 {'A'};
+        X xA2 {xA1};
+        expect(xA1.addr() != xA2.addr());
+      };
+      auto actual = hj.release();
+      expect(actual ==
+        "new  A\n"
+        "ctor A\n"
+        "del  A\n"
+        "del  A\n"
+      ) << actual;
+    };
+    given("without move ctor & assign") = [] {
+      my::hijack hj(std::cout);
+      when("copied") = [] {
+        X xA {'A'};
+        X xB {'B'};
+        auto xAaddr = xA.addr();
+        xA = ident(xB);
+        expect(xAaddr == xA.addr());
+      };
+      auto actual = hj.release();
+      expect(actual ==
+        "new  A\n"
+        "new  B\n"
+        // call to 'indent(xB)' copies xB to arg
+        "ctor B\n"
+        // 'return arg' creates a copy of arg
+        "ctor B\n"
+        // assign the copy to xA
+        "copy B over A\n"
+        // leaving indent()
+        // a copy of arg is destructed
+        "del  B\n"
+        // arg is going out of scope
+        "del  B\n"
+        // xB and xA are going out of scope
+        "del  B\n"
+        "del  B\n"
+      ) << actual;
+    };
+  };
 }
 ```
 
@@ -239,9 +239,9 @@ Findings:
 
 [Copy initialization](https://en.cppreference.com/w/cpp/language/copy_initialization) is performed in the following situations:
 
-| syntax            | explanation
+| syntax      | explanation
 |-------------------|-------------
-| `f(`other`)`      | when passing an argument to a function by value
+| `f(`other`)`    | when passing an argument to a function by value
 | `return` other`;` | when returning from a function that returns by value
 
 The [`return`](https://en.cppreference.com/w/cpp/language/return) statement: Returning by value may involve construction and copy/move of a temporary object, unless copy elision is used.
@@ -255,21 +255,21 @@ You might notice that when calling the function `ident()`, the preceding code ma
 3. the return value is copied to `xA`
 
 ```c++
-            expect(actual ==
-                "new  A\n"
-                "new  B\n"
-                // call to 'indent(xB)' copies xB to arg
-                "ctor B\n"
-                // 'return arg' creates a copy of arg
-                "ctor B\n"
-                // assign the copy to xA
-                "copy B over A\n"
-                // leaving indent()
-                "del  B\n"
-                "del  B\n"
-                "del  B\n"
-                "del  B\n"
-            ) << actual;
+expect(actual ==
+  "new  A\n"
+  "new  B\n"
+  // call to 'indent(xB)' copies xB to arg
+  "ctor B\n"
+  // 'return arg' creates a copy of arg
+  "ctor B\n"
+  // assign the copy to xA
+  "copy B over A\n"
+  // leaving indent()
+  "del  B\n"
+  "del  B\n"
+  "del  B\n"
+  "del  B\n"
+) << actual;
 ```
 
 You can define [*move constructors*](https://en.cppreference.com/w/cpp/language/move_constructor) and [*move assignment operators*](https://en.cppreference.com/w/cpp/language/move_assignment): they typically *steal* the resources held by the argument, rather than make copies of them, and leave the argument in some valid but otherwise indeterminate state.
@@ -277,35 +277,35 @@ You can define [*move constructors*](https://en.cppreference.com/w/cpp/language/
 ```c++
 struct Y
 {
-    char c_;
+  char c_;
 
-    Y() : c_ {'~'}
-    { std::cout << "new  ~\n"; }
-    Y(char c) : c_ {c}
-    { std::cout << "new  " << c_ << '\n'; }
-    ~Y()
-    { std::cout << "del  " << c_ << '\n'; }
-    Y& operator=(const Y& rhs)
-    {
-        std::cout   << "copy " << rhs.c_
-                    << " over " << c_ << '\n';
-        c_ = rhs.c_;
-        return *this;
-    }
-    Y(const Y& rhs) : c_ {rhs.c_}
-    { std::cout << "ctor " << c_ << '\n'; }
-    Y(Y&& rhs) : c_ { std::exchange(rhs.c_, '~') }
-    { std::cout << "mtor " << c_ << '\n'; }
-    Y& operator=(Y&& rhs)
-    {
-        std::cout   << "move " << rhs.c_
-                    << " over " << c_ << '\n';
-        c_ = std::exchange(rhs.c_, '~');
-        return *this;
-    }
+  Y() : c_ {'~'}
+  { std::cout << "new  ~\n"; }
+  Y(char c) : c_ {c}
+  { std::cout << "new  " << c_ << '\n'; }
+  ~Y()
+  { std::cout << "del  " << c_ << '\n'; }
+  Y& operator=(const Y& rhs)
+  {
+    std::cout << "copy " << rhs.c_
+              << " over " << c_ << '\n';
+    c_ = rhs.c_;
+    return *this;
+  }
+  Y(const Y& rhs) : c_ {rhs.c_}
+  { std::cout << "ctor " << c_ << '\n'; }
+  Y(Y&& rhs) : c_ { std::exchange(rhs.c_, '~') }
+  { std::cout << "mtor " << c_ << '\n'; }
+  Y& operator=(Y&& rhs)
+  {
+    std::cout << "move " << rhs.c_
+              << " over " << c_ << '\n';
+    c_ = std::exchange(rhs.c_, '~');
+    return *this;
+  }
 
-    const auto addr() const
-    { return this; }
+  const auto addr() const
+  { return this; }
 };
 ```
 
@@ -320,40 +320,40 @@ With the move constructor and the move assignment operator,
 ```c++
 int main()
 {
-    using namespace boost::ut;
-    using namespace boost::ut::bdd;
+  using namespace boost::ut;
+  using namespace boost::ut::bdd;
 
-    "object lifetime"_test = [] {
-        given("constructors") = [] {
-        };
-        given("copy assign") = [] {
-        };
-        given("copy constructor") = [] {
-        };
-        given("without move ctor & assign") = [] {
-        };
-        given("move ctor & assign") = [] {
-            my::hijack hj(std::cout);
-            when("copied") = [] {
-                Y yA {'A'};
-                Y yB {'B'};
-                auto yAaddr = yA.addr();
-                yA = ident(yB);
-                expect(yAaddr == yA.addr());
-            };
-            auto actual = hj.release();
-            expect(actual ==
-                "new  A\n"
-                "new  B\n"
-                "ctor B\n"
-                "mtor B\n"
-                "move B over A\n"
-                "del  ~\n"
-                "del  ~\n"
-                "del  B\n"
-                "del  B\n"
-            ) << actual;
-        };
+  "object lifetime"_test = [] {
+    given("constructors") = [] {
     };
+    given("copy assign") = [] {
+    };
+    given("copy constructor") = [] {
+    };
+    given("without move ctor & assign") = [] {
+    };
+    given("move ctor & assign") = [] {
+      my::hijack hj(std::cout);
+      when("copied") = [] {
+        Y yA {'A'};
+        Y yB {'B'};
+        auto yAaddr = yA.addr();
+        yA = ident(yB);
+        expect(yAaddr == yA.addr());
+      };
+      auto actual = hj.release();
+      expect(actual ==
+        "new  A\n"
+        "new  B\n"
+        "ctor B\n"
+        "mtor B\n"
+        "move B over A\n"
+        "del  ~\n"
+        "del  ~\n"
+        "del  B\n"
+        "del  B\n"
+      ) << actual;
+    };
+  };
 }
 ```

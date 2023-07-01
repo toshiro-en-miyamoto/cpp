@@ -52,6 +52,7 @@
       "strcmp",
       "Stroustrup",
       "struct",
+      "subrange",
       "substr",
       "typeinfo",
       "unreassignable",
