@@ -31,7 +31,9 @@ compile error: no operator "*" matches the operand
 
 When some constrained algorithms that usually return an iterator or a subrange of a `range` take a particular rvalue range argument that does not model `std::ranges::borrowed_range`, **`std::ranges::dangling` will be returned instead** to avoid returning potentially dangling results.
 
-`std::ranges::max_element()`, a constrained algorithm used in the preceding code, usually returns an iterator of type `std::ranges::borrowed_iterator_t<R>`:
+As opposed to `std::ranges::dangling`, two template classes, `std::ranges::borrowed_iterator_t` and `std::ranges::borrowed_subrange_t` are used by some constrained algorithms to avoid returning potentially dangling iterators or views.
+
+For example, `std::ranges::max_element()`, a constrained algorithm used in the preceding code, usually returns an iterator of type `std::ranges::borrowed_iterator_t<R>`:
 
 ```c++
 constexpr ranges::borrowed_iterator_t<R>
