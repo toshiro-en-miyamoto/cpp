@@ -28,9 +28,8 @@ A value metafunction is a class template with a public `static constexpr` data m
 template<int N>
 struct factorial1
 {
-  static constexpr long long value {
-    N * factorial1<N - 1>::value
-  };
+  static constexpr long long value
+  { N * factorial1<N - 1>::value };
 };
 
 // factorial1 specialization for 0!
