@@ -93,6 +93,117 @@ int main()
 }
 ```
 
-## `constexpr if`
+## `constexpr if` Statements
 
+`distance1()` shows *concept-based function overloading* to optimize runtime execution. In this example, the compiler chose the correct overloaded function template to call based on the template parameter’s type constraints.
 
+```c++
+#include <iterator>
+
+template<std::input_iterator It>
+constexpr auto distance1(It begin, It end)
+{
+  std::ptrdiff_t count{ 0 };
+  for (auto& it{ begin }; it != end; ++it) {
+    ++count;
+  }
+  return count;
+}
+
+template<std::random_access_iterator It>
+constexpr auto distance1(It begin, It end)
+{
+  return end - begin;
+}
+```
+
+`distance2()` shows how you could implement similar functionality prior to concepts.
+
+```c++
+template<std::input_iterator It>
+auto distance2(It begin, It end)
+{
+  if constexpr (std::is_same_v<
+    std::random_access_iterator_tag,
+    typename std::iterator_traits<It>::iterator_category
+  >) {
+    return end - begin;
+  } else {
+    std::ptrdiff_t count{ 0 };
+    for (auto& it{ begin }; it != end; ++it) {
+      ++count;
+    }
+    return count;
+  }
+}
+```
+
+The template argument `It` is constrained to be at least `std::input_iterator`, which allows the O(n) approach in the `else` block to work. In fact, it works for all iterator types, because [iterators](https://en.cppreference.com/w/cpp/iterator/iterator_tags) are defined in a hierarchical manner:
+
+```c++
+struct input_iterator_tag { };
+struct output_iterator_tag { };
+
+struct forward_iterator_tag
+  : public input_iterator_tag { };
+
+struct bidirectional_iterator_tag
+  : public forward_iterator_tag { };
+
+struct random_access_iterator_tag
+  : public bidirectional_iterator_tag { };
+
+struct contiguous_iterator_tag
+  : public random_access_iterator_tag { };
+```
+
+`distance2()` uses a C++17 compile-time `constexpr if` statement to determine the actual type of the passed argument. If the type is `random_access`, then the compiler instantiates the `O(1)` code (and discard the `O(n)` code). Otherwise, the `O(n)` code is instantiated (the `O(1)` discarded).
+
+```c++
+  if constexpr (std::is_same_v<
+    std::random_access_iterator_tag,
+    typename std::iterator_traits<It>::iterator_category
+  >) {
+    // O(1) code
+  } else {
+    // O(n) code
+  }
+```
+
+`std::iterator_traits<It>::iterator_category` returns the iterator tag of `It` type.
+
+```c++
+#include <array>
+#include <list>
+#include <cassert>
+
+int main()
+{
+  const std::array a{1, 2, 3, 4, 5};
+  const std::list  l{1, 2, 3};
+
+  using IT_TAG_A = std::iterator_traits
+    <decltype(a.begin())>::iterator_category;
+
+  assert((std::is_same_v
+    <std::random_access_iterator_tag, IT_TAG_A>));
+  assert((std::is_base_of_v
+    <std::random_access_iterator_tag, IT_TAG_A>));
+
+  using IT_TAG_L = std::iterator_traits
+    <decltype(l.begin())>::iterator_category;
+  
+  assert((std::is_same_v
+    <std::bidirectional_iterator_tag, IT_TAG_L>));
+  assert((std::is_base_of_v
+    <std::bidirectional_iterator_tag, IT_TAG_L>));
+
+  assert(5 == distance1(a.begin(), a.end()));
+  assert(3 == distance1(l.begin(), l.end()));
+
+  assert(5 == distance2(a.begin(), a.end()));
+  assert(3 == distance2(l.begin(), l.end()));
+}
+```
+
+As you can see, both `is_same_v` and `is_base_of_v` work to check iterator tags.
