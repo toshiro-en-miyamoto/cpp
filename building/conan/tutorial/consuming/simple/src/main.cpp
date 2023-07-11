@@ -1,10 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <array>
-#include <string>
 #include <algorithm>
-#include <functional>
 #include <ranges>
 #include <iostream>
 
