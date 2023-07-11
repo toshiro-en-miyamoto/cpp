@@ -46,3 +46,6 @@
 
 # C/C++ binary extension file
 *.bin
+
+#### CMake
+build/

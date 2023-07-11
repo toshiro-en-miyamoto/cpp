@@ -8,6 +8,7 @@
       "cassert",
       "cerr",
       "chrono",
+      "conanfile",
       "consteval",
       "constexpr",
       "constness",
@@ -51,6 +52,7 @@
       "pessimizes",
       "prvalue",
       "ptrdiff",
+      "pyvenv",
       "RAII",
       "refref",
       "rvalue",
@@ -65,6 +67,7 @@
       "substr",
       "typeinfo",
       "unreassignable",
+      "venv",
       "wchar",
       "xvalue"
     ],
