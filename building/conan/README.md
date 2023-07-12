@@ -57,7 +57,7 @@ os=Linux
 Saving detected profile to ~/.conan2/profiles/default
 ```
 
-Conan will always set the default C++ standard as the one that the detected compiler version uses by default. If you want to use a different C++ standard, you can edit the default profile file directly.
+Conan will always set the default C++ standard as the one that the detected compiler version uses by default. If you want to use a different C++ standard, you can edit the default profile file directly. As of writing, the default `cppstd` is `gnu14` for Linux distributions and `gnu17` for Mac OS.
 
 ```bash
 (conan2) ~ $ cd ~/.conan2/profiles
@@ -78,4 +78,19 @@ compiler.cppstd=20
 compiler.libcxx=libstdc++11
 compiler.version=10
 os=Linux
+```
+
+You can store different profiles and use them to build for different settings. For example, to use a `build_type=Debug` to all the packages you build with that profile.
+
+```bash
+(conan2) profiles % sed s/Release/Debug/ < default > debug
+(conan2) profiles % cat debug
+[settings]
+arch=x86_64
+build_type=Debug
+compiler=apple-clang
+compiler.cppstd=20
+compiler.libcxx=libc++
+compiler.version=14
+os=Macos
 ```
