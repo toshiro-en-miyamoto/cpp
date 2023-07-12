@@ -1,46 +1,48 @@
-#include <array>
-#include <algorithm>
-#include <ranges>
-#include <iostream>
-
+#include <string>
 #include <zlib.h>
 
-int main(void) {
-  constexpr size_t BUF_LEN = 256;
-
-  std::array<char, BUF_LEN> out {};
-  std::array<char, BUF_LEN> in {
-    "Conan is a MIT-licensed, Open Source package "
-    "manager for C and C++ development for C and C++ "
-    "development, allowing development teams to easily "
-    "and efficiently manage their packages and "
-    "dependencies across platforms and build systems."
-  };
-
-  const auto IN_LEN {
-    std::ranges::count_if(in, [](char c){ return c != 0; })
-  };
+std::u8string compress(std::u8string&& in)
+{
+  const auto BUF_SIZE = in.size();
+  std::u8string out(BUF_SIZE, u8'\0');
 
   z_stream defstream;
   defstream.zalloc = Z_NULL;
   defstream.zfree = Z_NULL;
   defstream.opaque = Z_NULL;
-  defstream.avail_in = IN_LEN;
-  defstream.next_in = reinterpret_cast<Byte*>(in.data());
-  defstream.avail_out = out.size();
-  defstream.next_out = reinterpret_cast<Byte*>(out.data());
+  defstream.avail_in = BUF_SIZE;
+  defstream.next_in = reinterpret_cast<Bytef*>(in.data());
+  defstream.avail_out = BUF_SIZE;
+  defstream.next_out = reinterpret_cast<Bytef*>(out.data());
 
   deflateInit(&defstream, Z_BEST_COMPRESSION);
   deflate(&defstream, Z_FINISH);
   deflateEnd(&defstream);
 
-  const auto OUT_LEN {
-    std::ranges::count_if(out, [](char c){ return c != 0; })
+  const auto OUT_SIZE = out.find_first_of(u8'\0');
+  out.resize(OUT_SIZE);
+
+  return out;
+}
+
+#include <iostream>
+
+int main()
+{
+  static std::u8string in {
+    u8"Conan is a MIT-licensed, Open Source package "
+    "manager for C and C++ development for C and C++ "
+    "development, allowing development teams to easily "
+    "and efficiently manage their packages and "
+    "dependencies across platforms and build systems."
   };
+  std::cout
+  << "Uncompressed size is: " << in.size() << std::endl;
 
-  std::cout << "Uncompressed size is: " << IN_LEN << std::endl;
-  std::cout << "Compressed size is: " << OUT_LEN << std::endl;
-
+  auto out = compress(std::move(in));
+  
+  std::cout
+  << "Compressed size is: " << out.size() << std::endl;
   std::cout
   << "ZLIB VERSION: " << zlibVersion() << std::endl;
 }
