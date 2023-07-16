@@ -47,5 +47,16 @@
 # C/C++ binary extension file
 *.bin
 
-#### CMake
+#### Modern CMake for C++, chapter 1, by Rafal Swidzinski
 build/
+build_debug/
+build_release/
+
+# Generated and user files
+**/CMakeCache.txt
+**/CMakeUserPresets.json
+**/CTestTestfile.cmake
+**/CPackConfig.cmake
+**/cmake_install.cmake
+**/install_manifest.txt
+**/compile_commands.json
