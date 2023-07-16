@@ -110,6 +110,7 @@ Now we are ready to build:
 ```bash
 $ cd build
 $ cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+$ cmake --build .
 $ ./compressor
 Uncompressed size is: 233
 Compressed size is: 147
