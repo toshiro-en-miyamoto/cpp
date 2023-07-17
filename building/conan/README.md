@@ -1,6 +1,15 @@
 # [Conan](https://conan.io/)
 
-A software package manager for C and C++ developers.
+Conan is a dependency and package manager for C and C++ languages.
+
+- is free and open-source, works in all platforms ( Windows, Linux, OSX, FreeBSD, Solaris, etc.)
+- can be used to develop for all targets including embedded, mobile (iOS, Android), and bare metal
+- integrates with all build systems like CMake, Visual Studio (MSBuild), Makefiles, SCons, etc., including proprietary ones
+
+Conan is specifically designed and optimized for accelerating the development and Continuous Integration of C and C++ projects. With full binary management, it can create and reuse
+
+- any number of different binaries (for different configurations like architectures, compiler versions, etc.)
+- for any number of different versions of a package, using exactly the same process in all platforms.
 
 ## [Installing Conan 2.0](https://docs.conan.io/2/installation.html)
 
