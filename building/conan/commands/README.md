@@ -4,7 +4,8 @@ Consumer commands:
 
 | command             | description
 |---------------------|---------------
-| `conan list`        | List recipes, revisions and packages in the local cache or in remotes [(-> here)](./LIST.md)
+| `conan list`        | List recipes, revisions and packages in the local cache or in remotes [(-> here)](./LIST_REMOVE.md)
+| `conan remove`      | Remove packages from the local cache or from remotes  [(-> here)](./LIST_REMOVE.md)
 | `conan cache`       | Return the path of recipes and packages in the cache
 | `conan config`      | Manage Conan configuration (remotes, settings, plugins, etc)
 | `conan graph`       | Obtain information about the dependency graph without fetching binaries
@@ -12,7 +13,6 @@ Consumer commands:
 | `conan install`     | Install dependencies
 | `conan lock`        | Create and manage lockfiles
 | `conan profile`     | Display and manage profile files
-| `conan remove`      | Remove packages from the local cache or from remotes
 | `conan remote`      | Add, remove, login/logout and manage remote server
 | `conan search`      | Search packages matching a name
 | `conan version`     | Give information about the Conan client version
