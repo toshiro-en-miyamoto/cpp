@@ -6,11 +6,11 @@ Consumer commands:
 |---------------------|---------------
 | `conan list`        | List recipes, revisions and packages in the local cache or in remotes [(-> here)](./LIST_REMOVE.md)
 | `conan remove`      | Remove packages from the local cache or from remotes  [(-> here)](./LIST_REMOVE.md)
+| `conan install`     | Install dependencies [(-> here)](INSTALL.md)
 | `conan cache`       | Return the path of recipes and packages in the cache
 | `conan config`      | Manage Conan configuration (remotes, settings, plugins, etc)
 | `conan graph`       | Obtain information about the dependency graph without fetching binaries
 | `conan inspect`     | Inspect a conanfile.py to return the public fields
-| `conan install`     | Install dependencies
 | `conan lock`        | Create and manage lockfiles
 | `conan profile`     | Display and manage profile files
 | `conan remote`      | Add, remove, login/logout and manage remote server
