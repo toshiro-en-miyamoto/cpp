@@ -1,6 +1,6 @@
-# [Conan](https://conan.io/)
+# Conan
 
-Conan is a dependency and package manager for C and C++ languages.
+[Conan](https://conan.io/) is a dependency and package manager for C and C++ languages.
 
 - is free and open-source, works in all platforms ( Windows, Linux, OSX, FreeBSD, Solaris, etc.)
 - can be used to develop for all targets including embedded, mobile (iOS, Android), and bare metal
@@ -11,9 +11,9 @@ Conan is specifically designed and optimized for accelerating the development an
 - any number of different binaries (for different configurations like architectures, compiler versions, etc.)
 - for any number of different versions of a package, using exactly the same process in all platforms.
 
-## [Installing Conan 2.0](https://docs.conan.io/2/installation.html)
+## Installing Conan 2.0
 
-The preferred and strongly recommended way to install Conan is from PyPI, the Python Package Index, using the `pip` command.
+The preferred and strongly recommended way to [install Conan](https://docs.conan.io/2/installation.html) is from PyPI, the Python Package Index, using the `pip` command.
 
 Using Python virtual environment is strongly recommended. If not, it is possible that conan dependencies will conflict with previously existing dependencies, especially if you are using Python for other purposes.
 
@@ -43,9 +43,9 @@ Now you can install Conan in the virtual environment:
 (conan2) build $ 
 ```
 
-## [Conan Profiles](https://docs.conan.io/2/reference/config_files/profiles.html)
+## Conan Profiles
 
-*Conan profiles* allow users to define a configuration set for things like the compiler, build configuration, architecture, shared or static libraries, etc. Conan, by default, will not try to detect a profile automatically, so we need to create one. 
+[*Conan profiles*](https://docs.conan.io/2/reference/config_files/profiles.html) allow users to define a configuration set for things like the compiler, build configuration, architecture, shared or static libraries, etc. Conan, by default, will not try to detect a profile automatically, so we need to create one. 
 
 Profiles can be created with the detect option in `conan profile` command, and edited later.
 
@@ -67,3 +67,5 @@ Saving detected profile to ~/.conan2/profiles/default
 ```
 
 For more details, [here](./fundamentals/README.md)
+
+> [Best practices](https://docs.conan.io/2/reference/commands/profile.html): It is not recommended to use `conan profile detect` in production. To guarantee reproducibility, it is recommended to define your own profiles, store them in a git repo or in a zip in a server, and distribute it to your team and CI machines with `conan config install`, together with other configuration like custom settings, custom remotes definition, etc.
