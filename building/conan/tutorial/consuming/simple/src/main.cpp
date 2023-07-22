@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <string>
 #include <ranges>
+#include <algorithm>
 #include <iterator>
 
 namespace my

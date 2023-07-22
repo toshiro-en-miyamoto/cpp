@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(compressor)
+project(compressor CXX)
 
 find_package(ZLIB REQUIRED)
 
