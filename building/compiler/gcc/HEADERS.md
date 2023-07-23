@@ -1,8 +1,6 @@
 # Header Files
 
-Reference: [GCC 12.2.0 Online doc, Header files](https://gcc.gnu.org/onlinedocs/gcc-12.2.0/cpp/Header-Files.html)
-
-Header files serve two purposes.
+[Header files](https://gcc.gnu.org/onlinedocs/gcc-12.2.0/cpp/Header-Files.html) serve two purposes.
 
 - *System header files* declare the interfaces to parts of the operating system. You include them in your program to supply the definitions and declarations you need to invoke system calls and libraries.
 - Your own header files contain declarations for interfaces between the source files of your program.

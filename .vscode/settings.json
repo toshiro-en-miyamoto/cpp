@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
+      "aarch",
       "accum",
       "alignas",
       "alignof",
@@ -76,11 +77,13 @@
       "RAII",
       "refref",
       "rootfs",
+      "rpath",
       "runenv",
       "rvalue",
       "rvalues",
       "SFINAE",
       "Skippable",
+      "stdlib",
       "Stepanov",
       "strcmp",
       "Stroustrup",
@@ -90,6 +93,7 @@
       "subrange",
       "substr",
       "SYSROOT",
+      "SYSV",
       "typeinfo",
       "unreassignable",
       "venv",
