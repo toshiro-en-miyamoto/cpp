@@ -1,8 +1,8 @@
-# Building GCC
+# Building GCC 12
 
 ## The filesystem hierarchy
 
-Reference: [HIER(7) the filesystem hierarchy](https://www.man7.org/linux/man-pages/man7/hier.7.html)
+Reference: [The filesystem hierarchy](https://www.man7.org/linux/man-pages/man7/hier.7.html)
 
 | dir | description
 |-----|-------------
@@ -28,7 +28,7 @@ Reference: [HIER(7) the filesystem hierarchy](https://www.man7.org/linux/man-pag
 
 ## Configuration of GCC 10.2.1
 
-For example, with Debian Bulleyes 10.2:
+For example, with Debian Bullseye 10.2:
 
 ```
 $ lsb_release -a
@@ -117,7 +117,7 @@ Debian Bullseye 10.2 installs the libraries by default.
 
 | pack name  | ver   | description
 |------------|-------|-------------
-| `libgmp10` | 6.2.1 | Multiprecision arithmetic library
+| `libgmp10` | 6.2.1 | Multi-precision arithmetic library
 | `libmpfr6` | 4.1.0 | multiple precision floating-point computation
 | `libmpc3`  | 1.2.0 | multiple precision complex floating-point library
 | `libisl23` | 0.23  | manipulating sets and relations of integer points
@@ -143,19 +143,19 @@ Let's download the latest version of the source distributions, and place them in
 
 [Installing GCC: Configuration](https://gcc.gnu.org/install/configure.html)
 
-- `srcdir`: the toplevel source directory
-- `objdir`: the toplevel build/object directory
+- `src-dir`: the top-level source directory
+- `obj-dir`: the top-level build/object directory
 
-Recommending `srcdir != objdir`. Building where `objdir` is a subdirectory of `srcdir` is unsupported.
+Recommending `src-dir != obj-dir`. Building where `obj-dir` is a subdirectory of `src-dir` is unsupported.
 
 `cc` or `gcc` must be in your path.
 
 To configure GCC:
 
 ```
-% mkdir objdir
-% cd objdir
-% srcdir/configure [options] [target]
+% mkdir obj-dir
+% cd obj-dir
+% src-dir/configure [options] [target]
 ```
 
 ### Distributor options
@@ -198,11 +198,11 @@ Use options to override several configure time options for GCC. A list of suppor
   - Deb: `c,ada,c++,go,d,fortran,objc,obj-c++,m2`
   - pi4: `c++`
 - `prefix`
-  - Specify the toplevel installation directory. Recommended way to install the tools into a directory other than the default `/usr/local`.
+  - Specify the top-level installation directory. Recommended way to install the tools into a directory other than the default `/usr/local`.
   - Deb: `/usr`
   - pi4: N/A (`/usr/local`)
 - `exec-prefix`
-  - Specify the toplevel installation directory for architecture-dependent files. The default is `${prefix}`.
+  - Specify the top-level installation directory for architecture-dependent files. The default is `${prefix}`.
   - Deb: N/A (`/usr`)
   - pi4: N/A (`/usr/local`)
 - `bindir`
@@ -338,8 +338,8 @@ For [Raspberry Pi 4B](https://www.raspberrypi.com/products/raspberry-pi-4-model-
 ### Options of GCC 12.2 build `configure`
 
 ```
-$ cd objdir
-$ srcdir/configure \
+$ cd obj-dir
+$ src-dir/configure \
 --host=aarch64-linux-gnu \
 --enable-languages=c++ \
 --with-gcc-major-version-only \
@@ -371,8 +371,8 @@ It is normal to have compiler warnings when compiling certain files. Unless you 
 To build GCC:
 
 ```
-% mkdir objdir
-% cd objdir
+% mkdir obj-dir
+% cd obj-dir
 % make -j5
 ```
 
@@ -408,7 +408,7 @@ If you are short on disk space you might consider `make bootstrap-lean` instead.
 Let's install GCC 12.2. Because we are installing it to `/usr/local`, `sudo` is required to run `make`:
 
 ```
-% cd objdir
+% cd obj-dir
 % sudo make install
 ```
 
