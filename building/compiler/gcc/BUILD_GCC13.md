@@ -124,7 +124,144 @@ Now we build GCC:
 build $ make -j 5
 ```
 
-Started 01:07, July 27
-
 ## Final install
 
+Let's install GCC. Because we are installing it to `/usr/local`, `sudo` is required to run `make`:
+
+```bash
+build $ sudo make install
+  .....
+  Libraries have been installed in:
+  /usr/local/gcc-13.1.0/lib64
+
+build $ ls /usr/local/gcc-13.1.0/lib64/libstdc*
+/usr/local/gcc-13.1.0/lib64/libstdc++.a
+/usr/local/gcc-13.1.0/lib64/libstdc++exp.a
+/usr/local/gcc-13.1.0/lib64/libstdc++exp.la
+/usr/local/gcc-13.1.0/lib64/libstdc++fs.a
+/usr/local/gcc-13.1.0/lib64/libstdc++fs.la
+/usr/local/gcc-13.1.0/lib64/libstdc++.la
+/usr/local/gcc-13.1.0/lib64/libstdc++.so
+/usr/local/gcc-13.1.0/lib64/libstdc++.so.6
+/usr/local/gcc-13.1.0/lib64/libstdc++.so.6.0.31
+/usr/local/gcc-13.1.0/lib64/libstdc++.so.6.0.31-gdb.py
+```
+
+## Libraries
+
+If you ever happen to want to link against installed [libraries](https://gcc.gnu.org/onlinedocs/libstdc++/manual/using.html) in a given directory, `LIB_DIR`, you must either
+
+- use `libtool` and specify the full pathname of the library, or
+- use the `-LLIB_DIR` flag during linking and do at least one of the following:
+  - add `LIB_DIR` to the `LD_LIBRARY_PATH` environment variable during execution
+  - add `LIB_DIR` to the `LD_RUN_PATH` environment variable during linking
+  - use the `-Wl,-rpath -Wl,LIB_DIR` linker flag
+  - have your system administrator add `LIB_DIR` to `/etc/ld.so.conf`
+
+For your reference, `/etc/ld.so.conf` of Debian Bullseye looks like this:
+
+```bash
+~ $ cat /etc/ld.so.conf
+include /etc/ld.so.conf.d/*.conf
+
+~ $ cat /etc/ld.so.conf.d/libc.conf
+# libc default configuration
+/usr/local/lib
+
+~ $ cat /etc/ld.so.conf.d/aarch64-linux-gnu.conf
+# Multi-arch support
+/usr/local/lib/aarch64-linux-gnu
+/lib/aarch64-linux-gnu
+/usr/lib/aarch64-linux-gnu
+
+~ $ ls -l /usr/local/lib
+total 8
+drwxr-xr-x 3 root root 4096 May  3 11:01 pypy2.7
+drwxr-xr-x 3 root root 4096 May  3 10:53 python3.9
+
+~ $ ls -l /lib
+lrwxrwxrwx 1 root root 7 May  3 10:50 /lib -> usr/lib
+
+~ $ ls /usr/lib/aarch64-linux-gnu/libstdc*
+/usr/lib/aarch64-linux-gnu/libstdc++.so.6
+/usr/lib/aarch64-linux-gnu/libstdc++.so.6.0.28
+```
+
+## Compiling
+
+As you need to tell the link where the appropriate libraries reside, use the `-Wl,-rpath -Wl,[LIB_DIR]` linker flag.
+
+```bash
+cpp $ /usr/local/gcc-13.1.0/bin/g++ -std=c++20 hello.cpp
+cpp $ ./a.out
+Segmentation fault
+
+cpp $ /usr/local/gcc-13.1.0/bin/g++ -std=c++20 \
+  -L/usr/local/gcc-13.1.0/lib64 hello.cpp
+cpp $ ./a.out
+Segmentation fault
+
+cpp $ /usr/local/gcc-13.1.0/bin/g++ -std=c++20 \
+  -Wl,-rpath -Wl,/usr/local/gcc-13.1.0/lib64 hello.cpp
+cpp $ ./a.out
+Hello, world!
+```
+
+Static linking would help:
+
+```bash
+cpp $ /usr/local/gcc-13.1.0/bin/g++ -std=c++20 -static hello.cpp
+cpp $ ./a.out
+Hello, world!
+
+cpp $ file a.out
+a.out: ELF 64-bit LSB executable, ARM aarch64, version 1 (GNU/Linux), statically linked, for GNU/Linux 3.7.0, with debug_info, not stripped
+
+cpp $ g++ -std=c++20 -static hello.cpp
+cpp $ ./a.out
+Hello, world!
+
+cpp $ file a.out
+a.out: ELF 64-bit LSB executable, ARM aarch64, version 1 (GNU/Linux), statically linked, BuildID[sha1]=897434f443ce152764eef2f4aa8cbb75be5e511e, for GNU/Linux 3.7.0, not stripped
+```
+
+With the option `-std=c++23`, you can see that the library of the expected GCC version is statically linked:
+
+```bash
+cpp $ g++ -std=c++23 -static hello.cpp
+g++: error: unrecognized command-line option ‘-std=c++23’
+cpp $ g++ --version
+g++ (Debian 10.2.1-6) 10.2.1 20210110
+
+cpp $ /usr/local/gcc-13.1.0/bin/g++ -std=c++23 -static hello.cpp
+cpp $ ./a.out
+Hello, world!
+```
+
+## C++ Standards
+
+The standard library conforms to the dialect of C++ specified by the `-std` option passed to the compiler. By default,
+
+- `g++` is equivalent to `g++ -std=gnu++17` since GCC 11, and
+- `g++ -std=gnu++14` in GCC 10.
+
+## Experimental libraries of GCC build
+
+When building GCC from the source, experimental libraries are available:
+
+```bash
+build $ ls /usr/local/gcc-13.1.0/lib64/libstdc*
+/usr/local/gcc-13.1.0/lib64/libstdc++.a
+/usr/local/gcc-13.1.0/lib64/libstdc++exp.a
+/usr/local/gcc-13.1.0/lib64/libstdc++exp.la
+/usr/local/gcc-13.1.0/lib64/libstdc++fs.a
+/usr/local/gcc-13.1.0/lib64/libstdc++fs.la
+/usr/local/gcc-13.1.0/lib64/libstdc++.la
+/usr/local/gcc-13.1.0/lib64/libstdc++.so
+/usr/local/gcc-13.1.0/lib64/libstdc++.so.6
+/usr/local/gcc-13.1.0/lib64/libstdc++.so.6.0.31
+/usr/local/gcc-13.1.0/lib64/libstdc++.so.6.0.31-gdb.py
+```
+
+- `libstdc++exp` for use of the C++ Contract extension
+- `libstdc++fs` for use of `<experimental/filesystem>`
