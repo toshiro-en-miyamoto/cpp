@@ -10,6 +10,12 @@ GCC is distributed [via git](https://gcc.gnu.org/git.html).
 work $ git clone git://gcc.gnu.org/git/gcc.git
 ```
 
+If you want to build a gcc snapshot or gcc from git tree you will need to add `flex` as an explicit dependency into your derivation.
+
+```bash
+work $ sudo apt install flex
+```
+
 You can get a list of recent tags available in the repository:
 
 ```bash
@@ -118,7 +124,7 @@ Now we build GCC:
 build $ make -j 5
 ```
 
-Started 23:05, July 26
+Started 01:07, July 27
 
 ## Final install
 
