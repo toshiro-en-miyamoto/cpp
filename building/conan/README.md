@@ -74,7 +74,7 @@ For more details, [here](./fundamentals/README.md)
 
 Apple Clang is the default C/C++ compiler for Mac OS X, but Apple does not support [statically linked binaries](https://developer.apple.com/library/archive/qa/qa1118/_index.html) on Mac OS X, where dynamic-linking is the only option.
 
-On GCC-defaulted systems such as Debian, dynamically linked executable build with Clang requires to know at runtime where `libc++.so` is located. A simple way to do so is set the `LD_LIBRARY_PATH` variable environment.
+On GCC-defaulted systems such as Debian, dynamically linked executables build with Clang require to know at runtime where `libc++.so` is located. A simple way to do so is set the `LD_LIBRARY_PATH` variable environment.
 
 Python virtual environment provides a shell `activate` to set and unset variable environments.
 
