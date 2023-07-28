@@ -70,24 +70,6 @@ For more details, [here](./fundamentals/README.md)
 
 > [Best practices](https://docs.conan.io/2/reference/commands/profile.html): It is not recommended to use `conan profile detect` in production. To guarantee reproducibility, it is recommended to define your own profiles, store them in a git repo or in a zip in a server, and distribute it to your team and CI machines with `conan config install`, together with other configuration like custom settings, custom remotes definition, etc.
 
-## Integrating Clang
-
-The `conan profile` command on GCC-defaulted systems produces GCC-aware Conan profile as mentioned above. You can integrate Clang on such systems by setting Clang attributes in the profile files:
-
-```bash
-~ $ cat ~/.conan2/profiles/default
-[settings]
-arch=armv8
-build_type=Release
-compiler=clang
-compiler.cppstd=20
-compiler.libcxx=libc++
-compiler.version=16
-os=Linux
-[conf]
-tools.build:compiler_executables={'cpp': '/usr/local/clang-16.0.0/bin/clang++', 'c': '/usr/local/clang-16.0.0/bin/clang'}
-```
-
 ## Clang library path
 
 Apple Clang is the default C/C++ compiler for Mac OS X, but Apple does not support [statically linked binaries](https://developer.apple.com/library/archive/qa/qa1118/_index.html) on Mac OS X, where dynamic-linking is the only option.
@@ -127,6 +109,7 @@ deactivate () {
   ......
   unset VIRTUAL_ENV
   unset LD_LIBRARY_PATH
+  unset CLANG_HOME
 
   if [ ! "${1:-}" = "nondestructive" ] ; then
   # Self destruct!
@@ -134,20 +117,63 @@ deactivate () {
   fi
 }
 
-LD_LIBRARY_PATH="/usr/local/clang-16.0.0/lib/aarch64-linux-gnu"
+CLANG_HOME="/usr/local/clang-16.0.0"
+export CLANG_HOME
+
+LD_LIBRARY_PATH="${CLANG_HOME}/lib/aarch64-linux-gnu"
 export LD_LIBRARY_PATH
 
 VIRTUAL_ENV="/home/[user]/venv/conan2"
 export VIRTUAL_ENV
 ```
 
+## Integrating Clang
+
+The `conan profile` command on GCC-defaulted systems produces GCC-aware Conan profile as mentioned above. You can integrate Clang on such systems by setting Clang attributes in the profile files:
+
+```bash
+~ $ cat ~/.conan2/profiles/default
+[settings]
+arch=armv8
+build_type=Release
+compiler=clang
+compiler.cppstd=20
+compiler.libcxx=libc++
+compiler.version=16
+os=Linux
+[conf]
+{% set clang_home = os.getenv("CLANG_HOME") %}
+{% set clang = clang_home + '/bin/clang' %}
+tools.build:compiler_executables={'c': '{{ clang }}', 'cpp': '{{ clang + '++' }}'}
+```
+
 Activate the `conan2` virtual environment where `LD_LIBRARY_PATH` is set as you wish:
 
 ```bash
-build $ source ~/venv/conan2/bin/activate
+~ $ source ~/venv/conan2/bin/activate
 
-(conan2) build $ env | grep LD_LIB
+(conan2) ~ $ env | grep CLANG
+CLANG_HOME=/usr/local/clang-16.0.0
+
+(conan2) ~ $ env | grep LD_LIB
 LD_LIBRARY_PATH=/usr/local/clang-16.0.0/lib/aarch64-linux-gnu
+```
+
+With thess settings in the `activate` shell and the Conan profile, you can install dependencies, build the executable with Clang, and run the dynamically linked executable:
+
+```bash
+(conan2) ~ $ cd path/to/simple
+
+(conan2) simple $ conan install . \
+  --output-folder=build --build=missing
+......
+Install finished successfully
+
+(conan2) simple $ cd build
+(conan2) build $ cmake .. \
+  -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake \
+  -DCMAKE_BUILD_TYPE=Release
+(conan2) build $ cmake --build .
 
 (conan2) build $ ./compressor
 Uncompressed size is: 233
