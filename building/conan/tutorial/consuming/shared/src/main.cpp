@@ -3,8 +3,7 @@
 #include <vector>
 #include <cstddef>
 #include <string>
-#include <ranges>
-#include <iterator>
+#include <algorithm>
 
 namespace my
 {
@@ -54,11 +53,4 @@ int main()
   << "Compressed size is: " << out.size() << std::endl;
   std::cout
   << "ZLIB VERSION: " << zlibVersion() << std::endl;
-
-  std::cout << 
-  #ifdef NDEBUG
-  "Release configuration!\n";
-  #else
-  "Debug configuration!\n";
-  #endif
 }

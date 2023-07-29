@@ -29,9 +29,6 @@ A virtual environment may be *activated* using a script in its binary directory.
 $ source ~/venv/conan2/bin/activate
 (conan2) ~ $ which pip
 ~/venv/conan2/bin/pip
-(conan2) ~ $
-(conan2) ~ $ deactivate
-~ $
 ```
 
 Now you can install Conan in the virtual environment:
@@ -40,7 +37,9 @@ Now you can install Conan in the virtual environment:
 (conan2) ~ $ pip install conan
 (conan2) build $ which conan
 ~/venv/conan2/bin/conan
-(conan2) build $ 
+
+(conan2) ~ $ deactivate
+~ $
 ```
 
 ## Conan Profiles
@@ -119,12 +118,13 @@ build/deactivate_conanrun.sh
 Upon successful build, run the shells:
 
 ```bash
-(conan2) simple $ deactivate
-simple $ cd build
-build $ cmake .. \
+(conan2) simple $ cd build
+(conan2) build $ cmake .. \
   -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake \
   -DCMAKE_BUILD_TYPE=Release
-build $ cmake --build .
+(conan2) build $ cmake --build .
+
+(conan2) simple $ deactivate
 
 build $ source conanrun.sh
 build $ env | grep LD_

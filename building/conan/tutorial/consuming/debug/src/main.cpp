@@ -3,8 +3,7 @@
 #include <vector>
 #include <cstddef>
 #include <string>
-#include <ranges>
-#include <iterator>
+#include <algorithm>
 
 namespace my
 {

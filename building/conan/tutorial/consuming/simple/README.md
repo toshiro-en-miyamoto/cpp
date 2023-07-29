@@ -94,11 +94,12 @@ CMakeToolchain
 
 We will use Conan to install Zlib and generate the files that CMake needs to find this library and build our project. We will generate those files in the folder `build`.
 
+> Note: Before running the `conan install` command, specify the `LD_LIBRARY_PATH` environment variable in the `[runenv]` section of your Conan profile.
+
 ```bash
-~ $ source venv/conan2/bin/activate 
-(conan2) ~ $ conan install . --output-folder=build --build=missing
-(conan2) ~ $ deactivate
-~ $
+simple $ source ~/venv/conan2/bin/activate 
+(conan2) simple $ conan install . \
+  --output-folder=build --build=missing
 ```
 
 There are a couple of things that happened:
@@ -111,11 +112,20 @@ There are a couple of things that happened:
 Now we are ready to build:
 
 ```bash
-~ $ cd build
-build $ cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-build $ cmake --build .
+(conan2) simple $ cd build
+(conan2) build $ cmake .. \
+  -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake \
+  -DCMAKE_BUILD_TYPE=Release
+(conan2) build $ cmake --build .
+
+(conan2) simple $ deactivate
+
+build $ source conanrun.sh
 build $ ./compressor
 Uncompressed size is: 233
 Compressed size is: 147
 ZLIB VERSION: 1.2.13
+
+build $ source deactivate_conanrun.sh
+Restoring environment
 ```
