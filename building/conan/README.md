@@ -70,66 +70,15 @@ For more details, [here](./fundamentals/README.md)
 
 > [Best practices](https://docs.conan.io/2/reference/commands/profile.html): It is not recommended to use `conan profile detect` in production. To guarantee reproducibility, it is recommended to define your own profiles, store them in a git repo or in a zip in a server, and distribute it to your team and CI machines with `conan config install`, together with other configuration like custom settings, custom remotes definition, etc.
 
-## Clang library path
+## Integrating Clang
 
 Apple Clang is the default C/C++ compiler for Mac OS X, but Apple does not support [statically linked binaries](https://developer.apple.com/library/archive/qa/qa1118/_index.html) on Mac OS X, where dynamic-linking is the only option.
 
 On GCC-defaulted systems such as Debian, dynamically linked executables build with Clang require to know at runtime where `libc++.so` is located. A simple way to do so is set the `LD_LIBRARY_PATH` variable environment.
 
-Python virtual environment provides a shell `activate` to set and unset variable environments.
+> While [`LD_LIBRARY_PATH`](https://tecadmin.net/understanding-the-ld_library_path-environment-variable/) can be handy, an attacker can set LD_LIBRARY_PATH to a directory containing malicious versions of common libraries, tricking the program into using them.
 
-```bash
-~ $ ls ~/venv/conan2/bin
-activate       Activate.ps1  easy_install      pip     python
-activate.csh   conan         easy_install-3.9  pip3    python3
-activate.fish  distro        normalizer        pip3.9  python3.9
-
-~ $ cat ~/venv/conan2/bin/activate
-deactivate () {
-  # reset old environment variables
-  ......
-  ......
-  unset VIRTUAL_ENV
-  if [ ! "${1:-}" = "nondestructive" ] ; then
-  # Self destruct!
-    unset -f deactivate
-  fi
-}
-
-VIRTUAL_ENV="/home/[user]/venv/conan2"
-export VIRTUAL_ENV
-```
-
-You can hack the `activate` shell to specify `LD_LIBRARY_PATH`:
-
-```bash
-deactivate () {
-  # reset old environment variables
-  ......
-  ......
-  unset VIRTUAL_ENV
-  unset LD_LIBRARY_PATH
-  unset CLANG_HOME
-
-  if [ ! "${1:-}" = "nondestructive" ] ; then
-  # Self destruct!
-    unset -f deactivate
-  fi
-}
-
-CLANG_HOME="/usr/local/clang-16.0.0"
-export CLANG_HOME
-
-LD_LIBRARY_PATH="${CLANG_HOME}/lib/aarch64-linux-gnu"
-export LD_LIBRARY_PATH
-
-VIRTUAL_ENV="/home/[user]/venv/conan2"
-export VIRTUAL_ENV
-```
-
-## Integrating Clang
-
-The `conan profile` command on GCC-defaulted systems produces GCC-aware Conan profile as mentioned above. You can integrate Clang on such systems by setting Clang attributes in the profile files:
+In order to integrate Clang on such systems, edit Conan profiles to set Clang attributes in the profile files:
 
 ```bash
 ~ $ cat ~/.conan2/profiles/default
@@ -141,27 +90,19 @@ compiler.cppstd=20
 compiler.libcxx=libc++
 compiler.version=16
 os=Linux
+[runenv]
+{% set clang_home = '/usr/local/clang-16.0.0' %}
+{% set clang      = clang_home + '/bin/clang' %}
+{% set clang_lib  = clang_home + '/lib/aarch64-linux-gnu' %}
+LD_LIBRARY_PATH={{ clang_lib }}
 [conf]
-{% set clang_home = os.getenv("CLANG_HOME") %}
-{% set clang = clang_home + '/bin/clang' %}
 tools.build:compiler_executables={'c': '{{ clang }}', 'cpp': '{{ clang + '++' }}'}
 ```
 
-Activate the `conan2` virtual environment where `LD_LIBRARY_PATH` is set as you wish:
+The environment variables specified in the `[runenv]` section of your Conan profiles go into `build/conanrun*.sh`. The shell sets the environment variables.
 
 ```bash
 ~ $ source ~/venv/conan2/bin/activate
-
-(conan2) ~ $ env | grep CLANG
-CLANG_HOME=/usr/local/clang-16.0.0
-
-(conan2) ~ $ env | grep LD_LIB
-LD_LIBRARY_PATH=/usr/local/clang-16.0.0/lib/aarch64-linux-gnu
-```
-
-With thess settings in the `activate` shell and the Conan profile, you can install dependencies, build the executable with Clang, and run the dynamically linked executable:
-
-```bash
 (conan2) ~ $ cd path/to/simple
 
 (conan2) simple $ conan install . \
@@ -169,14 +110,44 @@ With thess settings in the `activate` shell and the Conan profile, you can insta
 ......
 Install finished successfully
 
-(conan2) simple $ cd build
-(conan2) build $ cmake .. \
+(conan2) simple $ ls build/*.sh | grep conanrun
+build/conanrunenv-release-armv8.sh
+build/conanrun.sh
+build/deactivate_conanrun.sh
+```
+
+Upon successful build, run the shells:
+
+```bash
+(conan2) simple $ deactivate
+simple $ cd build
+build $ cmake .. \
   -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake \
   -DCMAKE_BUILD_TYPE=Release
-(conan2) build $ cmake --build .
+build $ cmake --build .
 
-(conan2) build $ ./compressor
+build $ source conanrun.sh
+build $ env | grep LD_
+LD_LIBRARY_PATH=/usr/local/clang-16.0.0/lib/aarch64-linux-gnu
+
+build $ ./compressor
 Uncompressed size is: 233
 Compressed size is: 147
 ZLIB VERSION: 1.2.13
+```
+
+The shell not only sets the environment variables but creates `build/deactivate_conanrun.sh`, which allows you to restore the environment.
+
+```bash
+build $ ls *.sh | grep conanrun
+conanrunenv-release-armv8.sh
+conanrun.sh
+deactivate_conanrunenv-release-armv8.sh
+deactivate_conanrun.sh
+
+build $ source deactivate_conanrun.sh
+Restoring environment
+
+build $ env | grep LD_
+build $ 
 ```

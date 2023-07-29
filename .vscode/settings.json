@@ -17,6 +17,7 @@
       "conancenter",
       "conanfile",
       "conanrun",
+      "conanrunenv",
       "conantoolchain",
       "consteval",
       "constexpr",
