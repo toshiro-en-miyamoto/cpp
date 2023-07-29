@@ -1,9 +1,0 @@
-{
-    "version": 4,
-    "vendor": {
-        "conan": {}
-    },
-    "include": [
-        "/Users/toshiro/repo/cpp/building/conan/tutorial/consuming/shared/build/CMakePresets.json"
-    ]
-}
