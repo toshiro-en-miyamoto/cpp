@@ -28,13 +28,13 @@ Programs, when they internally list the shared libraries they need, should only 
 
 ```bash
 consuming $ ldd shared/build/compressor
-	linux-vdso.so.1 (0x007fa1bc1000)
-	libz.so.1 => /home/.../.conan2/.../libz.so.1 (0x007fa1b54000)
+	linux-vdso.so.1 (0x...)
+	libz.so.1 => /home/.../.conan2/.../libz.so.1 (0x...)
 	libc++.so.1 => not found
 	libc++abi.so.1 => not found
-	libm.so.6 => /lib/.../libm.so.6 (0x007fa1a94000)
-	libc.so.6 => /lib/.../libc.so.6 (0x007fa18fb000)
-	/lib/ld-linux-aarch64.so.1 (0x007fa1b91000)
+	libm.so.6 => /lib/.../libm.so.6 (0x...)
+	libc.so.6 => /lib/.../libc.so.6 (0x...)
+	/lib/ld-linux-aarch64.so.1 (-x...)
 ```
 
 ## Creating a shared library

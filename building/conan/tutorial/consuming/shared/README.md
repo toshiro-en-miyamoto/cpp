@@ -7,11 +7,24 @@ shared $ ~/source venv/conan2/bin/activate
 (conan2) shared $ conan install . \
   --output-folder=build --build=missing \
   --options=zlib/1.2.13:shared=True
-[100%] Linking C shared library libz.so
-[100%] Built target zlib
-.......
-conanfile.txt: Generated aggregated env files: ['conanbuild.sh', 'conanrun.sh']
-Install finished successfully
+```
+
+The profile with the option works as well:
+
+```bash
+(conan2) shared $ cat conanfile.txt
+[requires]
+zlib/1.2.13
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+zlib/1.2.13:shared=True
+
+(conan2) shared $ conan install . \
+  --output-folder=build --build=missing
 ```
 
 Doing this, Conan will install the Zlib shared libraries, generate the files to build with them and, also the necessary files to locate those dynamic libraries when running the application. Let’s build the application again after configuring it to link Zlib as a shared library:
@@ -40,15 +53,45 @@ Conan provides a mechanism to define those variables and make it possible, for e
 ```bash
 build $ source conanrun.sh
 
+build $ env | grep LD_
+DYLD_LIBRARY_PATH=/home/.../.conan2/p/b/zlib.../p/lib:
+LD_LIBRARY_PATH=/usr/local/clang-16.0.0/lib/aarch64-linux-gnu
+
 build $ ./compressor
 Uncompressed size is: 233
 Compressed size is: 147
 ZLIB VERSION: 1.2.13
+```
 
-build $ env | grep LD_
-DYLD_LIBRARY_PATH=/home/[user]/.conan2/p/b/zlib..../p/lib:
-LD_LIBRARY_PATH=/usr/local/clang-16.0.0/lib/aarch64-linux-gnu
+You can examine if the binary depends on the `zlib` library generated in the Conan build tree:
+
+```bash
+build $ ldd compressor
+	linux-vdso.so.1 (0x...)
+	libz.so.1 => /home/.../.conan2/p/b/zlib.../p/lib/libz.so.1 (0x...)
+	libc++.so.1 => /usr/local/clang-16.0.0/lib/aarch64-linux-gnu/libc++.so.1 (0x...)
+	libc++abi.so.1 => /usr/local/clang-16.0.0/lib/aarch64-linux-gnu/libc++abi.so.1 (0x...)
+	libm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x...)
+	libgcc_s.so.1 => /lib/aarch64-linux-gnu/libgcc_s.so.1 (0x...)
+	libc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x...)
+	libpthread.so.0 => /lib/aarch64-linux-gnu/libpthread.so.0 (0x...)
+	librt.so.1 => /lib/aarch64-linux-gnu/librt.so.1 (0x...)
+	libatomic.so.1 => /lib/aarch64-linux-gnu/libatomic.so.1 (0x...)
+	/lib/ld-linux-aarch64.so.1 (0x...)
 
 build $ source deactivate_conanrun.sh
 Restoring environment
+
+build $ env | grep LD_
+build $
+
+build $ ldd compressor
+	linux-vdso.so.1 (0x...)
+	libz.so.1 => /home/.../.conan2/p/b/zlib.../p/lib/libz.so.1 (0x...)
+	libc++.so.1 => not found
+	libc++abi.so.1 => not found
+	libm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x...)
+	libgcc_s.so.1 => /lib/aarch64-linux-gnu/libgcc_s.so.1 (0x...)
+	libc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x...)
+	/lib/ld-linux-aarch64.so.1 (0x...)
 ```

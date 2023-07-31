@@ -4,3 +4,6 @@ zlib/1.2.13
 [generators]
 CMakeDeps
 CMakeToolchain
+
+[options]
+zlib/1.2.13:shared=True
