@@ -1,4 +1,4 @@
-# Shared Library
+# Shared Libraries on Unix
 
 [Shared libraries](https://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html) are libraries that are loaded by programs when they start. When a shared library is installed properly, all programs that start afterwards automatically use the new shared library.
 
