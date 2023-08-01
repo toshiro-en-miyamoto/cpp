@@ -1,14 +1,13 @@
-##### VisualStudioCode
-.vscode/*
-!.vscode/settings.json
-.vscode/c_cpp_properties.json
-.vscode/tasks.json
-.vscode/launch.json
-.vscode/extensions.json
+##### Visual Studio Code
+!settings.json
+c_cpp_properties.json
+tasks.json
+launch.json
+extensions.json
 *.code-workspace
 
 # Local History for Visual Studio Code
-.history/
+**/.history/
 
 ##### C++
 # Prerequisites
