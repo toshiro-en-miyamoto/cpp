@@ -1,6 +1,13 @@
 # Building for multiple configurations: Release, Debug
 
-When you call a Conan command setting the `--profile argument`, Conan will take all the information from the profile and apply it to the packages you want to build or install.
+Let’s build our project for Debug configuration:
+
+```bash
+(conan2) debug $ conan install . \
+  --output-folder=build --build=missing --settings=build_type=Debug
+```
+
+This is the equivalent of having debug profile and running these command using the `--profile` argument. When you call a Conan command setting the `--profile`, Conan will take all the information from the profile and apply it to the packages you want to build or install.
 
 ```bash
 % cat ~/.conan2/profiles/debug.clang16
