@@ -12,3 +12,9 @@ When an app is launched, the OS X kernel loads the app’s code and data into th
 
 The static linker records the filenames of each of the dependent libraries at the time the app is linked. This filename is known as the dynamic library’s *install name*. The dynamic loader uses the app’s dependent libraries’ install names to locate them in the file system. If the dynamic loader doesn’t find all the app’s dependent libraries at launch time or if any of the libraries is not compatible with the app, the launch process is aborted.
 
+```bash
+(conan2) build % otool -L compressor
+compressor:
+	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 1500.65.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1319.100.3)
+```
