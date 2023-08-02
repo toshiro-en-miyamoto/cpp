@@ -151,3 +151,34 @@ Restoring environment
 build $ env | grep LD_
 build $ 
 ```
+
+## Integrating VS Code
+
+Setting `(CMAKE_EXPORT_COMPILE_COMMANDS ON)` tells CMake to
+generate [`compile_commands.json`](https://cmake.org/cmake/help/latest/variable/CMAKE_EXPORT_COMPILE_COMMANDS.html) in the `build` directory. The json file containing the exact compiler calls for all translation units of the project in machine-readable form.
+
+```cmake
+cmake_minimum_required(VERSION 3.26)
+project(tutorial CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+find_package(doctest REQUIRED)
+
+add_executable(tutorial1 src/tutorial1.cpp)
+target_link_libraries(tutorial1 doctest::doctest)
+```
+
+In the Advanced section of the *C/C++: Edit Configurations (UI)*, you can supply the path to your `compile_commands.json` and the extension will use the compilation information listed in that file to configure IntelliSense. Once setting the pathname of the compile commands file, the `c_cpp_properties.json` file in the `.vscode` directory of the VS Code workplace include the following option:
+
+```json
+"compileCommands": "${workspaceFolder}/build/compile_commands.json"
+```
+
+With the setting, IntelliSense can find header files provided by the Conan packages.
+
+```c++
+#include <doctest/doctest.h>
+```
