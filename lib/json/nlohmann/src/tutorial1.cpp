@@ -14,26 +14,21 @@ const char* o_str = R"({
 }
 )";
 
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include <doctest/doctest.h>
 #include <sstream>
-#include <boost/ut.hpp>
 
-int main()
-{
+TEST_CASE("istream") {
+  std::istringstream is(i_str);
+  json j;
+  is >> j;
+  CHECK(3.141 == j["pi"]);
+  CHECK(true == j["happy"]);
+};
 
-  using namespace boost::ut;
-
-  "istream"_test = [&] {
-    std::istringstream is(i_str);
-    json j;
-    is >> j;
-    expect(3.141 == j["pi"]) << j["pi"];
-    expect(true == j["happy"]) << j["happy"];
-  };
-
-  "ostream"_test = [&] {
-    auto j = json::parse(i_str);
-    std::ostringstream os;
-    os << std::setw(2) << j <<std::endl;
-    expect(os.str() == o_str) << os.str();
-  };
-}
+TEST_CASE("ostream") {
+  auto j = json::parse(i_str);
+  std::ostringstream os;
+  os << std::setw(2) << j <<std::endl;
+  CHECK(os.str() == o_str);
+};

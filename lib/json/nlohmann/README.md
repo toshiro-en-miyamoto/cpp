@@ -24,18 +24,20 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+find_package(doctest REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
 add_executable(tutorial1 src/tutorial1.cpp)
+target_link_libraries(tutorial1 doctest::doctest)
 target_link_libraries(tutorial1 nlohmann_json::nlohmann_json)
 ```
 
 And `conanfile.txt`:
 
 ```bash
-nlohmann $ source ~/venv/conan2/bin/activate
-(conan2) nlohmann $ cat conanfile.txt
+nlohmann $ cat conanfile.txt
 [requires]
+doctest/2.4.11
 nlohmann_json/3.11.2
 
 [generators]
@@ -46,6 +48,7 @@ CMakeToolchain
 Install `nlohmann_json` and generate the files that CMake needs to find this library:
 
 ```bash
+nlohmann $ source ~/venv/conan2/bin/activate
 (conan2) nlohmann $ conan install . \
   --output-folder=build --build=missing
 
@@ -55,15 +58,8 @@ Install `nlohmann_json` and generate the files that CMake needs to find this lib
   -DCMAKE_BUILD_TYPE=Release
 ```
 
-Among the files CMake generates in the `build` directory is [`compile_commands.json`](https://cmake.org/cmake/help/latest/variable/CMAKE_EXPORT_COMPILE_COMMANDS.html). The json file file containing the exact compiler calls for all translation units of the project in machine-readable form.
-
-In the Advanced section of the *C/C++: Edit Configurations (UI)*, you can supply the path to your `compile_commands.json` and the extension will use the compilation information listed in that file to configure IntelliSense. Once setting the pathname of the compile commands file, the `c_cpp_properties.json` file in the `.vscode` directory of the VS Code workplace include the following option:
-
-```json
-"compileCommands": "${workspaceFolder}/build/compile_commands.json"
-```
-
-With the setting, IntelliSense can find `nlohmann/json.hpp`:
+Setting `(CMAKE_EXPORT_COMPILE_COMMANDS ON)` tells CMake to
+generate [`compile_commands.json`](https://cmake.org/cmake/help/latest/variable/CMAKE_EXPORT_COMPILE_COMMANDS.html) in the `build` directory. In the Advanced section of the *C/C++: Edit Configurations (UI)*, you can supply the path to your `compile_commands.json` and the extension will use the compilation information listed in that file to configure IntelliSense. With the setting, IntelliSense can find `nlohmann/json.hpp`:
 
 ```c++
 #include <nlohmann/json.hpp>
@@ -71,9 +67,12 @@ With the setting, IntelliSense can find `nlohmann/json.hpp`:
 
 You can build and run the executable;
 
-```
+```bash
 (conan2) build $ cmake --build .
+
 (conan2) build $ source conanrun.sh
 (conan2) build $ ./tutorial1
-All tests passed (3 asserts in 2 tests)
+[doctest] test cases: 2 | 2 passed | 0 failed | 0 skipped
+[doctest] assertions: 3 | 3 passed | 0 failed |
+[doctest] Status: SUCCESS!
 ```
