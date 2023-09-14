@@ -87,6 +87,7 @@
       "noreturn",
       "nullptr",
       "offsetof",
+      "opencv",
       "otool",
       "pessimizes",
       "posix",
