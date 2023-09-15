@@ -8,4 +8,5 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(opencv REQUIRED)
 find_package(doctest REQUIRED)
 
-add_subdirectory(src)
+# add_subdirectory(main bin)
+add_subdirectory(test)
