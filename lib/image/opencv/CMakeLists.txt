@@ -1,12 +1,11 @@
-cmake_minimum_required(VERSION 3.27)
-project(opencv_tutorial CXX)
+cmake_minimum_required(VERSION 3.23)
+project(docteestTutorial CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(opencv REQUIRED)
-find_package(doctest REQUIRED)
+find_package(cxxopts REQUIRED)
 
-# add_subdirectory(main bin)
+add_subdirectory(src)
 add_subdirectory(test)

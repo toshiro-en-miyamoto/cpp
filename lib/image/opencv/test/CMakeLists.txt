@@ -1,9 +1,4 @@
-add_library(doctest INTERFACE)
-target_sources(doctest INTERFACE
-  FILE_SET HEADERS
-)
+find_package(doctest REQUIRED)
 
-add_executable(hello hello.cpp)
-target_link_libraries(hello
-  PUBLIC doctest
-)
+# add_subdirectory(deliverables)
+add_subdirectory(components)
