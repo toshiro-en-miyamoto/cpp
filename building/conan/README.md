@@ -35,7 +35,7 @@ Now you can install Conan in the virtual environment:
 
 ```bash
 (conan2) ~ $ pip install conan
-(conan2) build $ which conan
+(conan2) ~ $ which conan
 ~/venv/conan2/bin/conan
 
 (conan2) ~ $ deactivate
@@ -50,9 +50,10 @@ Profiles can be created with the detect option in `conan profile` command, and e
 
 ```bash
 (conan2) ~ $ conan profile detect
-Found gcc 10
+Found gcc 12
 gcc>=5, using the major as version
 gcc C++ standard library: libstdc++11
+
 Detected profile:
 [settings]
 arch=armv8
@@ -60,8 +61,9 @@ build_type=Release
 compiler=gcc
 compiler.cppstd=gnu14
 compiler.libcxx=libstdc++11
-compiler.version=10
+compiler.version=12
 os=Linux
+
 Saving detected profile to ~/.conan2/profiles/default
 ```
 
