@@ -62,3 +62,4 @@ build_release/
 
 # CTest
 **/LastTest.log
+**/CTestCostData.txt

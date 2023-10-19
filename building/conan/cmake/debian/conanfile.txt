@@ -1,5 +1,5 @@
 [requires]
-doctest/2.4.11
+catch2/3.4.0
 
 [generators]
 CMakeDeps
