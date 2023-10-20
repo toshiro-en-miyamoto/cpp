@@ -82,6 +82,7 @@
       "metaprograms",
       "milli",
       "MPFR",
+      "msvc",
       "nlohmann",
       "nodiscard",
       "noexcept",
