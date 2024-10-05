@@ -24,7 +24,7 @@ The code for this edition of the book uses contemporary C++, C++20 (plus a bit o
 
 We follow the rules of *The C++ Core Guidelines* to simplify programming and eliminate common errors. You can find the Core Guidelines on the Web and *rule checkers are available* when you need guaranteed conformance.
 
-### PPP support
+## &sect;0.4 PPP support
 
 We consider range checking essential to simplify learning and minimize frustration. So we supply a module `PPP_support` that makes a version of the C++ standard library with guaranteed range checking for subscripting available.
 
