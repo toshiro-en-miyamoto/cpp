@@ -1,7 +1,7 @@
 # C++ Programming Language
 
 - [Bjarne/cpp4] *The C++ Programming Language, 4th Edition* by Bjarne Stroustrup (2013), presents concise, *pure C++11* examples.
-- [Bjarne/prog3] *Programming: Principles and Practice Using C++, 3rd Edition* by Bjarne Stroustrup (2024), for someone who programs in another language and wants to learn C++.
+- [Bjarne/ppp3] *Programming: Principles and Practice Using C++, 3rd Edition* by Bjarne Stroustrup (2024), for someone who programs in another language and wants to learn C++.
 - [Lakos/embrace] *Embracing Modern C++ Safely* by John Lakos, et al. (2021)
 - [Meyers/empower] 
 
