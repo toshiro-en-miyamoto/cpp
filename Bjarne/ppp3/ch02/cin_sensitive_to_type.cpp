@@ -24,15 +24,15 @@ std::pair<std::string, int> read_string_int(std::istream& is)
 TEST_CASE("the input operation is sensitive to type")
 {
   std::istringstream buf1{"Carlos 22"};
-  const auto result1 = read_string_int(buf1);
-  CHECK(std::get<0>(result1) == "Carlos");
-  CHECK(std::get<1>(result1) == 22);
+  auto [name, age] = read_string_int(buf1);
+  CHECK(name == "Carlos");
+  CHECK(age == 22);
 }
 
 TEST_CASE("reading of string is terminated by a whitespace")
 {
   std::istringstream buf1{"Hello Carlos 22"};
-  const auto result1 = read_string_int(buf1);
-  CHECK(std::get<0>(result1) == "Hello");
-  CHECK(std::get<1>(result1) == 0);
+  auto [name, age] = read_string_int(buf1);
+  CHECK(name == "Hello");
+  CHECK(age == 0);    // reading "Carlos" as int results in 0
 }
