@@ -15,8 +15,8 @@ According to the section 2.3 of PPP3,
 [[nodiscard]]
 std::pair<std::string, int> read_string_int(std::istream& is)
 {
-  std::string str;
-  int num;
+  std::string str ="???";
+  int num = -1;
   is >> str >> num;
   return {str, num};
 }
