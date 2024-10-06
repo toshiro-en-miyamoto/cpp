@@ -5,7 +5,7 @@ Years: 2024 to 2025
 | start | end   | part     | ch | title                             |
 |:-----:|:-----:|:--------:|---:|-----------------------------------|
 |       |       | &#x2160; |    | The Basics                        |
-| 10-06 |       |          | 1  | Hello, World!                     |
+| 10-06 | 10-06 |          | 1  | Hello, World!                     |
 |       |       |          | 2  | Objects, Types, and Values        |
 |       |       |          | 3  | Computation                       |
 |       |       |          | 4  | Errors!                           |
