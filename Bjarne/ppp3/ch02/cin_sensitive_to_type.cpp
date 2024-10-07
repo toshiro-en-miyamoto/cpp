@@ -1,16 +1,15 @@
-// g++ -std=c++20 cin_sensitive_to_type.cpp
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "../doctest/doctest.h"
-#include <iostream>
-#include <sstream>
-#include <utility>
-
-/*
+/* g++ -std=c++20 cin_sensitive_to_type.cpp
 This test code is to understand the sensitivity of std::istream.
 According to the section 2.3 of PPP3,
   - The input operation >> ("get from") is sensitive to type.
   - Reading of strings is terminated by a whitespace.
 */
+
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "../doctest/doctest.h"
+#include <iostream>
+#include <sstream>
+#include <utility>
 
 [[nodiscard]]
 std::pair<std::string, int> read_string_int(std::istream& is)
