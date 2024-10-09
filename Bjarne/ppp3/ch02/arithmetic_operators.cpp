@@ -1,4 +1,4 @@
-// g++ -std=c++20 arithmetic_operators.cpp
+// g++ -std=c++20 -Wall arithmetic_operators.cpp
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "../doctest/doctest.h"
 #include <utility>

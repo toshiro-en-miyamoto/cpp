@@ -1,4 +1,4 @@
-/* g++ -std=c++20 cin_sensitive_to_type.cpp
+/* g++ -std=c++20 -Wall cin_sensitive_to_type.cpp
 This test code is to understand the sensitivity of std::istream.
 According to the section 2.3 of PPP3,
   - The input operation >> ("get from") is sensitive to type.

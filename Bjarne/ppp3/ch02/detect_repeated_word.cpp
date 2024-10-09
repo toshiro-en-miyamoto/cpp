@@ -1,4 +1,4 @@
-/* g++ -std=c++20 detect_repeated_word.cpp
+/* g++ -std=c++20 -Wall detect_repeated_word.cpp
 This is a "Try This" in 2.5.1 An example: detect repeated word.
 This program detects adjacent repeated word in a sequence of word. 
 */
@@ -13,29 +13,29 @@ const std::string text2{
 };
 
 [[nodiscard]]
-int number_of_adjacent_repeated_word_in(const std::string text)
+int number_of_repeated_words_in(const std::string text)
 {
   std::stringstream is{text};
   std::string current;
   std::string previous;
-  int number_of_adjacent_repeated_word = 0;
+  int counter = 0;
 
   while(is >> current) {
     if (current == previous)
-      number_of_adjacent_repeated_word++;
+      counter++;
     previous = current;
   }
-  return number_of_adjacent_repeated_word;
+  return counter;
 }
 
 TEST_CASE("count the number of adjacent repeated word in the text")
 {
-  CHECK(number_of_adjacent_repeated_word_in(text1) == 1);
+  CHECK(number_of_repeated_words_in(text1) == 1);
 
   // two occurrences of adjacent repeated word in text2,
   //  "did" == "did", "good" == "good"
   //  "\"he" != "he", "he" != "he!\""
-  CHECK(number_of_adjacent_repeated_word_in(text2) == 2);
+  CHECK(number_of_repeated_words_in(text2) == 2);
 }
 
 [[nodiscard]]
@@ -43,12 +43,12 @@ int number_of_words_in(const std::string text)
 {
   std::stringstream is{text};
   std::string current;
-  int number_of_words = 0;
+  int counter = 0;
 
   while(is >> current) {
-    number_of_words++;
+    counter++;
   }
-  return number_of_words;
+  return counter;
 }
 
 TEST_CASE("count the number of words in the text")
