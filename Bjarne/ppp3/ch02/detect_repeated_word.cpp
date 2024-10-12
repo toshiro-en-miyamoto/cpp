@@ -1,4 +1,5 @@
-/* g++ -std=c++20 -Wall detect_repeated_word.cpp
+// g++ -std=c++20 -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Wconversion detect_repeated_word.cpp
+/*
 This is a "Try This" in 2.5.1 An example: detect repeated word.
 This program detects adjacent repeated word in a sequence of word. 
 */

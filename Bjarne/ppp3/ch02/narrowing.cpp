@@ -1,4 +1,4 @@
-// g++ -std=c++20 -Wall narrowing.cpp
+// g++ -std=c++20 -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Wconversion narrowing.cpp
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "../doctest/doctest.h"
 #include <utility>
@@ -6,8 +6,14 @@
 [[nodiscard]]
 std::pair<int, char> narrowing(double d)
 {
-  int i = d;
-  char c = i;
+  int i = static_cast<int>(d);
+  char c = static_cast<char>(i);
+
+  // with -Wconversion option,
+  // warning: conversion from ‘double’ to ‘int’ may change value
+  //    int i = d;
+  // warning: conversion from int to char may change value
+  //    char c = i;
   return {i, c};
 }
 

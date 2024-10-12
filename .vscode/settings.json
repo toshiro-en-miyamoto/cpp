@@ -129,7 +129,11 @@
       "unreassignable",
       "venv",
       "wchar",
-      "xvalue",
+      "Wconversion",
+      "Wextra",
+      "Wfloat",
+      "Wnon",
+      "Wshadow",
       "zstd"
     ],
     "editor.tabSize": 2,

@@ -1,4 +1,4 @@
-// g++ -std=c++20 -Wall hello_world.cpp
+// g++ -std=c++20 -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic hello_world.cpp
 #include <iostream>
 int main()
 {
