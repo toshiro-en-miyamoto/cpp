@@ -101,18 +101,45 @@ The program has 487 lines of code, and the lines fall into four categories:
 
 Code design amounts to about 180 comment lines (out of 207, from #167 to #373) in the source code.
 
-| category              | lines |
-|-----------------------|------:|
-| requirements and test | 190   |
-| design                | 180   |
-| implementation        |  79   |
+| category                    | lines | ratio   |
+|-----------------------------|------:|--------:|
+| req & test                  | 190   |   42.3% |
+| design, coding and testing  | 259   |   57.7% |
+| total                       | 449   |  100.0% |
 
 ### Effort
 
-| category                            | min | hours |
-|-------------------------------------|----:|------:|
-| req & test                          |  90 | 1.5   |
-| design                              |  90 | 1.5   |
-| writing and testing solution code   |  60 | 1.0   |
-| total                               | 240 | 4.0   |
+| category                    | min | hours | ratio   |
+|-----------------------------|----:|------:|--------:|
+| req & test                  |  90 | 1.5   |   37.5% |
+| design, coding and testing  | 150 | 2.5   |   62.5% |
+| total                       | 240 | 4.0   |  100.0% |
+
+## `ex06.cpp`
+
+### Lines of code
+
+The program has 137 lines of code, and the lines fall into four categories:
+
+| from  | to    | lines | category        |
+|------:|------:|------:|-----------------|
+|   3   |   7   |   5   | requirements    |
+|   9   |  14   |   6   | macro design    |
+|  16   | 112   |  97   | test cases      |
+| 114   | 125   |  12   | implementation  |
+| 127   | 137   |  11   | test code       |
+
+| category                    | lines | ratio   |
+|-----------------------------|------:|--------:|
+| req & test                  | 113   |   86.3% |
+| design, coding and testing  |  18   |   13.7% |
+| total                       | 131   |  100.0% |
+
+### Effort
+
+| category                    | min | hours | ratio   |
+|-----------------------------|----:|------:|--------:|
+| req & test                  |  60 | 1.0   |   50.0% |
+| design, coding and testing  |  60 | 1.0   |   50.0% |
+| total                       | 120 | 2.0   |  100.0% |
 
