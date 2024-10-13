@@ -116,6 +116,8 @@
       "stdlib",
       "Stepanov",
       "strcmp",
+      "stringbuf",
+      "stringstream",
       "Stroustrup",
       "struct",
       "subcase",
