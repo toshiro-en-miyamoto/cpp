@@ -250,7 +250,7 @@ fmt_kidding {
 void letter_stream(std::istream& is, std::ostream& os)
 {
   std::string name, friend_name;
-  int age;
+  int age{0};
 
   is >> name >> friend_name >> age;
 
@@ -274,7 +274,7 @@ void letter_stream(std::istream& is, std::ostream& os)
 #include "../doctest/doctest.h"
 
 [[nodiscard]]
-std::string letter_string(const std::string_view input)
+std::string report_string(const std::string_view input)
 {
   std::istringstream is{std::string{input}};
   std::ostringstream os;
@@ -286,16 +286,16 @@ std::string letter_string(const std::string_view input)
 
 TEST_CASE("12 test cases")
 {
-  CHECK(tc[0].expected == letter_string(tc[0].input));
-  CHECK(tc[1].expected == letter_string(tc[1].input));
-  CHECK(tc[2].expected == letter_string(tc[2].input));
-  CHECK(tc[3].expected == letter_string(tc[3].input));
-  CHECK(tc[4].expected == letter_string(tc[4].input));
-  CHECK(tc[5].expected == letter_string(tc[5].input));
-  CHECK(tc[6].expected == letter_string(tc[6].input));
-  CHECK(tc[7].expected == letter_string(tc[7].input));
-  CHECK(tc[8].expected == letter_string(tc[8].input));
-  CHECK(tc[9].expected == letter_string(tc[9].input));
-  CHECK(tc[10].expected == letter_string(tc[10].input));
-  CHECK(tc[11].expected == letter_string(tc[11].input));
+  CHECK(tc[0].expected == report_string(tc[0].input));
+  CHECK(tc[1].expected == report_string(tc[1].input));
+  CHECK(tc[2].expected == report_string(tc[2].input));
+  CHECK(tc[3].expected == report_string(tc[3].input));
+  CHECK(tc[4].expected == report_string(tc[4].input));
+  CHECK(tc[5].expected == report_string(tc[5].input));
+  CHECK(tc[6].expected == report_string(tc[6].input));
+  CHECK(tc[7].expected == report_string(tc[7].input));
+  CHECK(tc[8].expected == report_string(tc[8].input));
+  CHECK(tc[9].expected == report_string(tc[9].input));
+  CHECK(tc[10].expected == report_string(tc[10].input));
+  CHECK(tc[11].expected == report_string(tc[11].input));
 }

@@ -1,11 +1,13 @@
 # Test Driven Approach
 
-The `drill.cpp` program was implemented by a test driven approach. This article analyzes the approach in terms of:
+Some programs in this folder were implemented by a test driven approach. This article analyzes the approach in terms of:
 
 - lines of code
 - effort
 
-## Lines of code
+## `drill.cpp`
+
+### Lines of code
 
 The program has 301 lines of code, and the lines fall into four categories:
 
@@ -33,7 +35,7 @@ As test (test cases and test code) helps better understand requirements, they ca
 
 The amount of lines for requirements and test (199 lines) is about twice as much as the implementation code (97 lines).
 
-## Effort
+### Effort
 
 The total effort to finish the `drill.cpp` code was 10 hours, and the effort can be broken down as follows:
 
@@ -81,3 +83,36 @@ As TDA enforces programmers to consider carefully whether test cases are suffici
 - As a result, when they finish all test cases, they will feel confident in code quality.
 
 In summary, TDA enables you write better code with almost the same effort.
+
+## `ex04.cpp`
+
+### Lines of code
+
+The program has 487 lines of code, and the lines fall into four categories:
+
+| from  | to    | lines | category        |
+|------:|------:|------:|-----------------|
+|   4   |   7   |   4   | requirements    |
+|   9   | 165   | 157   | test cases      |
+| 167   | 373   | 180   | code design     |
+| 167   | 373   |  18   | implementation  |
+| 375   | 435   |  61   | implementation  |
+| 437   | 487   |  29   | test code       |
+
+Code design amounts to about 180 comment lines (out of 207, from #167 to #373) in the source code.
+
+| category              | lines |
+|-----------------------|------:|
+| requirements and test | 190   |
+| design                | 180   |
+| implementation        |  79   |
+
+### Effort
+
+| category                            | min | hours |
+|-------------------------------------|----:|------:|
+| req & test                          |  90 | 1.5   |
+| design                              |  90 | 1.5   |
+| writing and testing solution code   |  60 | 1.0   |
+| total                               | 240 | 4.0   |
+

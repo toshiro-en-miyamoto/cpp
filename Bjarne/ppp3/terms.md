@@ -6,8 +6,9 @@
 - **error**: Errors found by the compiler are called *compile-time errors*, errors found by the linker are called *link-time errors*, and errors not found until the program is run are called *run-time errors* or *logic errors*. (&sect;1.4)
 - **implicit conversion**: Refer to [Implicit conversions](https://en.cppreference.com/w/cpp/language/implicit_conversion)
   - **narrowing**: Narrowing conversions put a value into an object that may be too small to hold all of it. (&sect;2.9)
-  - **widening**: Widening conversions, a.k.a *promotion*, put a value into an object that is big enough to hold all ot it. (&sect;2.9)implicit_conversion)
+  - **widening**: Widening conversions, a.k.a *promotion*, put a value into an object that is big enough to hold all ot it. (&sect;2.9)
 - **initializer**: An initializer operator provide a variable with an initial value. (&sect;2.2)
+- **literal**: Literals are the tokens of a C++ program that represent constant values embedded in the source code, e.g. integer literals, character literals, floating-point literals, string literals. [cppreference]
 - **object**: An object is a region of memory with a *type* that specifies what kind of information can be placed in it. (&sect;2.1)
 - **prompt**: A message that prompts the user to take an action is called a prompt. (&sect;2.1)
 - **type**: A type defines a set of possible values and a set of operations for an object. (&sect;2.7)
