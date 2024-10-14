@@ -6,8 +6,8 @@ Years: 2024 to 2025
 |:-----:|:-----:|:--------:|---:|-----------------------------------|
 |       |       | &#x2160; |    | The Basics                        |
 | 10-06 | 10-06 |          | 1  | Hello, World!                     |
-| 10-06 |       |          | 2  | Objects, Types, and Values        |
-|       |       |          | 3  | Computation                       |
+| 10-06 | 10-14 |          | 2  | Objects, Types, and Values        |
+| 10-14 |       |          | 3  | Computation                       |
 |       |       |          | 4  | Errors!                           |
 |       |       |          | 5  | Writing a Program                 |
 |       |       |          | 6  | Completing a Program              |

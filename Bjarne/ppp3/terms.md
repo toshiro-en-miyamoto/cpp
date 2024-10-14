@@ -1,14 +1,20 @@
 # Terms
 
+- **abstraction**: Hide details that we don't need to use a facility (implementation details) behind a convenient and general interface. (&sect;3.2)
 - **bug**: A bug is a defect in a program that causes run-time errors or logic errors. (&sect;1.5)
+- **constant expression**: An expression that can be evaluated at compile time. ([cppreference](https://en.cppreference.com/w/cpp/language/constant_expression)) For example, `constexpr double pi = 3.1415;`. (&sect;3.3.1)
+- **`const` variable**: A variable that is not a constant expression (its value is not known at compile time) but do not change value after initialization. For example, `const int c3 = n;`, where `n` is a variable. (&sect;3.3.1)
 - **declaration**: A declaration is a statement that gives a name and a type to an object. (&sect;2.7)
 - **definition**: A definition is a declaration that sets aside memory for an object. (&sect;2.7)
 - **error**: Errors found by the compiler are called *compile-time errors*, errors found by the linker are called *link-time errors*, and errors not found until the program is run are called *run-time errors* or *logic errors*. (&sect;1.4)
-- **implicit conversion**: Refer to [Implicit conversions](https://en.cppreference.com/w/cpp/language/implicit_conversion)
+- **expression**: Expressions include: literals (e.g. `2` or `"Hello, world"`); suitable declared identifiers (e.g. `n` or `std::cout`); identifiers to be declared in declarator. ([cppreference](https://en.cppreference.com/w/cpp/language/expressions))
+- **expression evaluation**: Expression evaluation may produce a result (e.g., evaluation of `2 + 2` produces the result `4`) and may generate side-effects (e.g. evaluation of `std::printf("%d", 4)` prints the character `4` on the standard output). ([cppreference](https://en.cppreference.com/w/cpp/language/expressions))
+- **implicit conversion**: Refer to [cppreference](https://en.cppreference.com/w/cpp/language/implicit_conversion)
   - **narrowing**: Narrowing conversions put a value into an object that may be too small to hold all of it. (&sect;2.9)
   - **widening**: Widening conversions, a.k.a *promotion*, put a value into an object that is big enough to hold all ot it. (&sect;2.9)
 - **initializer**: An initializer operator provide a variable with an initial value. (&sect;2.2)
-- **literal**: Literals are the tokens of a C++ program that represent constant values embedded in the source code, e.g. integer literals, character literals, floating-point literals, string literals. [cppreference]
+- **literal**: Literals are the tokens of a C++ program that represent constant values embedded in the source code, e.g. integer literals, character literals, floating-point literals, string literals. ([cppreference](https://en.cppreference.com/w/cpp/language/expressions#Literals))
+- **magic constant**: Non-obvious literals in code are derisively referred to as magic constant. (&sect;3.3.1)
 - **object**: An object is a region of memory with a *type* that specifies what kind of information can be placed in it. (&sect;2.1)
 - **prompt**: A message that prompts the user to take an action is called a prompt. (&sect;2.1)
 - **type**: A type defines a set of possible values and a set of operations for an object. (&sect;2.7)
