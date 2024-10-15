@@ -7,16 +7,35 @@
 - **declaration**: A declaration is a statement that gives a name and a type to an object. (&sect;2.7)
 - **definition**: A definition is a declaration that sets aside memory for an object. (&sect;2.7)
 - **error**: Errors found by the compiler are called *compile-time errors*, errors found by the linker are called *link-time errors*, and errors not found until the program is run are called *run-time errors* or *logic errors*. (&sect;1.4)
-- **expression**: Expressions include: literals (e.g. `2` or `"Hello, world"`); suitable declared identifiers (e.g. `n` or `std::cout`); identifiers to be declared in declarator. ([cppreference](https://en.cppreference.com/w/cpp/language/expressions))
+- **expression**: An expression is a sequence of *operators* and their *operand*, that specifies a computation. ([cppreference](https://en.cppreference.com/w/cpp/language/expressions))
 - **expression evaluation**: Expression evaluation may produce a result (e.g., evaluation of `2 + 2` produces the result `4`) and may generate side-effects (e.g. evaluation of `std::printf("%d", 4)` prints the character `4` on the standard output). ([cppreference](https://en.cppreference.com/w/cpp/language/expressions))
+- **function**: A function is a named sequence of statements. A function can return a result (also called a `return` value). (&sect;3.5)
+  - **function body**: The function body is the *block* that actually does the work.
+  - **function definition**: A function definition consists of the return type, followed by the function identifier (the name of the function), followed by a list of parameters in parentheses, followed by the function body.
+  - **parameter list**: The list of arguments required by the function. Its elements are called parameters (or *formal arguments*).
+  - **function declaration**: A function declaration introduces the function name and its type. A function definition associates the function name/type with the function body. [cppreference](https://en.cppreference.com/w/cpp/language/function)
+  - **class member function**: A function declaration at class scope introduces a class member function. [cppreference](https://en.cppreference.com/w/cpp/language/function)
 - **implicit conversion**: Refer to [cppreference](https://en.cppreference.com/w/cpp/language/implicit_conversion)
   - **narrowing**: Narrowing conversions put a value into an object that may be too small to hold all of it. (&sect;2.9)
   - **widening**: Widening conversions, a.k.a *promotion*, put a value into an object that is big enough to hold all ot it. (&sect;2.9)
 - **initializer**: An initializer operator provide a variable with an initial value. (&sect;2.2)
+- **iteration**: Doing the same thing to a series of objects is called iteration. Language constructs for iteration include: `while`; `for`; and `do-while`. (&sect;3.4.2)
+  - **loop**: A way to repeat some statement.
+  - **loop variable**: A variable to keep track of how many times we have been through the loop.
+  - **loop body**: Something to do each time around the loop.
 - **literal**: Literals are the tokens of a C++ program that represent constant values embedded in the source code, e.g. integer literals, character literals, floating-point literals, string literals. ([cppreference](https://en.cppreference.com/w/cpp/language/expressions#Literals))
 - **magic constant**: Non-obvious literals in code are derisively referred to as magic constant. (&sect;3.3.1)
 - **object**: An object is a region of memory with a *type* that specifies what kind of information can be placed in it. (&sect;2.1)
+- **operator**: ([cppreference](https://en.cppreference.com/w/cpp/language/expressions))
+  - Common operators include: assignment (e.g. `+=`); increment (`++`) and decrement (`--`); arithmetic (e.g. `+`); logical (e.g. `||`); comparison (e.g. `!=`); member access (e.g. `*it`); function call (e.g. `f()`); comma (e.g. `a, b`); and conditional (e.g. `a ? b : c`).
+  - Special operators include: conversions (e.g. `static_cast`); memory allocation (`new` and `delete`); and others (e.g. `sizeof`). 
 - **prompt**: A message that prompts the user to take an action is called a prompt. (&sect;2.1)
+- **selection**: In programs, we often have select among alternatives. In C++, that is done using either an `if` statement or a `switch` statement. (&sect;3.4.1)
+- **statement**:
+  - **expression statement**: An expression statement is simply an expression followed by a semicolon. For example, `++c;`. (&sect;3.4)
+  - **declaration statement**: Refer to *declaration*. (&sect;3.4)
+  - **block**: A sequence of statements delimited by curly braces `{` and `}` is called a block statement or a *compound statement*. (&sect;3.4.2.2)
+  - **empty block**: The empty block `{}` is sometimes useful for expressing that nothing is to be done. (&sect;3.4.2.2)
 - **type**: A type defines a set of possible values and a set of operations for an object. (&sect;2.7)
 - **value**: The data items we put into variables are called values. (&sect;2.2) A value is a set of bits in memory *interpreted according to a type*. (&sect;2.7)
 - **variable**: A named object is called a variable. (&sect;2.1)
