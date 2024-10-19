@@ -94,6 +94,7 @@
       "nullptr",
       "offsetof",
       "opencv",
+      "ostream",
       "ostringstream",
       "otool",
       "pessimizes",

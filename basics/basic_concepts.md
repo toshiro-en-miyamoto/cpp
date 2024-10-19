@@ -1,11 +1,92 @@
-# Types
+# C++ Basic Concepts
+
+[Basic concepts](https://en.cppreference.com/w/cpp/language/basic_concepts) of the C++ programming language include:
+
+- A [C++ program]() is a sequence of text files that contain declarations. They undergo translation to become an executable program, which is executed when the C++ implementation calls its `main` function.
+- Declarations may introduce entities, associate them with *names* and define their properties. The declarations that define all properties required to use an entity are definitions.
+- Definitions of *functions* usually include sequences of *statements*, some of which include *expressions*.
+- An expression specify the computations to be performed by the program.
+
+Key entities of a C++ program include:
+
+- values;
+- objects;
+- references;
+- functions;
+- types;
+
+C++ programs create, destroy, refer to, access, and manipulate [objects](https://en.cppreference.com/w/cpp/language/object). An object in C++ has:
+
+- size;
+- alignment requirement;
+- storage duration;
+- lifetime;
+- type;
+- value;
+- optionally, a name. 
+
+Each object, reference, function, expression in C++ is associated with a type.
+
+Topics in this document include:
+
+- statements;
+- expressions;
+- types;
+- values (its categories in particular);
+- references;
+
+## Statements and expressions
+
+[Statements](https://en.cppreference.com/w/cpp/language/statements) are fragments of the C++ program that are executed in sequence. The body of any function is a sequence of statements.
+
+Most statements in a typical C++ program are expression statements, such as assignments or function calls.
+
+An [expression](https://en.cppreference.com/w/cpp/language/expressions) is a sequence of operators and their operands, that specifies a computation.
+
+| operator              | example (`a`, `b`, `c`: operands) |
+|-----------------------|-----------------------------------|
+| assignment            | `a = b`, `a += b`                 |
+| increment, decrement  | `++a`, `--a`, `a++`, `a--`        |
+| arithmetic            | `+a`, `a + b`, `a % b`            |
+| logical               | `!a`, `a && b`, `a \|\| b`        |
+| comparison            | `a == b`, `a < b`                 |
+| member access         | `a[...]`, `*a`, `&a`              |
+| function call         | `f(...)`                          |
+| comma                 | `a, b`                            |
+| conditional           | `a ? b : c`                       |
+| conversion            | `static_cast`, `dynamic_cast`     |
+| memory allocation     | `new`, `delete`                   |
+| others                | `sizeof`, `typeid`, `noexcept`    |
+| overloaded operator   | `std::ostream&::operator<<`       |
+
+Expression evaluation may produce a result (e.g., evaluation of `2 + 2` produces the result `4`) and may generate side-effects (e.g. evaluation of `std::cout << 2 + 2` prints the character `4` on the standard output).
+
+```c++
+#include <iostream>
+
+int main()
+{
+    std::cout << 2 + 2 << std::endl;
+}
+```
+
+The operands of any operator may be other expressions or *primary expressions*. Primary expressions are any of the following:
+
+| primary expression            | example                         |
+|-------------------------------|---------------------------------|
+| `this`                        |                                 |
+| literals                      | `2`, `"hello"`                  |
+| identifier expressions        | `n`, `std::cout`                |
+| lambda expressions (*C++11*)  | `[](int n) { return n < 0; }`   |
+| fold expression (*C++17**)    | `(... && args)`                 |
+| requires expression (*C++20*) | `requires (T a, T b){ a + b; }` |
+
+## Types
 
 Objects, references, functions including function template specializations, and expressions have a property called [type](https://en.cppreference.com/w/cpp/language/type), which both
 
 - restricts the operations that are permitted for those entities and
 - provides semantic meaning to the otherwise generic sequences of bits.
-
-## Type classification
 
 ### The C++ type system
 
@@ -13,14 +94,14 @@ The C++ type system consists of the following types:
 
 - fundamental types (`std::is_fundamental`)
   - `void` (`std::is_void`);
-  - `std::nullptr_t` (`std::is_null_pointer`); (*since C++11*)
+  - `std::nullptr_t` (`std::is_null_pointer`); (*C++11*)
   - arithmetic types (`std::is_arithmetic`):
     - integral types, incl. cv-qualified versions (`std::is_integral`):
       - `bool`;
       - character types:
         - `char`, `signed char`, `unsigned char`;
-        - `char8_t`; (*since C++20)
-        - `char16_t`, `char32_t`; (*since C++11)
+        - `char8_t`; (*C++20)
+        - `char16_t`, `char32_t`; (*C++11)
         - `wchar_t`;
       - integer types:
         - `signed car`, `short`, `int`, `long`, `long long`;
@@ -32,7 +113,7 @@ The C++ type system consists of the following types:
     - lvalue reference types (`std::is_lvalue_reference`):
       - lvalue reference to object types;
       - lvalue reference to function types;
-    - rvalue reference types (`std::is_rvalue_reference`): (*since C++11)
+    - rvalue reference types (`std::is_rvalue_reference`): (*C++11)
       - rvalue reference to object types;
       - rvalue reference to function types;
   - pointer types (`std::is_pointer`):
@@ -45,7 +126,7 @@ The C++ type system consists of the following types:
   - function types (`std::is_function`);
   - enumeration types (`std::is_enum`):
     - unscoped enumeration types;
-    - scoped enumeration types (`std::is_scoped_enum`); (*since C++11*)
+    - scoped enumeration types (`std::is_scoped_enum`); (*C++11*)
   - class types
     - non-union types (`std::is_class`)
     - union types (`std::is_union`)
@@ -145,9 +226,11 @@ cpc++;     // error: const pointer (to const int) cannot be changed
 cp = &ci;  // error: const pointer (to non-const int) cannot be changed
 ```
 
-### Lvalue reference declarations
+## References
 
 [Reference declaration](https://en.cppreference.com/w/cpp/language/reference) declares a named variable as a reference, that is, an alias to an already-existing object or function.
+
+### Lvalue reference declarations
 
 A lvalue reference declaration has the form:
 
@@ -217,9 +300,7 @@ char& char_number(std::string& s, std::size_t n)
 
 ### Rvalue reference declarations
 
-[Reference declaration](https://en.cppreference.com/w/cpp/language/reference) declares a named variable as a reference, that is, an alias to an already-existing object or function.
-
-A rvalue reference declaration (*since C++11*) has the form:
+A rvalue reference declaration (*C++11*) has the form:
 
 ```
 && [attr] declarator
@@ -293,7 +374,7 @@ template< class T >
 constexpr std::remove_reference_t<T>&& move( T&& t ) noexcept;
 ```
 
-[`std::move`](https://en.cppreference.com/w/cpp/utility/move) (*since C++11*) is used to indicate that an object `t` may be "moved from", i.e. allowing the efficient transfer of resources from `t` to another object.
+[`std::move`](https://en.cppreference.com/w/cpp/utility/move) (*C++11*) is used to indicate that an object `t` may be "moved from", i.e. allowing the efficient transfer of resources from `t` to another object.
 
 > Move semantics is nothing else than an additional overload that is allowed and expected to steal data from a source object. [*Back to Basics: C++ Move Semantics*. CppCon 2022]
 
@@ -331,8 +412,50 @@ A& operator=(A&& other)
 }
 ```
 
+## Value categories
+
+Each C++ expression (an operator with its operands, a literal, a variable name, etc.) is characterized by two independent properties: a *type* and a [value category](https://en.cppreference.com/w/cpp/language/value_category). Each expression has some non-reference type, and each expression belongs to exactly one of the three primary value categories:
+
+- *prvalue* (“pure” rvalue)
+- *xvalue* (“eXpiring” value)
+- *lvalue*
+
+Every C++ expression has a type, and belongs to a [value category](https://learn.microsoft.com/en-us/cpp/cpp/lvalues-and-rvalues-visual-cpp). The value categories are the basis for rules that compilers must follow when creating, copying, and moving temporary objects during expression evaluation.
+
+- An lvalue has an address that your program can access:
+  - variable names, including `const` variables;
+  - array elements;
+  - function calls that return an lvalue reference;
+  - bit fields;
+  - unions;
+  - class members;
+- A prvalue expression has no address that is accessible by your program:
+  - literals;
+  - functional calls that return a non-reference type;
+  - temporary objects that are created during expression evaluation but accessible only by the compiler;
+- An xvalue expression has an address that no longer accessible by your program but can be used to initialize an rvalue reference, which provides access to the expression:
+  - function calls that returns an rvalue reference;
+  - the array subscript (i.e. the expression within the brackets);
+  - member (and pointer to member) expressions where the array or object is an rvalue reference;
+
+```c++
+Object base{};                    // base is lvalue
+Object obj = ...                  // obj is lvalue
+
+Object obj2 = base;               // base is lvalue
+Object obj3 = GetValue();         // Object&& GetVale() is xvalue
+Object obj4 = std::move(base);    // std::move(base) is xvalue
+Object obj5 = GetOtherValue();    // Object GetOtherValue() is prvalue
+Object obj6 = 5;                  // 5 (literal) is prvalue
+```
+
+The two secondary value categories are:
+
+- a *glvalue* (“generalized” lvalue) is an expression whose evaluation determines the identity of an object or function;
+- an *rvalue* is a prvalue or an xvalue; 
+
 ### Forwarding references
 
-### Value categories
+[Forwarding references](https://en.cppreference.com/w/cpp/language/reference) are a special kind of references that preserve the value category of a function argument, making it possible to forward it by means of `std::forward`. ### Value categories
 
 
