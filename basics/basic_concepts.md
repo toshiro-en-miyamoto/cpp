@@ -81,6 +81,12 @@ The operands of any operator may be other expressions or *primary expressions*. 
 | fold expression (*C++17**)    | `(... && args)`                 |
 | requires expression (*C++20*) | `requires (T a, T b){ a + b; }` |
 
+Most importantly:
+
+- Expression evaluation may produce a result.
+- Each expression is characterized by two independent properties: A type and a value category.
+- Value categories classify expressions by their values.
+
 ## Types
 
 Objects, references, functions including function template specializations, and expressions have a property called [type](https://en.cppreference.com/w/cpp/language/type), which both
@@ -132,27 +138,6 @@ The C++ type system consists of the following types:
     - union types (`std::is_union`)
 
 For every non-cv-qualified type other than reference and function, the type system supports three additional cv-qualified versions of that type (`const`, `volatile`, and `const volatile`). 
-
-Types are grouped in various categories:
-
-- *object types*: types that are not function types, reference types, or `void`(`std::is_object`);
-- *scalar types*: object types that are not array types or class types (`std::is_scalar`);
-- *trivial types*: (`std::is_trivial`)
-- *POD types*: (`std::is_pod`)
-- *literal types*: (`std::is_literal`)
-
-| object  | scalar  | type                    |
-|:-------:|:-------:|-------------------------|
-|         |         | `void`                  |
-| &check; | &check; | `std::nullptr_t`        |
-| &check; | &check; | arithmetic types        |
-|         |         | reference types         |
-| &check; | &check; | pointer types           |
-| &check; | &check; | pointer to member type  |
-| &check; |         | array types             |
-|         |         | function types          |
-| &check; | &check; | enumeration types       |
-| &check; |         | class types             |
 
 ### Constant and volatile type qualifiers
 
@@ -230,22 +215,16 @@ cp = &ci;  // error: const pointer (to non-const int) cannot be changed
 
 [Reference declaration](https://en.cppreference.com/w/cpp/language/reference) declares a named variable as a reference, that is, an alias to an already-existing object or function.
 
-### Lvalue reference declarations
-
-A lvalue reference declaration has the form:
-
-```
-& [attr] declarator
-```
-
-References are not objects; they do not necessarily occupy storage, although the compiler may allocate storage if it is necessary to implement the desired semantics (e.g. a non-static data member of reference type usually increases the size of the class by the amount necessary to store a memory address).
-
-Because references are not objects, there are no arrays of references, no pointers to references, and no references to references: 
+A reference is required to be [initialized](https://en.cppreference.com/w/cpp/language/reference_initialization) to refer to a valid object or function.
 
 ```c++
-int& a[3];    // error: there are no arrays of references
-int&* p;      // error: there are no pointers to references
+T& ref = target;
+T&& ref = target;
 ```
+
+References are not objects; they do not necessarily occupy storage, although the compiler may allocate storage if it is necessary to implement the desired semantics.
+
+### Lvalue reference declarations
 
 Lvalue references can be used to alias an existing object (optionally with different cv-qualification):
 
@@ -281,6 +260,7 @@ void double_string(std::string& s)
 {
   s += s;     // 's' is the same object as 'main()'s 'str'
 }
+
 int main()
 {
   std::string str = "Test";
@@ -299,12 +279,6 @@ char& char_number(std::string& s, std::size_t n)
 ```
 
 ### Rvalue reference declarations
-
-A rvalue reference declaration (*C++11*) has the form:
-
-```
-&& [attr] declarator
-```
 
 Rvalue references can be used to extend the lifetimes of temporary objects (note, lvalue references to const can extend the lifetimes of temporary objects too, but they are not modifiable through them):
 
@@ -420,23 +394,64 @@ Each C++ expression (an operator with its operands, a literal, a variable name, 
 - *xvalue* (“eXpiring” value)
 - *lvalue*
 
-Every C++ expression has a type, and belongs to a [value category](https://learn.microsoft.com/en-us/cpp/cpp/lvalues-and-rvalues-visual-cpp). The value categories are the basis for rules that compilers must follow when creating, copying, and moving temporary objects during expression evaluation.
+```c++
+#include <utility>
 
-- An lvalue has an address that your program can access:
-  - variable names, including `const` variables;
-  - array elements;
-  - function calls that return an lvalue reference;
-  - bit fields;
-  - unions;
-  - class members;
-- A prvalue expression has no address that is accessible by your program:
-  - literals;
-  - functional calls that return a non-reference type;
-  - temporary objects that are created during expression evaluation but accessible only by the compiler;
-- An xvalue expression has an address that no longer accessible by your program but can be used to initialize an rvalue reference, which provides access to the expression:
-  - function calls that returns an rvalue reference;
-  - the array subscript (i.e. the expression within the brackets);
-  - member (and pointer to member) expressions where the array or object is an rvalue reference;
+template <typename T> struct is_prvalue       : std::true_type  {};
+template <typename T> struct is_prvalue<T&>   : std::false_type {};
+template <typename T> struct is_prvalue<T&&>  : std::false_type {};
+
+template <typename T> struct is_lvalue        : std::false_type {};
+template <typename T> struct is_lvalue<T&>    : std::true_type  {};
+template <typename T> struct is_lvalue<T&&>   : std::false_type {};
+
+template <typename T> struct is_xvalue        : std::false_type {};
+template <typename T> struct is_xvalue<T&>    : std::false_type {};
+template <typename T> struct is_xvalue<T&&>   : std::true_type  {};
+
+#include <type_traits>
+
+void f()
+{
+  int   a{42};
+  int&  b{a};
+  int&& r{std::move(a)};
+
+  // expression '42' is prvalue
+  // so is a literal (except for string literal)
+  static_assert(is_prvalue<decltype((42))>::value);
+
+  // expression 'a' is lvalue
+  static_assert(is_lvalue<decltype((a))>::value);
+
+  // expression 'b' is lvalue
+  static_assert(is_lvalue<decltype((b))>::value);
+  // type of variable 'b' is lvalue reference
+  static_assert(std::is_lvalue_reference_v<decltype(b)>);
+
+  // expression `r` is lvalue
+  static_assert(is_lvalue<decltype((r))>::value);
+  // type of variable 'r' is rvalue reference
+  static_assert(std::is_rvalue_reference_v<decltype(r)>);
+
+  // expression 'std::move(a)' is xvalue
+  static_assert(is_xvalue<decltype((std::move(a)))>::value);
+}
+```
+
+### Mixed value categories
+
+A glvalue (“generalized” lvalue) expression is either lvalue or xvalue.
+
+- a glvalue is an expression whose evaluation determines the identity of an object or function;
+
+An rvalue expression is either prvalue of xvalue.
+
+### Primary value categories
+
+The following expressions are *lvalue expressions*:
+- the name of a variable, a function, a template parameter object, a data member, regardless of type. Even if the variable's type is rvalue reference, the expression consisting of its name is an lvalue expression;
+- a function call or an overloaded
 
 ```c++
 Object base{};                    // base is lvalue
@@ -448,11 +463,6 @@ Object obj4 = std::move(base);    // std::move(base) is xvalue
 Object obj5 = GetOtherValue();    // Object GetOtherValue() is prvalue
 Object obj6 = 5;                  // 5 (literal) is prvalue
 ```
-
-The two secondary value categories are:
-
-- a *glvalue* (“generalized” lvalue) is an expression whose evaluation determines the identity of an object or function;
-- an *rvalue* is a prvalue or an xvalue; 
 
 ### Forwarding references
 
