@@ -396,94 +396,176 @@ Each C++ expression is characterized by two independent properties: a *type* and
 
 [Microsoft Learn](https://learn.microsoft.com/en-us/cpp/cpp/lvalues-and-rvalues-visual-cpp) explains the value categories as follows:
 
-- An lvalue has an address that your program can access.
-- A prvalue expression has no address that is accessible by your program.
-- An xvalue expression has an address that no longer accessible by your program but can be used to initialize an rvalue reference, which provides access to the expression.
+- An lvalue has an address that your program can access. Examples include:
+  - variable names, including `const` variables [1],
+  - function calls that return an lvalue reference [3],
+  - array elements, bit-fields, unions, and class members.
+- A prvalue expression has no address that is accessible by your program. Example include:
+  - literals [4],
+  - function calls that return a non-reference type [5],
+  - and temporary objects that are created during expression evaluation but accessible only by the compiler.
+- An xvalue expression has an address that is no longer accessible by your program but can be used to initialize an rvalue reference, which provides access to the expression. Examples include:
+  - function calls that return an rvalue reference [6],
+  - and the array subscript, member and pointer to member expressions where the array or object is an rvalue reference.
+
+Even if the variable's type is rvalue reference, the expression consisting of its name is an lvalue expression [2].
+
+| [#] | expression      | kind      | type        | addr  | val cat |
+|:---:|-----------------|-----------|-------------|:-----:|---------|
+| [4] | `42`            | literal   | non ref     | no    | prvalue |
+| [1] | `a`             | variable  | non ref     | has   | lvalue  |
+| [1] | `b`             | variable  | lvalue ref  | -     | lvalue  |
+| [2] | `r`             | variable  | rvalue ref  | -     | lvalue  |
+| [5] | `get_value()`   | func call | non ref     | no    | prvalue |
+| [3] | `get_ref()`     | func call | lvalue ref  | -     | lvalue  |
+| [6] | `get_refref()`  | func call | rvalue ref  | -     | xvalue  |
+| [6] | `std::move(a)`  | func call | rvalue ref  | -     | xvalue  |
 
 ```c++
 #include <type_traits>
 
-template <typename>   struct is_prvalue       : std::true_type  {};
-template <typename T> struct is_prvalue<T&>   : std::false_type {};
-template <typename T> struct is_prvalue<T&&>  : std::false_type {};
+template <typename>   struct is_prvalue_expr       : std::true_type  {};
+template <typename T> struct is_prvalue_expr<T&>   : std::false_type {};
+template <typename T> struct is_prvalue_expr<T&&>  : std::false_type {};
 
-template <typename>   struct is_lvalue        : std::false_type {};
-template <typename T> struct is_lvalue<T&>    : std::true_type  {};
-template <typename T> struct is_lvalue<T&&>   : std::false_type {};
+template <typename>   struct is_lvalue_expr        : std::false_type {};
+template <typename T> struct is_lvalue_expr<T&>    : std::true_type  {};
+template <typename T> struct is_lvalue_expr<T&&>   : std::false_type {};
 
-template <typename>   struct is_xvalue        : std::false_type {};
-template <typename T> struct is_xvalue<T&>    : std::false_type {};
-template <typename T> struct is_xvalue<T&&>   : std::true_type  {};
+template <typename>   struct is_xvalue_expr        : std::false_type {};
+template <typename T> struct is_xvalue_expr<T&>    : std::false_type {};
+template <typename T> struct is_xvalue_expr<T&&>   : std::true_type  {};
 
 #include <utility>
 
-int         get_value () { int i = 42; return i; }
-const int&  get_ref ()   { int i = 42; return i; }
-int&&       get_refref() { int i = 42; return std::move(i); }
+constexpr int   get_value()  { static int i = 42; return i; }
+constexpr int&  get_ref()    { static int i = 42; return i; }
+constexpr int&& get_refref() { static int i = 42; return std::move(i); }
 
-void f()
+constexpr void f()
 {
   int   a{42};
   int&  b{a};
   int&& r{std::move(a)};
 
+  // expressions that have non-reference type
   // expressions that belong to prvalue value category
-  static_assert(is_prvalue<decltype((42))>::value);
-  static_assert(is_prvalue<decltype((get_value()))>::value);
+  static_assert(is_prvalue_expr<decltype((42))>::value);
+  static_assert(is_prvalue_expr<decltype((get_value()))>::value);
+  static_assert(std::is_integral_v<decltype(42)>);
+  static_assert(std::is_integral_v<decltype(get_value())>);
 
+  // expressions that have non-reference type
   // expressions that belong to lvalue value category
-  static_assert(is_lvalue<decltype((a))>::value);
-  static_assert(is_lvalue<decltype((b))>::value);
-  static_assert(is_lvalue<decltype((r))>::value);
-  static_assert(is_lvalue<decltype((get_ref()))>::value);
-
-  // expressions that belong to xvalue value category
-  static_assert(is_xvalue<decltype((std::move(a)))>::value);
-  static_assert(is_xvalue<decltype((get_refref()))>::value);
-
-  // expressions that have lvalue reference type
-  static_assert(std::is_lvalue_reference_v<decltype(b)>);
-  static_assert(std::is_lvalue_reference_v<decltype(get_ref())>);
-  static_assert(std::is_same_v<int&, decltype(b)>);
-  static_assert(std::is_same_v<const int&, decltype(get_ref())>);
+  static_assert(is_lvalue_expr<decltype((a))>::value);
+  static_assert(std::is_integral_v<decltype(a)>);
 
   // expressions that have rvalue reference type
+  // expressions that belong to lvalue value category
+  static_assert(is_lvalue_expr<decltype((r))>::value);
   static_assert(std::is_rvalue_reference_v<decltype(r)>);
+
+  // expressions that have rvalue reference type
+  // expressions that belong to xvalue value category
+  static_assert(is_xvalue_expr<decltype((std::move(a)))>::value);
+  static_assert(is_xvalue_expr<decltype((get_refref()))>::value);
   static_assert(std::is_rvalue_reference_v<decltype(std::move(a))>);
   static_assert(std::is_rvalue_reference_v<decltype(get_refref())>);
-  static_assert(std::is_same_v<int&&, decltype(r)>);
-  static_assert(std::is_same_v<int&&, decltype(std::move(a))>);
-  static_assert(std::is_same_v<int&&, decltype(get_refref())>);
+
+  // expressions that have lvalue reference type
+  // expressions that belong to lvalue value category
+  static_assert(is_lvalue_expr<decltype((b))>::value);
+  static_assert(is_lvalue_expr<decltype((get_ref()))>::value);
+  static_assert(std::is_lvalue_reference_v<decltype(b)>);
+  static_assert(std::is_lvalue_reference_v<decltype(get_ref())>);
 }
 ```
 
-### Mixed value categories
-
-A glvalue (“generalized” lvalue) expression is either lvalue or xvalue.
-
-- a glvalue is an expression whose evaluation determines the identity of an object or function;
-
-An rvalue expression is either prvalue of xvalue.
-
-### Primary value categories
-
-The following expressions are *lvalue expressions*:
-- the name of a variable, a function, a template parameter object, a data member, regardless of type. Even if the variable's type is rvalue reference, the expression consisting of its name is an lvalue expression;
-- a function call or an overloaded
+### `std::move` function
 
 ```c++
-Object base{};                    // base is lvalue
-Object obj = ...                  // obj is lvalue
-
-Object obj2 = base;               // base is lvalue
-Object obj3 = GetValue();         // Object&& GetVale() is xvalue
-Object obj4 = std::move(base);    // std::move(base) is xvalue
-Object obj5 = GetOtherValue();    // Object GetOtherValue() is prvalue
-Object obj6 = 5;                  // 5 (literal) is prvalue
+// <utility> constexpr since C++14
+template< class T >
+constexpr std::remove_reference_t<T>&& move( T&& t ) noexcept;
 ```
+
+[`std::move`](https://en.cppreference.com/w/cpp/utility/move) is used to indicate that an object `t` may be *moved from*, i.e. allowing the efficient transfer of resources from `t` to another object.
+
+In particular, `std::move` produces an xvalue expression that identifies its argument `t`. It is exactly equivalent to a `static_cast` to an rvalue reference type.
+
+```c++
+static_cast<typename std::remove_reference<T>::type&&>(t)
+```
+
+The functions that accept rvalue reference parameters include:
+
+- move constructors;
+- move assignment operators;
+- regular member functions such as `std::vector::push_bask`
+
+The functions that accept rvalue reference parameters are selected, by overload resolution, when called with rvalue arguments (either prvalues or xvalues). If the argument identifies a resource-owning object, these overloads have the option, but aren't required, to move any resources held by the argument.
+
+```c++
+int main()
+{
+  std::vector<std::string> v;
+  std::string str = "Hello";
+
+  v.push_back(str);             // uses 'push_back(const T&)'
+  v.push_back(std::move(str));  // uses 'push_back(T&&)'
+}
+```
+
+Names of rvalue reference variables are lvalues and have to be converted to xvalues to be bound to the function overloads that accept rvalue reference parameters, which is why move constructors and move assignment operators typically use `std::move`:
+
+```c++
+struct A {
+  std::string s;
+  int n;
+  // move constructor
+  A(A&& other) noexcept :
+    s(std::move(other.s)),
+    n(std::exchange(other.n, 0))
+  {}
+  // move assignment operator
+  A& operator=(A&& other) noexcept {
+    s = std::move(other.s);
+    n = std::exchange(other.n, 0);
+    return *this;
+  }
+};
+```
+
+> [`std::exchange`](https://en.cppreference.com/w/cpp/utility/exchange) can be used when implementing move constructors and move assignment operators.
+
+### `std::exchange` function
+
+```c++
+// <utility> constexpr since C++20
+template< class T, class U = T >
+constexpr T exchange( T& obj, U&& new_value ) noexcept;
+```
+
+[`std::exchange`](https://en.cppreference.com/w/cpp/utility/exchange) replaces the value of `obj` with `new_value` and returns the old value of `obj`.
+
+- `T` must meet the requirements of *MoveConstructible*.
+- `T` must be possible to move-assign objects of type `U` to objects of type `T`.
 
 ### Forwarding references
 
 [Forwarding references](https://en.cppreference.com/w/cpp/language/reference) are a special kind of references that preserve the value category of a function argument, making it possible to forward it by means of `std::forward`. ### Value categories
 
+### Exception safety
 
+After the error condition is reported by a function, additional guarantees may be provided with regards to the state of the program. The following [four levels of exception guarantee](https://en.cppreference.com/w/cpp/language/exceptions) are generally recognized, which are strict superset's of each other:
+
+- *No-throw (or nofail) exception guarantee* &mdash; the function never throws exceptions. No-throw (errors are reported by other means or concealed) is expected of destructors and other functions that may be called during stack unwinding. The destructors are `noexcept` by default.(since C++11) No-fail (the function always succeeds) is expected of `swap`s, move constructors, and other functions used by those that provide strong exception guarantee.
+- *Strong exception guarantee* &mdash; If the function throws an exception, the state of the program is rolled back to the state just before the function call (for example, `std::vector::push_back`).
+- *Basic exception guarantee* &mdash; If the function throws an exception, the program is in a valid state. No resources are leaked, and all objects' invariants are intact.
+- *No exception-guarantee* &mdash; If the function throws an exception, the program may not be in a valid state: resource leaks, memory corruption, or other invariant-destroying errors may have occurred. 
+
+### The copy-and-swap idiom in assignment operators
+
+The [copy-and-swap idiom](https://www.modernescpp.com/index.php/the-copy-and-swap-idiom/) is an architectural or design pattern implementation in a concrete programming language. This idiom gives you the *strong exception safety guarantee*.
+
+In general, you should at least aim for the basic exception safety guarantee. This means that you don’t have resource leaks in case of an error, and your program is always in a well-defined state. If your program is not in a well-defined state after an error, there is only one option left: shut down your program.
