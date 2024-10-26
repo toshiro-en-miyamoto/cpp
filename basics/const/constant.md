@@ -1,4 +1,18 @@
-# Constant objects
+# Constant Expressions
+
+[Constant expressions](https://en.cppreference.com/w/cpp/language/constant_expression) are the expressions that can be evaluated at compile time. Such expressions can be used as non-type template arguments, array sizes, and in other contexts that require constant expressions, e.g.
+
+```c++
+#include <array>
+void constant_array()
+{
+    std::size_t n = 1;
+//  std::array<int, n> a1;  // compile-time error
+    const std::size_t cn = 2;
+    std::array<int, cn> a2; // OK: cn is a constant expression
+}
+```
+
 
 ## [`const` objects](https://en.cppreference.com/w/cpp/language/cv)
 
@@ -49,21 +63,6 @@ void f2(int* const p)
 {
 //  p = nullptr;                    // compile-time error
     *p = 1;
-}
-```
-
-## [Constant expressions](https://en.cppreference.com/w/cpp/language/constant_expression)
-
-*Constant expressions* are the expressions that can be evaluated at compile time. Such expressions can be used as non-type template arguments, array sizes, and in other contexts that require constant expressions, e.g.
-
-```c++
-#include <array>
-int main()
-{
-    std::size_t n = 1;
-//  std::array<int, n> a1;  // compile-time error
-    const std::size_t cn = 2;
-    std::array<int, cn> a2; // OK: cn is a constant expression
 }
 ```
 
