@@ -135,3 +135,124 @@ All temporary objects are destroyed as the last step in evaluating the full-expr
     for (T l = f1(g()); auto& e : l) {}
   }
   ```
+
+## Implicit-lifetime types
+
+The following types are collectively called [implicit-lifetime types](https://en.cppreference.com/w/cpp/named_req/ImplicitLifetimeType):
+
+- scalar types
+- implicit-lifetime class types
+- array types
+- cv-qualified versions of these types
+
+The following types are collectively called [scalar types](https://en.cppreference.com/w/cpp/named_req/ScalarType):
+
+- arithmetic types
+- enumeration types
+- pointer types
+- pointer-to-member types
+-`std::nullptr_t`
+- cv-qualified versions of these types
+
+An [implicit-lifetime class](https://en.cppreference.com/w/cpp/language/classes#Implicit-lifetime_class) is a class that
+
+- is an aggregate whose destructor is not user-provided, or
+
+  ```c++
+  // S is an aggregate without user-provided destructor
+  struct S { int x, y; };
+  ```
+
+- has at least one trivial eligible constructor and a trivial, non-deleted destructor
+
+  ```c++
+  struct B { B() {} };
+  static_assert(std::is_trivial_v<B> == false);
+  ```
+
+## Default constructors
+
+A [default constructor](https://en.cppreference.com/w/cpp/language/default_constructor) is a constructor which can be called with no arguments.
+
+*Implicitly-declared default constructor*: If there is no user-declared constructor or constructor template for a class type, the compiler implicitly declare a default constructor as an `inline public` member of its class.
+
+*Implicitly-defined default constructor*: If the implicitly-declared or explicitly-defaulted constructor is not defined as deleted, it is defined (that is, a function body is generated and compiled) by the compiler if odr-used or needed for constant evaluation, and
+
+- it has the same effect as a user-defined constructor with empty body and empty initializer list,
+
+  ```c++
+  struct A {
+    int x;
+    A(int x = 1): x(x) {}       // user-defined default constructor
+  };
+  ```
+
+- that is, it calls the default constructors of the bases and of the non-static members of this class.
+
+  ```c++
+  struct B : A {
+    // B::B() is implicitly-defined, calls A::A()
+  };
+  struct C {
+    A a;
+    // C::C() is implicitly-defined, calls A::A()
+  }
+  ```
+
+If the requirements of a `constexpr` function, the generated constructor is `constexpr`.
+
+If some user-defined constructors are present, the user may still force the automatics generation of a default constructor by the compiler that would be implicitly-declared otherwise with the keyword `default`.
+
+```c++
+struct D : A {
+  D(int y) : A(y) {}
+  // D::D() is not declared because another constructor exists
+};
+struct E : A {
+  E(int y) : A(y) {}
+  E() = default;    // explicitly defaulted, calls A::A()
+};
+```
+
+*Deleted default constructor*: The implicitly-declared or explicitly-defaulted default constructor for class `T` is defined as deleted, if any of the following conditions is satisfied:
+
+- `T` has a non-static data member of reference type without a default initializer.
+- `T` has a non-variant non-static non-const-default-constructible data member of const-qualified type without a default member initializer.
+- etc.
+
+  ```c++
+  struct F {
+    int& ref;     // reference member
+    const int c;  // const member
+    // F::F() is implicitly defined as deleted
+  };
+  ```
+
+If no user-defined constructors are present and the implicitly-declared default constructor is not trivial, the user may still inhibit the automatic generation of an implicitly-defined constructor by the compiler with the keyword `delete`.
+
+```c++
+struct G {
+  // user-defined constructor prevents implicit generation
+  // of a default constructor
+  G(const G&) {}
+  // G::G() is implicitly defined as deleted
+};
+struct H {
+  H(const H&) = delete;
+  // H::H() is implicitly defined as deleted
+};
+struct I {
+  I(const I&) = default;
+  // I::I() is implicitly defined as deleted
+};
+```
+
+*Trivial default constructor*: A trivial default constructor is a constructor that performs no action. All data types compatible with the C language (POD types) are trivially default-constructible.
+
+A default constructor is eligible if all following conditions are satisfied:
+
+- It is not deleted.
+- Its associated constraints (if any) are satisfied.
+- Among all default constructors whose associated constraints are satisfied, it is more constrained than any other default constructor.
+
+Triviality of eligible default constructors determines whether the class is an implicit-lifetime type, and whether the class is a trivial type.

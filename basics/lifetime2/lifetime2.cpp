@@ -58,3 +58,13 @@ void foo() {
 
   for (T l = f1(g()); auto& e : l) {}
 }
+
+// S is an aggregate without user-provided destructor
+struct S { int x, y; };
+// static_assert(std::is_implicit_lifetime_v<S>);
+
+struct A { int m; };
+static_assert(std::is_trivial_v<A> == true);
+ 
+struct B { B() {} };
+static_assert(std::is_trivial_v<B> == false);
