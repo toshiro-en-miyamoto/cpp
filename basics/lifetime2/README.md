@@ -31,6 +31,24 @@ The lifetime of a reference:
 - begins when its initialization is complete and
 - ends as if it were a scalar object.
 
+The lifetime of the referred object may end before the end of the lifetime of the reference, which makes dangling reference possible.
+
+## Dangling references
+
+Although references, once initialized, always refer to valid objects or functions, it is possible to create a program where the lifetime on the referred-to object ends, but the reference remains accessible ([dangling references](https://en.cppreference.com/w/cpp/language/reference#Dangling_references)). Accessing such a reference is undefined behavior. A common example is a function returning a reference to an automatic variable:
+
+```c++
+std::string& f() {
+  std::string s = "Example";
+  return s;
+} // destructor is called for 's' and its storage deallocated
+
+std::string& r = f();   // dangling reference
+std::cout << f;         // undefined behavior
+```
+
+Note that rvalue references and lvalue references to const extend the lifetimes of temporary objects.
+
 ## Temporary object lifetime
 
 Temporary objects are created when a prvalue is materialized so that it can be used as glvalue, which occurs in the following situations:
