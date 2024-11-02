@@ -145,5 +145,6 @@
       "zstd"
     ],
     "editor.tabSize": 2,
-    "editor.detectIndentation": false
+    "editor.detectIndentation": false,
+    "cmake.sourceDirectory": "/home/toshiro/repo/cpp/building/conan/template"
 }
