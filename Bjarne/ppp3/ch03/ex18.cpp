@@ -15,11 +15,36 @@ using Entry = std::pair<std::string, int>;
 
 #include <optional>
 #include <ranges>
-#include <type_traits>
+#include <concepts>
 #include <vector>
 
+// Abbreviated function template
+[[nodiscard]]
+constexpr auto check(std::ranges::forward_range auto&& r)
+-> std::optional<std::vector<Entry>>
+requires std::same_as<std::ranges::range_value_t<decltype(r)>, Entry>
+{
+  std::vector<std::string> names;
+  std::vector<int> scores;
+  for (const auto& p : r) {
+    if (p.first == "NoName") break;
+    const auto it_name = std::ranges::find(names, p.first);
+    if (it_name != names.end()) { // p.name found in names
+      return std::nullopt;
+    } else {
+      names.push_back(p.first);
+      scores.push_back(p.second);
+    }
+  }
+  std::vector<Entry> entries;
+  for (const auto& [name, score] : std::views::zip(names, scores)) {
+    entries.emplace_back(std::make_pair(name, score));
+  }
+  return entries;
+}
+
 template <std::ranges::forward_range R>
-  requires std::is_same_v<std::ranges::range_value_t<R>, Entry>
+  requires std::same_as<std::ranges::range_value_t<R>, Entry>
 [[nodiscard]]
 constexpr std::optional<std::vector<Entry>> check_dup(R&& r) noexcept
 {
@@ -27,23 +52,17 @@ constexpr std::optional<std::vector<Entry>> check_dup(R&& r) noexcept
   std::vector<int> scores;
   for (const auto& p : r) {
     if (p.first == "NoName") break;
-    if (names.size() == 0) {
+    const auto it_name = std::ranges::find(names, p.first);
+    if (it_name != names.end()) { // p.name found in names
+      return std::nullopt;
+    } else {
       names.push_back(p.first);
       scores.push_back(p.second);
-    } else {
-      const auto it_name = std::ranges::find(names, p.first);
-      if (it_name != names.end()) { // p.name found in names
-        return std::nullopt;
-      } else {
-        names.push_back(p.first);
-        scores.push_back(p.second);
-      }
     }
   }
   std::vector<Entry> entries;
-  for (auto [name, score] : std::views::zip(names, scores)) {
-    const auto entry = std::make_pair(name, score);
-    entries.push_back(entry);
+  for (const auto& [name, score] : std::views::zip(names, scores)) {
+    entries.emplace_back(std::make_pair(name, score));
   }
   return entries;
 }
@@ -68,7 +87,7 @@ TEST_CASE("happy path")
     std::make_pair("Joe", 17),
     std::make_pair("Barbara", 22),
   };
-  const auto result = check_dup(std::views::all(dataset1));
+  const auto result = check(std::views::all(dataset1));
   CHECK_EQ(expected, result);
 }
 
