@@ -103,7 +103,8 @@ According to the simple arithmetic grammar in this chapter:
 
 [I] Integer:
 [I1]  Digit+                  // non negative integer
-[I2]  "-" Digit+              // negative integer
+[I2]  "+" Integer             // positive integer
+[I3]  "-" Integer             // negative integer
 
 [D] Digit
 [D1]  "0" | "1" | "2" | ... | "9"
