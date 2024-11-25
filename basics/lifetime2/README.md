@@ -217,7 +217,7 @@ A [default constructor](https://en.cppreference.com/w/cpp/language/default_const
   }
   ```
 
-If the requirements of a `constexpr` function, the generated constructor is `constexpr`.
+If the generated constructor satisfies the requirements of a `constexpr` function, it is `constexpr`.
 
 If some user-defined constructors are present, the user may still force the automatics generation of a default constructor by the compiler that would be implicitly-declared otherwise with the keyword `default`.
 
@@ -274,3 +274,52 @@ A default constructor is eligible if all following conditions are satisfied:
 - Among all default constructors whose associated constraints are satisfied, it is more constrained than any other default constructor.
 
 Triviality of eligible default constructors determines whether the class is an implicit-lifetime type, and whether the class is a trivial type.
+
+## Destructors
+
+A [destructor](https://en.cppreference.com/w/cpp/language/destructor) is a special member function that is called when the lifetime of an object ends. The purpose of the destructor is to free the resources that the object may have acquired during its lifetime.
+
+The destructor is implicitly invoked whenever an object's lifetime ends, which includes
+
+- program termination, for objects with static storage duration
+- thread exit, for objects with thread-local storage duration
+- end of scope, for objects with automatic storage duration and for temporaries whose life was extended by binding to a reference
+- delete-expression, for objects with dynamic storage duration
+- end of the full expression, for nameless temporaries
+- stack unwinding, for objects with automatic storage duration when an exception escapes their block, uncaught. 
+
+The destructor can also be invoked explicitly. 
+
+*Prospective destructor*: A class may have one or more prospective destructors, one of which is selected as the destructor for the class.
+
+- In order to determine which prospective destructor is the destructor, at the end of the definition of the class, overload resolution is performed among prospective destructors declared in the class with an empty argument list. If the overload resolution fails, the program is ill-formed. Destructor selection does not odr-use the selected destructor, and the selected destructor may be deleted.
+- All prospective destructors are special member functions. If no user-declared prospective destructor is provided for class `T`, the compiler will always declare one (see below), and the implicitly declared prospective destructor is also the destructor for `T`.
+
+*Implicitly-declared destructor*: If no user-declared prospective destructor is provided for a class type, the compiler will always declare a destructor as an `inline public` member of its class.
+
+- As with any implicitly-declared special member function, the exception specification of the implicitly-declared destructor is non-throwing unless the destructor of any potentially-constructed base or member is potentially-throwing implicit definition would directly invoke a function with a different exception specification.
+- In practice, implicit destructors are `noexcept` unless the class is "poisoned" by a base or member whose destructor is `noexcept(false)`.
+
+*Implicitly-defined destructor*: If an implicitly-declared destructor is not deleted, it is implicitly defined (that is, a function body is generated and compiled) by the compiler when it is odr-used. This implicitly-defined destructor has an empty body. 
+
+If this satisfies the requirements of a `constexpr` function, the generated destructor is `constexpr`.
+
+*Deleted destructor*: The implicitly-declared or explicitly-defaulted destructor for class `T` is defined as deleted if any of the following conditions is satisfied:
+
+- `T` has a potentially constructed sub-object of class type `M` (or possibly multi-dimensional array thereof) such that `M` has a destructor that
+  - is deleted or inaccessible from the destructor of `T`, or
+  - in the case of the sub-object being variant member, is non-trivial.
+- The destructor is virtual and the lookup for the deallocation function results in
+  - an ambiguity, or
+  - a function that is deleted or inaccessible from the destructor.
+
+An explicitly-defaulted prospective destructor for `T` is defined as deleted if it is not the destructor for `T`.
+
+*Trivial destructor*: The destructor for class `T` is trivial if all of the following is true:
+
+- The destructor is not user-provided (meaning, it is either implicitly declared, or explicitly defined as defaulted on its first declaration).
+- The destructor is not virtual (that is, the base class destructor is not virtual).
+- All direct base classes have trivial destructors.
+- All non-static data members of class type (or array of class type) have trivial destructors. 
+
+A trivial destructor is a destructor that performs no action. Objects with trivial destructors don't require a `delete`-expression and may be disposed of by simply deallocating their storage. All data types compatible with the C language (POD types) are trivially destructible. 
