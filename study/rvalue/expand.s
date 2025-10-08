@@ -10,20 +10,30 @@ __Z6expandO5Point:                      ## @_Z6expandO5Point
 	.cfi_offset %rbp, -16
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register %rbp
-	movq	%rdi, -8(%rbp)
-	movq	-8(%rbp), %rax
+	movq	%rdi, -24(%rbp)
+	movq	-24(%rbp), %rax
 	movl	(%rax), %ecx
-	addl	$1, %ecx
+	incl	%ecx
 	movl	%ecx, (%rax)
-	movq	-8(%rbp), %rax
+	movq	-24(%rbp), %rax
 	movl	4(%rax), %ecx
-	addl	$1, %ecx
+	incl	%ecx
 	movl	%ecx, 4(%rax)
-	movq	-8(%rbp), %rax
+	movq	-24(%rbp), %rax
 	movl	8(%rax), %ecx
-	addl	$1, %ecx
+	incl	%ecx
 	movl	%ecx, 8(%rax)
-	movq	-8(%rbp), %rax
+	movq	-24(%rbp), %rax
+	movl	8(%rax), %ecx
+	movl	%ecx, -8(%rbp)
+	movq	(%rax), %rax
+	movq	%rax, -16(%rbp)
+	movl	-8(%rbp), %eax
+	movl	%eax, -32(%rbp)
+	movq	-16(%rbp), %rax
+	movq	%rax, -40(%rbp)
+	movq	-40(%rbp), %rax
+	movl	-32(%rbp), %edx
 	popq	%rbp
 	retq
 	.cfi_endproc
@@ -38,19 +48,20 @@ _main:                                  ## @main
 	.cfi_offset %rbp, -16
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register %rbp
-	subq	$32, %rsp
-	movq	l___const.main.a(%rip), %rax
-	movq	%rax, -12(%rbp)
-	movl	l___const.main.a+8(%rip), %eax
-	movl	%eax, -4(%rbp)
-	leaq	-12(%rbp), %rdi
+	subq	$48, %rsp
+	movabsq	$8589934593, %rax               ## imm = 0x200000001
+	movq	%rax, -16(%rbp)
+	movl	$3, -8(%rbp)
+	leaq	-16(%rbp), %rdi
 	callq	__Z6expandO5Point
-	movq	(%rax), %rcx
-	movq	%rcx, -24(%rbp)
-	movl	8(%rax), %eax
-	movl	%eax, -16(%rbp)
+	movl	%edx, -40(%rbp)
+	movq	%rax, -48(%rbp)
+	movq	-48(%rbp), %rax
+	movq	%rax, -28(%rbp)
+	movl	-40(%rbp), %eax
+	movl	%eax, -20(%rbp)
 	xorl	%eax, %eax
-	addq	$32, %rsp
+	addq	$48, %rsp
 	popq	%rbp
 	retq
 	.cfi_endproc

@@ -36,20 +36,17 @@ struct Point {
 };
 #include <cstddef>
 #include <utility>
-Point&& expand(Point&& p) {
+Point expand(Point&& p) {
   p.x++;
   p.y++;
   p.z++;
-  // an rvalue reference cannot bind to an lvalue
-  // Point&& cannot bind to Point&& p (p is an lvalue)
-  // return p;
-  return std::move(p);
+  return p;
 }
 int main() {
   Point a{1, 2, 3};
   // an rvalue reference cannot bind to an lvalue
   // Point&& p cannot bind to Point a (a is an lvalue)
-  // auto b = expand(a);
+  // auto b = expand(a); --- compile error
   auto b = expand(std::move(a));
 }
 ```
@@ -59,57 +56,43 @@ int main() {
 An rvalue reference refers to a temporary object, which the user of the reference can modify, assuming that the object will never be used again. (Stroustrup 2013: §7.7.2. Rvalue References)
 
 ```c++
-Point&& expand(Point&& p) {
-//  pushq	%rbp
-//  movq	%rsp, %rbp
-//  movq	%rdi, -8(%rbp)    // -8(%rbp) ⬅︎ &&p
+Point expand(Point&& p) {
+//  pushq %rbp
+//  movq %rsp, %rbp
+//  movq %rdi, -24(%rbp)    # Point&& p
   p.x++;
-//  movq	-8(%rbp), %rax    // %eax ⬅︎ &&p
-//  movl	(%rax), %ecx      // %ecx ⬅︎ p->x
-//  addl	$1, %ecx          // %ecx ⬅︎ %ecx + 1
-//  movl	%ecx, (%rax)      // p->x ⬅︎ %ecx
+//  movq -24(%rbp), %rax
+//  movl (%rax), %ecx       # %ecx ⬅︎ p.x
+//  incl %ecx
+//  movl %ecx, (%rax)       # p.x ⬅︎ p.x + 1
   p.y++;
-//  movq	-8(%rbp), %rax    // %eax ⬅︎ &&p
-//  movl	4(%rax), %ecx     // %ecx ⬅︎ p->y
-//  addl	$1, %ecx          // %ecx ⬅︎ %ecx + 1
-//  movl	%ecx, 4(%rax)     // p->y ⬅︎ %ecx
+//  movq -24(%rbp), %rax
+//  movl 4(%rax), %ecx      # %ecx ⬅︎ p.y
+//  incl %ecx
+//  movl %ecx, 4(%rax)      # p.y ⬅︎ p.y + 1
   p.z++;
-//  movq	-8(%rbp), %rax    // %eax ⬅︎ &&p
-//  movl	8(%rax), %ecx     // %ecx ⬅︎ p->z
-//  addl	$1, %ecx          // %ecx ⬅︎ %ecx + 1
-//  movl	%ecx, 8(%rax)     // p->z ⬅︎ %ecx
-  return std::move(p);
-//  movq	-8(%rbp), %rax    // %rax ⬅︎ &&p
-//  popq	%rbp
+//  movq -24(%rbp), %rax
+//  movl 8(%rax), %ecx      # %ecx ⬅︎ p.z
+//  incl %ecx
+//  movl %ecx, 8(%rax)      # p.z ⬅︎ p.z + 1
+  return p;
+//  movq -24(%rbp), %rax
+//  movl 8(%rax), %ecx
+//  movl %ecx, -8(%rbp)     # -8(%rbp) ⬅︎ new p.z
+//  movq (%rax), %rax
+//  movq %rax, -16(%rbp)    # -16(%rbp) ⬅︎ new p.x
+//  movl -8(%rbp), %eax
+//  movl %eax, -32(%rbp)    # -32(%rbp) ⬅︎ -8(%rbp)
+//  movq -16(%rbp), %rax
+//  movq %rax, -40(%rbp)    # -40(%rbp) ⬅︎ -16(%rbp)
+//  movq -40(%rbp), %rax
+//  movl -32(%rbp), %edx
+
+//  popq %rbp
 //  retq
 }
 int main() {
-//  pushq	%rbp
-//  movq	%rsp, %rbp
-//  subq	$32, %rsp
   Point a{1, 2, 3};
-//  .section	__TEXT,__const
-//  l___const.main.a:
-//  .long	1   ## 0x1        // a[0]
-//  .long	2   ## 0x2        // a[1]
-//  .long	3   ## 0x3        // a[2]
-//  movq	l___const.main.a(%rip), %rax
-//  movq	%rax, -12(%rbp)   // -12(%rbp) ⬅︎ &&a[0]
-//  movl	l___const.main.a+8(%rip), %eax
-//  movl	%eax, -4(%rbp)    //  -4(%rbp) ⬅︎ &&a[2]
   auto b = expand(std::move(a));
-//  leaq	-12(%rbp), %rdi   // %rdi ⬅︎ -12(%rbp):&&a[0]
-//  callq	__Z6expandO5Point   // call Point::expand()
-//  movq	(%rax), %rcx      // &rcx ⬅︎ &&Point[0]
-//  movq	%rcx, -24(%rbp)   // &b[0]:-24(%rbp) ⬅︎ &&Point[0]
-//  movl	8(%rax), %eax     // &rax ⬅︎ &&Point[2]
-//  movl	%eax, -16(%rbp)   // &b[2]:-16(%rbp) ⬅︎ &&Point[2]
-
-//  xorl	%eax, %eax        // rc ⬅︎ 0
-//  addq	$32, %rsp
-//  popq	%rbp
-//  retq
 }
 ```
-
-
