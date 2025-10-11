@@ -42,6 +42,13 @@ struct Point {
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest.h"
+#include <type_traits>
+TEST_CASE("references") {
+  int v {4};
+  int& ref {v};
+  int&& refref {5};
+  CHECK(std::is_same_v<decltype(ref), decltype(refref)> == false);
+}
 TEST_CASE("constructors") {
   Point zero;
   CHECK(zero.s == Semantics::default_constructed);
@@ -85,4 +92,23 @@ TEST_CASE("swapping by moving") {
   CHECK(b.x == 2);
   CHECK(b.y == 3);
   CHECK(b.z == 4);
+}
+
+Point operator+(const Point& lhs, const Point& rhs) {
+  Point tmp = lhs;
+  tmp.x += rhs.x;
+  tmp.y += rhs.y;
+  tmp.z += rhs.z;
+  return std::move(tmp);
+}
+
+TEST_CASE("to return value by moving") {
+  Point a {2, 3, 4};
+  Point b {5, 6, 7};
+  Point c = a + b;
+
+  CHECK(c.s == Semantics::move_constructed);
+  CHECK(c.x == 7);
+  CHECK(c.y == 9);
+  CHECK(c.z == 11);
 }
