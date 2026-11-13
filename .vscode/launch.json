@@ -1,18 +1,17 @@
 {
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
   "configurations": [
     {
-      "name": "C/C++: clang build and debug the active file",
-      "type": "cppdbg",
+      "type": "lldb-dap",
       "request": "launch",
-      "program": "${fileDirname}/${fileBasenameNoExtension}",
+      "name": "Debug",
+      "program": "${workspaceFolder}/<your program>",
       "args": [],
-      "stopAtEntry": false,
-      "cwd": "${fileDirname}",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "lldb",
-      "preLaunchTask": "C/C++: clang build the active file"
+      "env": [],
+      "cwd": "${workspaceFolder}"
     }
-  ],
-  "version": "2.0.0"
+  ]
 }
