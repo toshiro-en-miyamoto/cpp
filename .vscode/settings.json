@@ -58,6 +58,7 @@
     "dylib",
     "endl",
     "fcoroutines",
+    "fmodule",
     "fmodules",
     "fmtflags",
     "fpic",
