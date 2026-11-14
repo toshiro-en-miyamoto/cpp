@@ -1,5 +1,6 @@
-export module hello;
+module;
 #include <iostream>
-export void say_hello() {
+export module Hello;
+export void hello() {
   std::cout << "Hello World!\n";
 }

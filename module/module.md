@@ -1,32 +1,34 @@
 # C++20 Modules
 
+- [Modules (since C++20), cppreference](https://www.cppreference.com/cpp/language/modules)
+- [Standard C++ Module, Clang](https://clang.llvm.org/docs/StandardCPlusPlusModules.html#how-to-build-projects-using-modules)
+
 ## How to build projects using modules
 
 ### Simple Hello World
 
 ```c++
-// hello.cppm
+// Hello.cpp
 module;
 #include <iostream>
-export module hello;
-export void say_hello() {
+export module Hello;
+export void hello() {
   std::cout << "Hello World!\n";
 }
 
-// main.cpp
-import hello;
+// use.cpp
+import Hello;
 int main() {
-  say_hello();
-  return 0;
+  hello();
 }
 ```
 
 Then, on the command line, invoke `clang++` like:
 
 ```bash
-~ % clang++ -std=c++20 hello.cppm --precompile -o hello.pcm
-~ % clang++ -std=c++20 main.cpp -fmodule-file=Hello=hello.pcm hello.pcm -o hello.out
-~ % ./hello.out
+~ % clang++ -std=c++20 Hello.cppm --precompile -o Hello.pcm
+~ % clang++ -std=c++20 use.cpp -fmodule-file=Hello=Hello.pcm Hello.pcm -o Hello.out
+~ % ./Hello.out
 Hello World!
 ```
 
