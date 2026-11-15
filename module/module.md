@@ -1,9 +1,36 @@
 # C++20 Modules
 
-- [Modules (since C++20), cppreference](https://www.cppreference.com/cpp/language/modules)
-- [Standard C++ Module, Clang](https://clang.llvm.org/docs/StandardCPlusPlusModules.html#how-to-build-projects-using-modules)
+- [C++Ref] [Modules (since C++20), cppreference](https://www.cppreference.com/cpp/language/modules)
+- [Clang] [Standard C++ Module, Clang](https://clang.llvm.org/docs/StandardCPlusPlusModules.html#how-to-build-projects-using-modules)
 
-## How to build projects using modules
+## Modules [C++Ref]
+
+```c++
+// helloworld.cpp
+export module helloworld;  // module declaration
+import <iostream>;         // import declaration
+export void hello() ()     // export declaration
+{
+  std::cout << "Hello world!\n";
+}
+
+// main.cpp
+import helloworld;         // import declaration
+int main()
+{
+  hello();
+}
+```
+
+### Module Declaration
+
+A **module unit** is a translation unit that have a **module declaration**. In a module unit, no statements or preprocessing directives can appear before the module declaration. A module declaration provides a **module name**.
+
+```c++
+module NAME;
+```
+
+## How to build projects using modules [Clang]
 
 ### Simple Hello World
 
