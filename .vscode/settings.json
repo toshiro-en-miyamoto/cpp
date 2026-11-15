@@ -41,6 +41,7 @@
     "CTAD",
     "Cukic",
     "cxxopts",
+    "datamodel",
     "DCMAKE",
     "deallocate",
     "deallocated",

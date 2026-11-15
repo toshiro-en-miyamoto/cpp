@@ -72,6 +72,62 @@ module A;             // declares a module implementation unit for named module 
 module A;             // declares another module implementation unit for named module 'Hello'
 ```
 
+### Submodules [Gregoire2024]
+
+If a namespace is explicitly exported with the `export` keyword, everything inside that namespace is automatically exported as well. For example, the following code snippet export the entire `DataModel` namespace; hence, there is no need to explicitly export the individual classes and type alias:
+
+```c++
+// DataModel.cppm
+export module datamodel;
+import std;
+export namespace DataModel
+{
+  class Person { /* ... */ };
+  class Address { /* ... */ };
+  using Persons = std::vector<Person>;
+}
+```
+
+This namespace can be restructured by defining two submodules: `datamodel.person` and `datamodel.address`. As [C++Ref] describes, dots in a module name have no intrinsic meaning, however that makes it possible to structure your modules in any hierarchy you want.
+
+```c++
+// DataModelPerson.cppm
+export module datamodel.person;
+export namespace DataModel {
+  class Person { /* ... */ };
+}
+
+// DataModelAddress.cppm
+export module datamodel.address;
+export namespace DataModel {
+  class Address { /* ... */ };
+}
+
+// DataModel.cppm
+export module datamodel;
+export import datamodel.person;
+export import datamodel.address;
+import std;
+export namespace DataModel
+{
+  using Persons = std::vector<Person>;
+}
+```
+
+`export import ...` imports a module and immediately exports the module.
+
+A benefit of structuring your code with submodules is that clients can import either everything at once or only specific parts they want to use. For example, if client code needs access to everything in the datamodel module, then the following import declaration is the easiest:
+
+```c++
+import datamodel;
+```
+
+On the other hand, if client code is only interested in using the Address class, then the following import declaration suffices:
+
+```c++
+import datamodel.address;
+```
+
 ### Module Partitions
 
 A module can have **module partition units**.
