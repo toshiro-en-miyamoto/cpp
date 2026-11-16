@@ -40,6 +40,7 @@
     "cstdint",
     "CTAD",
     "Cukic",
+    "cxxm",
     "cxxopts",
     "datamodel",
     "DCMAKE",
