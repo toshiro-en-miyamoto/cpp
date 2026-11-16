@@ -86,6 +86,7 @@ Here is a summary table of the syntax and term:
 | `export` | `module A:B;` | the module partition interface unit for the module `A` partition `B` |
 | | `module A:B;` | the module partition implementation unit for the module `A` partition `B` |
 | | `module;` | used when the module unit has a global module fragment |
+| | `module :private;` | used when the module unit has a private module fragment |
 
 > Note: A module can have multiple partition units (explained later in this article). A module partition can be imported by module units of the same named module. Translation units outside the named module cannot import a module partition directly.
 
@@ -181,6 +182,22 @@ import :C;              // (*5)
 - (*4): Module partition interface units can be `export-import`ed by only the primary module interface unit, and their exported statements will be visible from outside the named module by importing the module.
 - (*4) and (*5): All definitions and declarations in a module partition are visible by the importing module unit, whether exported or not.
 
+### Global Module Fragment
+
+The global module fragment is the code between the `module;` and the module declaration with in a module unit. [Clang]
+
+### Private Module Fragment [Gregoire2024]
+
+The primary module interface can include a **private module fragment**. This fragment starts withe the following line:
+
+```c++
+module :private;
+```
+
+Everything after this line is part of the private module fragment. Anything that is defined in this private module fragment is **not exported** and thus not visible to consumers of the module.
+
+> Note that the private module fragment can only be in the primary module interface unit. (Clang)
+
 ## How to build projects using modules [Clang]
 
 ### Simple Hello World
@@ -259,7 +276,31 @@ int main() {
 }
 ```
 
-### Reachability of internal partition units
+### Option consistency
 
-The internal partition units are sometimes called *implementation partition units* in other documentation. However, the name may be confusing since implementation partition units are not implementation units.
+Compiler options related to the language dialect for a module unit and its non-module-unit uses need to be consistent. Consider the following example:
 
+```c++
+// M.cppm
+export module M;
+
+// Use.cpp
+import M;
+```
+```bash
+~ % clang++ -std=c++20 M.cppm --precompile -o M.pcm
+~ % clang++ -std=c++23 Use.cpp -fprebuilt-module-path=.
+```
+
+Clang rejects the example due to the inconsistent language standard modes. Not all compiler options are language-dialect options, though. For example:
+
+```bash
+~ % clang++ -std=c++20 M.cppm --precompile -o M.pcm
+
+# Inconsistent optimization level.
+~ % clang++ -std=c++20 -O3 Use.cpp -fprebuilt-module-path=.
+# Inconsistent debugging level.
+~ % clang++ -std=c++20 -g Use.cpp -fprebuilt-module-path=.
+```
+
+Although the optimization and debugging levels are inconsistent, these compilations are accepted because the compiler options do not impact the language dialect.

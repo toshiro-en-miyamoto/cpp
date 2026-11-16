@@ -64,6 +64,7 @@
     "fmodules",
     "fmtflags",
     "fpic",
+    "fprebuilt",
     "glvalue",
     "gnueabihf",
     "godbolt",
